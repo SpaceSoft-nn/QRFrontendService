@@ -15,7 +15,7 @@ jobs:
 
     - name: Build image
       run: |
-        docker build -t QRFrontendService .
+        docker build -t qr-frontend-service ~/projects/QRFrontendService/
 
     - name: Copy image to server
       uses: appleboy/scp-action@master
@@ -23,7 +23,7 @@ jobs:
         host: ${{ secrets.HOST }}
         username: ${{ secrets.USER }}
         key: ${{ secrets.DEPLOY_KEY }}
-        source: "QRFrontendService"
+        source: "qr-frontend-service"
         target: "/tmp"
 
     - name: Deploy to remote server
@@ -33,7 +33,7 @@ jobs:
         username: ${{ secrets.USER }}
         key: ${{ secrets.DEPLOY_KEY }}
         script: |
-          docker load < /tmp/QRFrontendService
+          docker load < /tmp/qr-frontend-service
           docker stop QRFrontendService || true
           docker rm QRFrontendService || true
-          docker run --name QRFrontendService -d -p 80:80 QRFrontendService
+          docker run --name QRFrontendService -d -p 80:80 qr-frontend-service
