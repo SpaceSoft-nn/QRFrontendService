@@ -1,9 +1,8 @@
 import React from 'react';
-import Button from '../Button';
+import { Logo, Button } from "../../components"
 import { useNavigate } from 'react-router-dom';
-import { Logo } from '../Logo/Logo';
 
-const Header: React.FC = () => {
+export const Header: React.FC = () => {
     const navigate = useNavigate();
 
     return (
@@ -29,5 +28,3 @@ const Header: React.FC = () => {
         </header >
     );
 };
-
-export default Header;

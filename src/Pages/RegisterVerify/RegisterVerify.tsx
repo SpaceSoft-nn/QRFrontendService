@@ -1,9 +1,7 @@
 import React from 'react'
-import FormHeader from '../../components/FormHeader'
-import Button from '../../components/Button'
-import VerificationCodeInput from '../../components/VerificationCodeInput/VerificationCodeInput'
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { useNavigate } from 'react-router-dom';
+import { Button, FormHeader, VerificationCodeInput } from "../../components"
 
 interface IRegisterVerifyFormInput {
   code: string;

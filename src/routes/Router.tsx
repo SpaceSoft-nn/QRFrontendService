@@ -1,5 +1,5 @@
 import { createBrowserRouter } from 'react-router-dom';
-import PrivateRoute from './PrivateRoute';
+// import PrivateRoute from './PrivateRoute';
 import {
   Dashboard,
   RegisterVerify,
@@ -9,6 +9,7 @@ import {
   Error,
   Home
 } from '../Pages';
+import { Help, Main, Orders, PaymentHistory, Settings, Terminal } from '../components';
 
 const router = createBrowserRouter([
   {
@@ -17,23 +18,49 @@ const router = createBrowserRouter([
   },
   {
     // private route
-    path: "dashboard",
-    element: <PrivateRoute element={<Dashboard/>}/>,
+    path: "/dashboard",
+    element: <Dashboard />,
+    children: [
+      {
+        index: true,
+        element: <Main />,
+      },
+      {
+        path: "terminal",
+        element: <Terminal />,
+      },
+      {
+        path: "orders",
+        element: <Orders />,
+      },
+      {
+        path: "payment_history",
+        element: <PaymentHistory />,
+      },
+      {
+        path: "settings",
+        element: <Settings />,
+      },
+      {
+        path: "help",
+        element: <Help />
+      },
+    ]
   },
   {
-    path: "login",
+    path: "/login",
     element: <Login />,
   },
   {
-    path: "register",
+    path: "/register",
     element: <Register />,
   },
   {
-    path: "forgot_password",
+    path: "/forgot_password",
     element: <ForgotPassword />,
   },
   {
-    path: "register_verify",
+    path: "/register_verify",
     element: <RegisterVerify />,
   },
   {

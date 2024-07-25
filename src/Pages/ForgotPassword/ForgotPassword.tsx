@@ -1,7 +1,5 @@
 import React, { useState } from 'react'
-import FormHeader from '../../components/FormHeader'
-import Button from '../../components/Button'
-import AuthOptionSelector from '../../components/AuthOptionSelector/AuthOptionSelector'
+import { FormHeader, Button, AuthOptionSelector } from '../../components';
 import InputMask from 'react-input-mask';
 
 export const ForgotPassword: React.FC = () => {

@@ -1,9 +1,9 @@
 import React from 'react'
 import { useNavigate } from 'react-router-dom'
 import BackIcon from '../../assets/back.svg';
-import Button from '../Button';
+import { Button } from '../Button/Button';
 
-const BackBtn: React.FC = () => {
+export const BackBtn: React.FC = () => {
     const navigate = useNavigate();
     const goback = () => navigate(-1);
 
@@ -13,5 +13,3 @@ const BackBtn: React.FC = () => {
         </Button>
     )
 }
-
-export default BackBtn;

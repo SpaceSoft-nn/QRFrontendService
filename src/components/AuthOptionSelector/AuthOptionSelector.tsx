@@ -1,11 +1,11 @@
 import React from 'react';
-import Button from '../Button';
+import { Button } from "../../components";
 
 interface AuthOptionSelectorProps {
     setAuthOption: (option: 'email' | 'tel') => void;
 }
 
-const AuthOptionSelector: React.FC<AuthOptionSelectorProps> = ({ setAuthOption }) => {
+export const AuthOptionSelector: React.FC<AuthOptionSelectorProps> = ({ setAuthOption }) => {
     return (
         <div className="flex mb-[20px] outline rounded-lg outline-2 outline-stroke items-center">
             <Button
@@ -21,5 +21,3 @@ const AuthOptionSelector: React.FC<AuthOptionSelectorProps> = ({ setAuthOption }
         </div>
     );
 };
-
-export default AuthOptionSelector;

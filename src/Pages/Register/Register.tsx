@@ -4,9 +4,7 @@ import { useNavigate } from 'react-router-dom'
 import { yupResolver } from '@hookform/resolvers/yup';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { registrationSchema } from '../../utils/formValidationSchema';
-import AuthOptionSelector from '../../components/AuthOptionSelector/AuthOptionSelector';
-import FormHeader from '../../components/FormHeader'
-import Button from '../../components/Button'
+import { FormHeader, Button, AuthOptionSelector } from '../../components';
 
 interface IRegisterFormInput {
     tel?: string | null;

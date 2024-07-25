@@ -29,7 +29,10 @@ module.exports = {
       },
       fontFamily: {
         montserrat: ["Montserrat", "sans-serif"],
-      }
+      },
+      backgroundImage: {
+        "gradient": "url('./assets/gradient.svg')",
+      },
     },
   },
   plugins: [],

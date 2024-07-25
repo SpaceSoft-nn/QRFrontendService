@@ -5,7 +5,7 @@ interface IVerificationCodeInputProps {
     className?: string;
 }
 
-const VerificationCodeInput: React.FC<IVerificationCodeInputProps> = ({className}) => {
+export const VerificationCodeInput: React.FC<IVerificationCodeInputProps> = ({className}) => {
     const [inputs, setInputs] = useState<string[]>(Array(6).fill(''));
     const inputRefs = useRef<HTMLInputElement[]>([]);
 
@@ -64,5 +64,3 @@ const VerificationCodeInput: React.FC<IVerificationCodeInputProps> = ({className
         </div>
     );
 };
-
-export default VerificationCodeInput;

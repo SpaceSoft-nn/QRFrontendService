@@ -3,9 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { SubmitHandler, useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { loginSchema } from '../../utils/formValidationSchema';
-import FormHeader from '../../components/FormHeader';
-import Button from '../../components/Button';
-import AuthOptionSelector from '../../components/AuthOptionSelector/AuthOptionSelector';
+import { FormHeader, Button, AuthOptionSelector } from '../../components';
 import InputMask from 'react-input-mask';
 
 interface ILoginFormInput {
@@ -27,14 +25,14 @@ export const Login: React.FC = () => {
 
     const navigate = useNavigate();
     const [authOption, setAuthOption] = useState<'email' | 'tel'>('email');
-    
+
     useEffect(() => {
         if (authOption === 'email') {
-            setValue('tel', undefined); // Очищаем значение телефона
-            clearErrors('tel'); // Очищаем ошибки валидации телефона
+            setValue('tel', undefined);
+            clearErrors('tel');
         } else {
-            setValue('email', undefined); // Очищаем значение email
-            clearErrors('email'); // Очищаем ошибки валидации email
+            setValue('email', undefined);
+            clearErrors('email');
         }
     }, [authOption, setValue, clearErrors]);
 

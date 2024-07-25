@@ -1,16 +1,16 @@
 import React from 'react';
-import { ISidebarElementProps, SidebarElement } from './SidebarElement';
+import {  SidebarElement } from './SidebarElement';
+import { SidebarMenuList } from './SidebarMenuList';
 
-interface ISidebarProps {
-    buttons: ISidebarElementProps[];
-}
 
-export const Sidebar: React.FC<ISidebarProps> = ({ buttons }) => {
+export const Sidebar: React.FC = () => {
     return (
-        <aside className='sidebar flex flex-col items-center gap-[10px] p-[10px]'>
-            {buttons.map((elementProps, index) => (
-                <SidebarElement key={index} {...elementProps} />
-            ))}
+        <aside className='sidebar'>
+            <ul className="sidebar-menu">
+                {SidebarMenuList.map((elementProps, index) => (
+                    <SidebarElement key={index} {...elementProps} />
+                ))}
+            </ul>
         </aside>
     );
 };
