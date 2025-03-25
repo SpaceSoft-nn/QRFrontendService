@@ -23,7 +23,11 @@ export const AppSidebar: React.FC = () => {
 						<SidebarMenu>
 							{SidebarItems.map(item => (
 								<SidebarMenuItem key={item.title}>
-									<SidebarMenuButton asChild isActive={location.pathname === item.url}>
+									<SidebarMenuButton
+										asChild
+										isActive={location.pathname === item.url}
+										tooltip={item.title}
+									>
 										<Link to={item.url}>
 											<item.icon />
 											<span>{item.title}</span>
