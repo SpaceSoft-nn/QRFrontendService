@@ -1,22 +1,27 @@
-import { useNavigate } from 'react-router-dom'
-import { Button } from '@/shared/ui'
-import s from './NotFoundPage.module.scss'
+import { Link } from 'react-router-dom'
+import { ExternalLinkIcon } from 'lucide-react'
+import { Button, Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui'
+import { urls } from '@/shared/config'
 
 export const NotFoundPage = () => {
-	const navigate = useNavigate()
-
 	return (
-		<div className={s.container}>
-			<div className={s.content}>
-				<h1 className={s.title}>404</h1>
-				<h2 className={s.subtitle}>Страница не найдена</h2>
-				<p className={s.description}>
-					Извините, но страница, которую вы ищете, не существует или была перемещена.
-				</p>
-				<Button onClick={() => navigate('/')} variant='default'>
-					Вернуться на главную
-				</Button>
-			</div>
+		<div className='flex h-svh items-center justify-center'>
+			<Card className='max-w-md mx-auto'>
+				<CardHeader>
+					<CardTitle className='text-6xl font-bold text-center'>404</CardTitle>
+					<CardDescription>
+						Извините, но страница, которую вы ищете, не существует или была перемещена.
+					</CardDescription>
+				</CardHeader>
+				<CardFooter>
+					<Button asChild className='w-full'>
+						<Link to={urls.dashboard.main}>
+							<ExternalLinkIcon className='h-4 w-4' />
+							Вернуться на главную
+						</Link>
+					</Button>
+				</CardFooter>
+			</Card>
 		</div>
 	)
 }
