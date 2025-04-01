@@ -1,10 +1,7 @@
-import { loadEnv } from 'vite'
 import { CodegenConfig } from '@graphql-codegen/cli'
 
-const env = loadEnv('', process.cwd(), '')
-
 const config: CodegenConfig = {
-	schema: env.VITE_GQL_URL,
+	schema: 'http://185.247.185.17:8876/graphql',
 	documents: ['src/**/*.{ts,tsx}'],
 	generates: {
 		'./src/shared/api/graphql.ts': {
