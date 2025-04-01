@@ -1,2 +1,2 @@
-export * from './types/auth.types'
-export * from './store/auth.store'
+export { authStore } from './store/auth.store'
+export type { AuthMethod } from './schemas/auth-method.schema'

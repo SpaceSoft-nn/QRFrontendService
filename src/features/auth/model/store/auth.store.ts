@@ -1,113 +1,80 @@
-import { makeAutoObservable, runInAction } from 'mobx'
-import { authApi } from '../../api'
-import { LoginCredentials, RegisterCredentials } from '../../api/types/auth.api.types'
-import { AuthState, User } from '../../model/types/auth.types'
+import { makeAutoObservable } from 'mobx'
+import { apolloClient } from '@/shared/api/apollo'
+import { User } from '@/shared/api/graphql'
+import { LOGIN_MUTATION } from '../../gql/queries'
+import { LoginSchema } from '../schemas/login.schema'
+import { AuthState } from './types'
 
 class AuthStore implements AuthState {
-	isAuthenticated = false
-	loading = false
 	user: User | null = null
+	accessToken: string | null = null
+	isAuthenticated: boolean = false
+	loading: boolean = false
 	error: string | null = null
 
 	constructor() {
 		makeAutoObservable(this)
+		this.initializeFromStorage()
 	}
 
-	setLoading = (loading: boolean) => {
+	private initializeFromStorage() {
+		const token = localStorage.getItem('access_token')
+		if (token) {
+			this.setAccessToken(token)
+		}
+	}
+
+	setAccessToken(token: string) {
+		this.accessToken = token
+		this.isAuthenticated = true
+		localStorage.setItem('access_token', token)
+	}
+
+	setUser(user: User | null) {
+		this.user = user
+	}
+
+	setLoading(loading: boolean) {
 		this.loading = loading
 	}
 
-	setError = (error: string | null) => {
+	setError(error: string | null) {
 		this.error = error
 	}
 
-	setUser = (user: User | null) => {
-		this.user = user
-		this.isAuthenticated = !!user
-	}
-
-	login = async (credentials: LoginCredentials) => {
+	async login(input: LoginSchema) {
 		try {
 			this.setLoading(true)
 			this.setError(null)
-			const user = await authApi.login(credentials)
-			runInAction(() => {
-				this.setUser(user)
+
+			const { data } = await apolloClient.mutate({
+				mutation: LOGIN_MUTATION,
+				variables: { input }
 			})
-			return true
+
+			if (data?.authLogin?.access_token) {
+				this.setAccessToken(data.authLogin.access_token)
+				if (data.authLogin.user) {
+					this.setUser(data.authLogin.user)
+				}
+				return true
+			}
+
+			return false
 		} catch (error) {
-			runInAction(() => {
-				this.setError(error instanceof Error ? error.message : 'Ошибка авторизации')
-			})
+			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при входе')
 			return false
 		} finally {
-			runInAction(() => {
-				this.setLoading(false)
-			})
+			this.setLoading(false)
 		}
 	}
 
-	register = async (credentials: RegisterCredentials) => {
-		try {
-			this.setLoading(true)
-			this.setError(null)
-			const user = await authApi.register(credentials)
-			runInAction(() => {
-				this.setUser(user)
-			})
-			return true
-		} catch (error) {
-			runInAction(() => {
-				this.setError(error instanceof Error ? error.message : 'Ошибка регистрации')
-			})
-			return false
-		} finally {
-			runInAction(() => {
-				this.setLoading(false)
-			})
-		}
-	}
-
-	logout = async () => {
-		try {
-			this.setLoading(true)
-			this.setError(null)
-			await authApi.logout()
-			runInAction(() => {
-				this.setUser(null)
-			})
-			return true
-		} catch (error) {
-			runInAction(() => {
-				this.setError(error instanceof Error ? error.message : 'Ошибка выхода')
-			})
-			return false
-		} finally {
-			runInAction(() => {
-				this.setLoading(false)
-			})
-		}
-	}
-
-	checkAuth = async () => {
-		try {
-			this.setLoading(true)
-			this.setError(null)
-			const user = await authApi.getCurrentUser()
-			runInAction(() => {
-				this.setUser(user)
-			})
-			return true
-		} catch (error) {
-			runInAction(() => {
-				this.setError(error instanceof Error ? error.message : 'Ошибка проверки авторизации')
-			})
-			return false
-		} finally {
-			runInAction(() => {
-				this.setLoading(false)
-			})
-		}
+	logout() {
+		this.accessToken = null
+		this.user = null
+		this.isAuthenticated = false
+		this.error = null
+		localStorage.removeItem('access_token')
 	}
 }
 
