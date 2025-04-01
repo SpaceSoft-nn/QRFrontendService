@@ -142,6 +142,14 @@ export type GetCurrentUserQuery = {
 	authMe?: { __typename?: 'User'; id: string; email?: string | null; phone?: string | null } | null
 }
 
+export type AuthLogoutMutationVariables = Exact<{ [key: string]: never }>
+
+export type AuthLogoutMutation = { __typename?: 'Mutation'; authLogout: string }
+
+export type LogoutMutationVariables = Exact<{ [key: string]: never }>
+
+export type LogoutMutation = { __typename?: 'Mutation'; authLogout: string }
+
 export const LoginDocument = gql`
 	mutation Login($input: UserLogin!) {
 		authLogin(input: $input) {
@@ -225,3 +233,65 @@ export type GetCurrentUserQueryHookResult = ReturnType<typeof useGetCurrentUserQ
 export type GetCurrentUserLazyQueryHookResult = ReturnType<typeof useGetCurrentUserLazyQuery>
 export type GetCurrentUserSuspenseQueryHookResult = ReturnType<typeof useGetCurrentUserSuspenseQuery>
 export type GetCurrentUserQueryResult = Apollo.QueryResult<GetCurrentUserQuery, GetCurrentUserQueryVariables>
+export const AuthLogoutDocument = gql`
+	mutation AuthLogout {
+		authLogout
+	}
+`
+export type AuthLogoutMutationFn = Apollo.MutationFunction<AuthLogoutMutation, AuthLogoutMutationVariables>
+
+/**
+ * __useAuthLogoutMutation__
+ *
+ * To run a mutation, you first call `useAuthLogoutMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAuthLogoutMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [authLogoutMutation, { data, loading, error }] = useAuthLogoutMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useAuthLogoutMutation(
+	baseOptions?: Apollo.MutationHookOptions<AuthLogoutMutation, AuthLogoutMutationVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useMutation<AuthLogoutMutation, AuthLogoutMutationVariables>(AuthLogoutDocument, options)
+}
+export type AuthLogoutMutationHookResult = ReturnType<typeof useAuthLogoutMutation>
+export type AuthLogoutMutationResult = Apollo.MutationResult<AuthLogoutMutation>
+export type AuthLogoutMutationOptions = Apollo.BaseMutationOptions<AuthLogoutMutation, AuthLogoutMutationVariables>
+export const LogoutDocument = gql`
+	mutation Logout {
+		authLogout
+	}
+`
+export type LogoutMutationFn = Apollo.MutationFunction<LogoutMutation, LogoutMutationVariables>
+
+/**
+ * __useLogoutMutation__
+ *
+ * To run a mutation, you first call `useLogoutMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useLogoutMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [logoutMutation, { data, loading, error }] = useLogoutMutation({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useLogoutMutation(baseOptions?: Apollo.MutationHookOptions<LogoutMutation, LogoutMutationVariables>) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useMutation<LogoutMutation, LogoutMutationVariables>(LogoutDocument, options)
+}
+export type LogoutMutationHookResult = ReturnType<typeof useLogoutMutation>
+export type LogoutMutationResult = Apollo.MutationResult<LogoutMutation>
+export type LogoutMutationOptions = Apollo.BaseMutationOptions<LogoutMutation, LogoutMutationVariables>
