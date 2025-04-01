@@ -12,13 +12,35 @@
 	&__error {
 		@apply outline outline-1 outline-destructive;
 	}
+
+	&:-webkit-autofill,
+	&:-webkit-autofill:hover,
+	&:-webkit-autofill:focus {
+		@apply autofill-reset;
+	}
 }
 
 .formField__buttons {
-	@apply flex items-center gap-1 absolute inset-y-0 right-3 bg-background my-1;
+	@apply flex items-center gap-1 absolute inset-y-0 right-3 bg-inherit my-1;
 
 	svg {
 		@apply size-5 opacity-50 hover:opacity-100 transition-opacity duration-100;
+	}
+}
+
+.formField__clearButton {
+	@apply opacity-0 transition-opacity duration-100;
+}
+
+.formField__inputWrapper {
+	@apply relative;
+
+	&:hover .formField__clearButton {
+		@apply opacity-50;
+	}
+
+	&:hover .formField__clearButton:hover {
+		@apply opacity-100;
 	}
 }
 

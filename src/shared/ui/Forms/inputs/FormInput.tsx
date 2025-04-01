@@ -18,9 +18,8 @@ export const FormInput: React.FC<FormInputProps> = ({
 	type = 'text',
 	...props
 }) => {
-	const { control, value, error, setValue, register, onClickClearButton } = useFormField(name)
+	const { control, value, error, setValue, onClickClearButton } = useFormField(name)
 	const [showPassword, setShowPassword] = useState(false)
-	const [clearButtonVisible, setClearButtonVisible] = useState(false)
 
 	const onClickShowPassword = () => setShowPassword(!showPassword)
 
@@ -43,24 +42,23 @@ export const FormInput: React.FC<FormInputProps> = ({
 					required={required}
 					className={className}
 					error={error}
-					tabIndex={-1}
-					onMouseEnter={() => setClearButtonVisible(true)}
-					onMouseLeave={() => setClearButtonVisible(false)}
 				>
-					<Input
-						type={type === 'password' ? (showPassword ? 'text' : 'password') : type}
-						className={cn(s.formField__input, error && s.formField__input__error)}
-						{...field}
-						onChange={handleInputChange}
-						{...props}
-					/>
-					<div className={s.formField__buttons}>
-						{clearButtonVisible && value && !props.readOnly && !props.disabled && type !== 'number' && (
-							<FormClearButton onClick={onClickClearButton} />
-						)}
-						{type === 'password' && (
-							<FormShowPasswordButton showPassword={showPassword} onClick={onClickShowPassword} />
-						)}
+					<div className={s.formField__inputWrapper}>
+						<Input
+							type={type === 'password' ? (showPassword ? 'text' : 'password') : type}
+							className={cn(s.formField__input, error && s.formField__input__error)}
+							{...field}
+							onChange={handleInputChange}
+							{...props}
+						/>
+						<div className={s.formField__buttons}>
+							{value && !props.readOnly && !props.disabled && type !== 'number' && (
+								<FormClearButton onClick={onClickClearButton} className={s.formField__clearButton} />
+							)}
+							{type === 'password' && (
+								<FormShowPasswordButton showPassword={showPassword} onClick={onClickShowPassword} />
+							)}
+						</div>
 					</div>
 				</BaseFormField>
 			)}
