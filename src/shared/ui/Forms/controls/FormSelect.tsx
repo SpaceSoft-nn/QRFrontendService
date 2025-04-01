@@ -1,11 +1,10 @@
 import { Controller } from 'react-hook-form'
-import { Button } from '@/shared/ui/button'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
 import { cn } from '@/shared/lib'
-import { BaseFormField } from './BaseFormField'
-import s from './Forms.module.scss'
-import { FormSelectProps } from './Forms.types'
-import { useFormField } from './hooks/useFormField'
+import { BaseFormField } from '../BaseFormField'
+import { useFormField } from '../hooks/useFormField'
+import s from '../styles/Forms.module.scss'
+import { FormSelectProps } from '../types/Forms.types'
 
 export const FormSelect: React.FC<FormSelectProps> = ({
 	name,

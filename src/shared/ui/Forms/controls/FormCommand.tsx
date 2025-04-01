@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import React from 'react'
-import { Controller, useFormContext } from 'react-hook-form'
+import { Controller } from 'react-hook-form'
 import { Check, ChevronsUpDown } from 'lucide-react'
 import { Button } from '@/shared/ui/button'
 import {
@@ -12,12 +12,12 @@ import {
 	CommandList,
 	CommandSeparator
 } from '@/shared/ui/command'
-import { FormCommandProps, FormErrorMessage, FormRequiredSymbol } from '@/shared/ui/Forms'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
 import { cn } from '@/shared/lib'
-import { BaseFormField } from './BaseFormField'
-import s from './forms.module.scss'
-import { useFormField } from './hooks/useFormField'
+import { BaseFormField } from '../BaseFormField'
+import { useFormField } from '../hooks/useFormField'
+import s from '../styles/Forms.module.scss'
+import { FormCommandProps } from '../types/Forms.types'
 
 export const FormCommand: React.FC<FormCommandProps> = ({
 	items,

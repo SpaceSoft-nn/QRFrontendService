@@ -2,7 +2,7 @@ import type { DayPickerProps } from 'react-day-picker'
 import type { CheckboxProps } from '@radix-ui/react-checkbox'
 import type { SelectProps } from '@radix-ui/react-select'
 import type { TabsProps } from '@radix-ui/react-tabs'
-import type { Command } from '../command'
+import type { Command } from '@/shared/ui/command'
 
 export type SelectItem = {
 	value: string

@@ -1,9 +1,9 @@
 import { Controller } from 'react-hook-form'
 import { Checkbox } from '@/shared/ui'
 import { cn } from '@/shared/lib'
-import { FormCheckboxProps } from '../Forms.types'
 import { useFormField } from '../hooks/useFormField'
-import s from './FormCheckbox.module.scss'
+import s from '../styles/Forms.module.scss'
+import { FormCheckboxProps } from '../types/Forms.types'
 
 export const FormCheckbox: React.FC<FormCheckboxProps> = ({ name, label, labelStyle, className, ...props }) => {
 	const { control, error, checkBoxId } = useFormField(name)

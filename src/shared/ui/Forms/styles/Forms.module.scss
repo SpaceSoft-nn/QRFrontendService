@@ -1,5 +1,5 @@
 .formField {
-	@apply flex flex-col gap-[5px] w-full;
+	@apply flex flex-col gap-[5px] w-full relative;
 }
 
 .formField__input {
@@ -15,9 +15,25 @@
 }
 
 .formField__buttons {
-	@apply flex items-center gap-1 absolute inset-y-0 right-3 ;
+	@apply flex items-center gap-1 absolute inset-y-0 right-3 bg-background my-1;
 
 	svg {
 		@apply size-5 opacity-50 hover:opacity-100 transition-opacity duration-100;
+	}
+}
+
+.formCheckbox {
+	@apply flex items-center;
+
+	&__label {
+		@apply ml-2 border-none;
+
+		&__error {
+			@apply text-red-300;
+		}
+	}
+
+	&__error {
+		@apply border-destructive bg-destructive/10;
 	}
 }

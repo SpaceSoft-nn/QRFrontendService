@@ -5,10 +5,10 @@ import { format } from 'date-fns'
 import { CalendarIcon } from 'lucide-react'
 import { Button, Calendar, Popover, PopoverContent, PopoverTrigger } from '@/shared/ui'
 import { cn } from '@/shared/lib'
-import { BaseFormField } from './BaseFormField'
-import s from './forms.module.scss'
-import type { FormDateInputProps } from './Forms.types'
-import { useFormField } from './hooks/useFormField'
+import { BaseFormField } from '../BaseFormField'
+import { useFormField } from '../hooks/useFormField'
+import s from '../styles/Forms.module.scss'
+import type { FormDateInputProps } from '../types/Forms.types'
 
 export const FormDateInput: React.FC<FormDateInputProps> = ({
 	name,

@@ -1,9 +1,9 @@
 import { ReactNode } from 'react'
-import { FormErrorMessage, FormRequiredSymbol } from '@/shared/ui/Forms'
 import { cn } from '@/shared/lib'
-import s from './forms.module.scss'
+import { FormErrorMessage, FormRequiredSymbol } from './feedback'
+import s from './styles/Forms.module.scss'
 
-interface BaseFormFieldProps {
+interface BaseFormFieldProps extends React.HTMLAttributes<HTMLDivElement> {
 	name: string
 	label?: string
 	labelStyle?: string
@@ -19,10 +19,11 @@ export const BaseFormField: React.FC<BaseFormFieldProps> = ({
 	required,
 	className,
 	error,
-	children
+	children,
+	...props
 }) => {
 	return (
-		<div className={cn(s.formField, className)}>
+		<div className={cn(s.formField, className)} {...props}>
 			{label && (
 				<p className={labelStyle}>
 					{label} {required && <FormRequiredSymbol />}

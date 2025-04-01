@@ -2,9 +2,9 @@ import type React from 'react'
 import { Controller } from 'react-hook-form'
 import { Tabs, TabsList, TabsTrigger } from '@/shared/ui'
 import { cn } from '@/shared/lib'
-import s from './forms.module.scss'
-import type { FormTabsProps } from './Forms.types'
-import { useFormField } from './hooks/useFormField'
+import { useFormField } from '../hooks/useFormField'
+import s from '../styles/Forms.module.scss'
+import type { FormTabsProps } from '../types/Forms.types'
 
 export const FormTabs: React.FC<FormTabsProps> = ({
 	name,
