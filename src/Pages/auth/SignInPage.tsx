@@ -9,7 +9,7 @@ export const SignInPage = () => {
 				initial={{ opacity: 0, y: 100 }}
 				animate={{ opacity: 1, y: 0 }}
 				transition={{ duration: 0.5 }}
-				className='w-full max-w-sm'
+				className='w-full max-w-xs'
 			>
 				<Card>
 					<CardHeader>
