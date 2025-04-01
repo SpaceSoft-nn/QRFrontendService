@@ -25,7 +25,7 @@ export const FormCommand: React.FC<FormCommandProps> = ({
 	label,
 	labelStyle,
 	required,
-	placeholder,
+	placeholder = 'Выберите...',
 	emptyMessage = 'Ничего не найдено',
 	actions,
 	disabled,
@@ -34,6 +34,17 @@ export const FormCommand: React.FC<FormCommandProps> = ({
 }) => {
 	const [open, setOpen] = useState(false)
 	const { control, error } = useFormField(name)
+
+	const filter = (value: string, search: string) => {
+		if (!search) return 1
+		const item = items.find(item => item.value === value)
+		if (!item) return 0
+		const searchLower = search.toLowerCase()
+		return item.label.toLowerCase().includes(searchLower) ||
+			(item.description && item.description.toLowerCase().includes(searchLower))
+			? 1
+			: 0
+	}
 
 	return (
 		<Controller
@@ -49,27 +60,14 @@ export const FormCommand: React.FC<FormCommandProps> = ({
 								aria-controls='command-list'
 								disabled={disabled}
 								loading={loading}
-								className={s.formField__input__btnTrigger}
+								className={cn(s.formField__input__btnTrigger, !field.value && 'text-muted-foreground')}
 							>
 								{field.value ? items.find(item => item.value === field.value)?.label : placeholder}
 								<ChevronsUpDown className='ml-auto h-4 w-4 shrink-0 opacity-50' />
 							</Button>
 						</PopoverTrigger>
 						<PopoverContent className='!p-0' align='end'>
-							<Command
-								{...props}
-								onValueChange={field.onChange}
-								filter={(value, search) => {
-									if (!search) return 1
-									const item = items.find(item => item.value === value)
-									if (!item) return 0
-									const searchLower = search.toLowerCase()
-									return item.label.toLowerCase().includes(searchLower) ||
-										(item.description && item.description.toLowerCase().includes(searchLower))
-										? 1
-										: 0
-								}}
-							>
+							<Command {...props} onValueChange={field.onChange} filter={filter}>
 								<CommandInput placeholder='Поиск' />
 								<CommandList>
 									{actions && (

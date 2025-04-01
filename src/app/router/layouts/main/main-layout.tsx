@@ -2,7 +2,7 @@ import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { Header } from '@/widgets/header'
 import { AppSidebar } from '@/widgets/sidebar'
-import { ErrorBoundary } from '@/shared/ui/error-boundary'
+import { ErrorBoundary } from '@/shared/ui/ErrorBoundary/ErrorBoundary'
 import { SidebarProvider } from '@/shared/ui/sidebar'
 import s from './main-layout.module.scss'
 

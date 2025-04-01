@@ -15,6 +15,8 @@ export const useFormField = (name: string) => {
 	const value = watch(name)
 	const error = errors[name]?.message as string
 
+	const checkBoxId = `${name}-form-checkbox`
+
 	const onClickClearButton = () => {
 		setValue(name, '', { shouldValidate: true })
 	}
@@ -27,6 +29,7 @@ export const useFormField = (name: string) => {
 		control,
 		trigger,
 		form,
-		onClickClearButton
+		onClickClearButton,
+		checkBoxId
 	}
 }

@@ -3,6 +3,7 @@ export { FormTabs } from './FormTabs'
 export { FormCommand } from './FormCommand'
 export { FormDateInput } from './FormDateInput'
 export { FormCheckbox } from './FormCheckbox/FormCheckbox'
+export { FormSelect } from './FormSelect'
 
 export * from './Forms.types'
 export * from './FormClearButton'

@@ -1,7 +1,7 @@
 import { Component, ErrorInfo, ReactNode } from 'react'
 import { AlertCircle, RefreshCcw } from 'lucide-react'
-import { Button } from './button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from './card'
+import { Button } from '../button'
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../card'
 
 interface Props {
 	children: ReactNode
@@ -31,12 +31,12 @@ export class ErrorBoundary extends Component<Props, State> {
 		if (this.state.hasError) {
 			return (
 				this.props.fallback || (
-					<div className='flex min-h-[400px] flex-col items-center justify-center gap-4 p-4 text-center'>
+					<div className='flex min-h-[400px] h-full flex-col items-center justify-center gap-4 p-4 text-center'>
 						<Card>
 							<CardHeader>
 								<div className='flex items-center space-x-2'>
 									<AlertCircle className='h-4 w-4 text-destructive' />
-									<CardTitle className='text-lg'>Что-то пошло не так</CardTitle>
+									<CardTitle className='text-lg'>Ошибка приложения</CardTitle>
 								</div>
 								<CardDescription className='text-sm text-wrap'>
 									{this.state.error?.message || 'Произошла ошибка'}
@@ -46,8 +46,8 @@ export class ErrorBoundary extends Component<Props, State> {
 								<Button
 									className='w-full'
 									onClick={() => this.setState({ hasError: false, error: null })}
+									icon={RefreshCcw}
 								>
-									<RefreshCcw className='h-4 w-4' />
 									Попробовать снова
 								</Button>
 							</CardFooter>

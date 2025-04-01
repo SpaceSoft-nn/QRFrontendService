@@ -6,9 +6,7 @@ import { useFormField } from '../hooks/useFormField'
 import s from './FormCheckbox.module.scss'
 
 export const FormCheckbox: React.FC<FormCheckboxProps> = ({ name, label, labelStyle, className, ...props }) => {
-	const { control, error } = useFormField(name)
-
-	const checkboxId = `checkbox-${name}`
+	const { control, error, checkBoxId } = useFormField(name)
 
 	return (
 		<Controller
@@ -17,7 +15,7 @@ export const FormCheckbox: React.FC<FormCheckboxProps> = ({ name, label, labelSt
 			render={({ field }) => (
 				<div className={cn(s.formCheckbox, className)}>
 					<Checkbox
-						id={checkboxId}
+						id={checkBoxId}
 						onCheckedChange={field.onChange}
 						className={error && s.formCheckbox__error}
 						{...field}
@@ -25,8 +23,8 @@ export const FormCheckbox: React.FC<FormCheckboxProps> = ({ name, label, labelSt
 					/>
 					{label && (
 						<label
-							htmlFor={checkboxId}
-							className={cn(s.formCheckbox__label, s.formCheckbox__label__error && error, labelStyle)}
+							htmlFor={checkBoxId}
+							className={cn(s.formCheckbox__label, error && s.formCheckbox__label__error, labelStyle)}
 						>
 							{label}
 						</label>

@@ -22,7 +22,7 @@ export const FormDateInput: React.FC<FormDateInputProps> = ({
 	...calendarProps
 }) => {
 	const [open, setOpen] = useState(false)
-	const { control, error, value, form } = useFormField(name)
+	const { control, error } = useFormField(name)
 
 	return (
 		<Controller

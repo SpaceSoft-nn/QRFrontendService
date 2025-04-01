@@ -42,7 +42,20 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-	({ className, variant, size, asChild = false, loading = false, children, icon: Icon, tooltip, ...props }, ref) => {
+	(
+		{
+			className,
+			variant,
+			size = 'default',
+			asChild = false,
+			loading = false,
+			children,
+			icon: Icon,
+			tooltip,
+			...props
+		},
+		ref
+	) => {
 		const Comp = asChild ? Slot : 'button'
 		const button = (
 			<Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props}>
@@ -50,11 +63,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 					<Icon
 						className={cn(
 							{
-								default: 'w-[18px] h-[18px]',
+								default: 'w-4 h-4',
 								xs: 'w-3 h-3',
 								sm: 'w-4 h-4',
 								lg: 'w-5 h-5',
-								icon: 'w-[18px] h-[18px]'
+								icon: 'w-4 h-4'
 							}[size as keyof typeof size],
 							children && 'mr-2'
 						)}
