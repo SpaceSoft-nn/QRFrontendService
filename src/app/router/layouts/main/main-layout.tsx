@@ -4,7 +4,7 @@ import { Header } from '@/widgets/header'
 import { AppSidebar } from '@/widgets/sidebar'
 import { ErrorBoundary } from '@/shared/ui/error-boundary'
 import { SidebarProvider } from '@/shared/ui/sidebar'
-import s from './MainLayout.module.scss'
+import s from './main-layout.module.scss'
 
 export const MainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
 	return (

@@ -1,6 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { HomePage, NotFoundPage, SignInPage, SignUpPage } from '@/pages'
-import { MainLayout } from './layouts/MainLayout'
+import { MainLayout } from './layouts/main'
 import { urls } from '@/shared/config'
 
 export const AppRouter = createBrowserRouter([
