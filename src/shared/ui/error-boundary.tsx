@@ -38,7 +38,9 @@ export class ErrorBoundary extends Component<Props, State> {
 									<AlertCircle className='h-4 w-4 text-destructive' />
 									<CardTitle className='text-lg'>Что-то пошло не так</CardTitle>
 								</div>
-								<CardDescription>{this.state.error?.message || 'Произошла ошибка'}</CardDescription>
+								<CardDescription className='text-sm text-wrap'>
+									{this.state.error?.message || 'Произошла ошибка'}
+								</CardDescription>
 							</CardHeader>
 							<CardFooter>
 								<Button

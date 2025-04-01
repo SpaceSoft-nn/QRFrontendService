@@ -1,4 +1,4 @@
-import { CreditCard, HelpCircle, Home, Settings, ShoppingCart, Terminal } from 'lucide-react'
+import { CreditCard, HelpCircle, Home, ShoppingCart, Terminal } from 'lucide-react'
 import { urls } from '@/shared/config'
 
 export const SidebarItems = [
@@ -21,11 +21,6 @@ export const SidebarItems = [
 		title: 'История оплат',
 		icon: CreditCard,
 		url: urls.dashboard.paymentHistory
-	},
-	{
-		title: 'Настройки',
-		icon: Settings,
-		url: urls.dashboard.settings
 	},
 	{
 		title: 'Помощь',

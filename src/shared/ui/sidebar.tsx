@@ -1,6 +1,6 @@
 import { cva, VariantProps } from 'class-variance-authority'
 import * as React from 'react'
-import { PanelLeft } from 'lucide-react'
+import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
 import { Slot } from '@radix-ui/react-slot'
 import { Button } from '@/shared/ui/button'
 import { Input } from '@/shared/ui/input'
@@ -224,14 +224,15 @@ Sidebar.displayName = 'Sidebar'
 
 const SidebarTrigger = React.forwardRef<React.ElementRef<typeof Button>, React.ComponentProps<typeof Button>>(
 	({ className, onClick, ...props }, ref) => {
-		const { toggleSidebar } = useSidebar()
+		const { toggleSidebar, state } = useSidebar()
 
 		return (
 			<Button
 				ref={ref}
 				data-sidebar='trigger'
-				variant='secondary'
+				variant='ghost'
 				size='icon'
+				icon={state === 'expanded' ? PanelLeftOpen : PanelLeftClose}
 				className={cn(className)}
 				onClick={event => {
 					onClick?.(event)
@@ -239,8 +240,7 @@ const SidebarTrigger = React.forwardRef<React.ElementRef<typeof Button>, React.C
 				}}
 				{...props}
 			>
-				<PanelLeft />
-				<span className='sr-only'>Toggle Sidebar</span>
+				{props.children}
 			</Button>
 		)
 	}

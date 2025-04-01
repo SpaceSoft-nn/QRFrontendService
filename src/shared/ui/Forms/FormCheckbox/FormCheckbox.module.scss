@@ -1,0 +1,15 @@
+.formCheckbox {
+	@apply flex items-center;
+
+	.formCheckbox__label {
+		@apply ml-2 font-medium border-none;
+
+		.formCheckbox__label__error {
+			@apply text-red-300;
+		}
+	}
+
+	.formCheckbox__error {
+		@apply border-red-600 bg-red-300;
+	}
+}

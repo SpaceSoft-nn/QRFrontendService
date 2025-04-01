@@ -1,3 +1,6 @@
+export { LoaderUi } from './LoaderUi/LoaderUi'
+export { QueryWrapper } from './QueryWrapper/QueryWrapper'
+
 export * from './accordion'
 export * from './alert'
 export * from './badge'
@@ -21,3 +24,6 @@ export * from './textarea'
 export * from './container'
 export * from './toast'
 export * from './toaster'
+export * from './tabs'
+export * from './command'
+export * from './scroll-area'
