@@ -1,50 +1,35 @@
 import { createBrowserRouter } from 'react-router-dom'
-import { HomePage, NotFoundPage, SignInPage, SignUpPage } from '@/pages'
+import { NotFoundPage, SignInPage, SignUpPage } from '@/pages'
+import { dashboardRoutes } from './dashboard-routes'
 import { MainLayout } from './layouts/main'
+import { ProtectedRoute } from './protected-route'
 import { urls } from '@/shared/config'
 
 export const AppRouter = createBrowserRouter([
 	{
 		path: '/',
-		element: <MainLayout />,
-		children: [
-			{
-				index: true,
-				element: <HomePage />
-			},
-			{
-				path: urls.dashboard.main,
-				element: <HomePage />
-			},
-			{
-				path: urls.dashboard.settings,
-				element: <HomePage />
-			},
-			{
-				path: urls.dashboard.terminal,
-				element: <HomePage />
-			},
-			{
-				path: urls.dashboard.orders,
-				element: <HomePage />
-			},
-			{
-				path: urls.dashboard.paymentHistory,
-				element: <HomePage />
-			},
-			{
-				path: urls.dashboard.help,
-				element: <HomePage />
-			}
-		]
+		element: (
+			<ProtectedRoute>
+				<MainLayout />
+			</ProtectedRoute>
+		),
+		children: dashboardRoutes
 	},
 	{
 		path: urls.auth.login,
-		element: <SignInPage />
+		element: (
+			<ProtectedRoute requireAuth={false}>
+				<SignInPage />
+			</ProtectedRoute>
+		)
 	},
 	{
 		path: urls.auth.register,
-		element: <SignUpPage />
+		element: (
+			<ProtectedRoute requireAuth={false}>
+				<SignUpPage />
+			</ProtectedRoute>
+		)
 	},
 	{
 		path: '*',

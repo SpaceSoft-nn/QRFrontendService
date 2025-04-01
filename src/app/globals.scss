@@ -11,6 +11,14 @@
 		@apply bg-background text-foreground;
 	}
 
+	::selection {
+		@apply bg-primary/50 text-primary-foreground;
+	}
+
+	::-moz-selection {
+		@apply bg-primary/50 text-primary-foreground;
+	}
+
 	:root {
 		--background: 0 0% 100%;
 		--foreground: 0 0% 3.9%;
