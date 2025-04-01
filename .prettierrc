@@ -23,7 +23,7 @@
 		"^@/shared/api",
 		"^@/shared/hooks",
 		"^@/shared/constants",
-		"^@/shared/utils",
+		"^@/shared/lib",
 		"^../*",
 		"^./*"
 	],
