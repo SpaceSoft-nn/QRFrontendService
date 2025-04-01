@@ -53,7 +53,7 @@ export const AppSidebar: React.FC = () => {
 				</SidebarGroup>
 			</SidebarContent>
 			<SidebarFooter>
-				<NavUser user={{ name: 'Иван Иванов', email: 'ivan.ivanov@example.com' }} />
+				<NavUser />
 			</SidebarFooter>
 		</Sidebar>
 	)

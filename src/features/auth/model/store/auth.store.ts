@@ -1,8 +1,8 @@
 import { makeAutoObservable } from 'mobx'
 import { apolloClient } from '@/shared/api/apollo'
 import { User } from '@/shared/api/graphql'
-import { LOGIN_MUTATION } from '../../gql/queries'
-import { LoginSchema } from '../schemas/login.schema'
+import { GET_CURRENT_USER, LOGIN_MUTATION, LOGOUT_MUTATION, REFRESH_MUTATION } from '../../gql/queries'
+import { TypeLoginSchema } from '../schemas/login.schema'
 import { AuthState } from './types'
 
 class AuthStore implements AuthState {
@@ -18,7 +18,7 @@ class AuthStore implements AuthState {
 	}
 
 	private initializeFromStorage() {
-		const token = localStorage.getItem('access_token')
+		const token = localStorage.getItem('token')
 		if (token) {
 			this.setAccessToken(token)
 		}
@@ -27,7 +27,7 @@ class AuthStore implements AuthState {
 	setAccessToken(token: string) {
 		this.accessToken = token
 		this.isAuthenticated = true
-		localStorage.setItem('access_token', token)
+		localStorage.setItem('token', token)
 	}
 
 	setUser(user: User | null) {
@@ -42,7 +42,7 @@ class AuthStore implements AuthState {
 		this.error = error
 	}
 
-	async login(input: LoginSchema) {
+	async login(input: TypeLoginSchema) {
 		try {
 			this.setLoading(true)
 			this.setError(null)
@@ -54,9 +54,6 @@ class AuthStore implements AuthState {
 
 			if (data?.authLogin?.access_token) {
 				this.setAccessToken(data.authLogin.access_token)
-				if (data.authLogin.user) {
-					this.setUser(data.authLogin.user)
-				}
 				return true
 			}
 
@@ -69,12 +66,72 @@ class AuthStore implements AuthState {
 		}
 	}
 
-	logout() {
-		this.accessToken = null
-		this.user = null
-		this.isAuthenticated = false
-		this.error = null
-		localStorage.removeItem('access_token')
+	async getUser() {
+		try {
+			this.setLoading(true)
+			this.setError(null)
+
+			const { data } = await apolloClient.query({
+				query: GET_CURRENT_USER
+			})
+
+			if (data?.authMe) {
+				this.setUser(data.authMe)
+				return true
+			}
+
+			return false
+		} catch (error) {
+			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при получении данных пользователя')
+			return false
+		} finally {
+			this.setLoading(false)
+		}
+	}
+
+	async logout() {
+		try {
+			this.setLoading(true)
+
+			await apolloClient.mutate({
+				mutation: LOGOUT_MUTATION
+			})
+
+			this.accessToken = null
+			this.user = null
+			this.isAuthenticated = false
+			this.error = null
+			localStorage.removeItem('token')
+			return true
+		} catch (error) {
+			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при выходе')
+			return false
+		} finally {
+			this.setLoading(false)
+		}
+	}
+
+	async refreshToken() {
+		try {
+			this.setLoading(true)
+			this.setError(null)
+
+			const { data } = await apolloClient.mutate({
+				mutation: REFRESH_MUTATION
+			})
+
+			if (data?.authRefresh?.access_token) {
+				this.setAccessToken(data.authRefresh.access_token)
+				return true
+			}
+
+			return false
+		} catch (error) {
+			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при обновлении токена')
+			return false
+		} finally {
+			this.setLoading(false)
+		}
 	}
 }
 

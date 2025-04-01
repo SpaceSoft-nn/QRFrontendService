@@ -1,21 +1,26 @@
-import { FormProvider, useForm } from 'react-hook-form'
-import { Link, useNavigate } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { useNavigate } from 'react-router-dom'
+import { observer } from 'mobx-react-lite'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { Button } from '@/shared/ui'
-import { FormErrorMessage, FormInput } from '@/shared/ui/Forms'
-import { LoginSchema, loginSchema } from '../model/schemas/login.schema'
+import { Form, FormErrorMessage, FormInput } from '@/shared/ui/Forms'
+import { loginSchema, TypeLoginSchema } from '../model/schemas/login.schema'
 import { authStore } from '../model/store/auth.store'
 import { AuthMethodSelector } from './AuthMethodSelector'
 import { urls } from '@/shared/config'
 
-export const SignInForm = () => {
+export const SignInForm: React.FC = observer(() => {
 	const navigate = useNavigate()
 
-	const form = useForm<LoginSchema>({
-		resolver: zodResolver(loginSchema)
+	const form = useForm<TypeLoginSchema>({
+		resolver: zodResolver(loginSchema),
+		defaultValues: {
+			// @ts-ignore
+			authMethod: 'email'
+		}
 	})
 
-	const onSubmit = async (data: LoginSchema) => {
+	const onSubmit = async (data: TypeLoginSchema) => {
 		console.log(data)
 		const success = await authStore.login(data)
 		if (success) {
@@ -24,20 +29,26 @@ export const SignInForm = () => {
 	}
 
 	return (
-		<FormProvider {...form}>
-			<form onSubmit={form.handleSubmit(onSubmit)} className='space-y-3'>
-				<AuthMethodSelector />
-				<FormInput name='password' type='password' autoComplete='new-password' placeholder='Пароль' />
-				{authStore.error && <FormErrorMessage>{authStore.error}</FormErrorMessage>}
-				<Button type='submit' className='w-full' loading={authStore.loading} disabled={!form.formState.isValid}>
-					Войти
-				</Button>
-				<Link to={urls.auth.register} className='block w-full'>
-					<Button variant='secondary' className='w-full' type='button'>
-						Зарегистрироваться
-					</Button>
-				</Link>
-			</form>
-		</FormProvider>
+		<Form ctx={form} onSubmit={onSubmit} className='space-y-3'>
+			<AuthMethodSelector disabled={authStore.loading} />
+			<FormInput
+				name='password'
+				type='password'
+				autoComplete='new-password'
+				placeholder='Пароль'
+				disabled={authStore.loading}
+			/>
+
+			{authStore.error && <FormErrorMessage>{authStore.error}</FormErrorMessage>}
+
+			<Button
+				type='submit'
+				className='w-full'
+				loading={authStore.loading}
+				disabled={!form.formState.isValid || authStore.loading}
+			>
+				Войти
+			</Button>
+		</Form>
 	)
-}
+})
