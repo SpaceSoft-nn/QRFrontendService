@@ -13,9 +13,6 @@ module.exports = {
 				xl: '1440px'
 			},
 			colors: {
-				page: '#1a1a1a',
-				widget: '#111111',
-				component: '#19191B',
 				accent: {
 					DEFAULT: 'hsl(var(--accent))',
 					foreground: 'hsl(var(--accent-foreground))'
@@ -111,5 +108,16 @@ module.exports = {
 			}
 		}
 	},
-	plugins: [require('tailwindcss-animate')]
+	plugins: [
+		require('tailwindcss-animate'),
+		function({ addUtilities }) {
+			addUtilities({
+				'.autofill-reset': {
+					'-webkit-text-fill-color': 'hsl(var(--foreground))',
+					'background-color': 'hsl(var(--background))',
+					'transition': 'background-color 5000s ease-in-out 0s'
+				}
+			})
+		}
+	]
 }
