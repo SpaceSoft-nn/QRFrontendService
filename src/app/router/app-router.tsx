@@ -1,8 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom'
-import { NotFoundPage, SignInPage, SignUpPage } from '@/pages'
-import { HomePage } from '@/pages/home'
 import { MainLayout } from './layouts/main'
 import { ProtectedRoute } from './protected-route'
+import { HomePage, NotFoundPage, SignInPage, SignUpPage } from '@/Pages'
 import { urls } from '@/shared/config'
 
 export const AppRouter = createBrowserRouter([

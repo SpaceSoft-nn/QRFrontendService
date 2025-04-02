@@ -5,7 +5,8 @@ import { authStore } from '@/features/auth/model/store/auth.store'
 import { urls } from '@/shared/config'
 
 const httpLink = createHttpLink({
-	uri: import.meta.env.VITE_GQL_URL
+	uri: import.meta.env.VITE_GQL_URL,
+	credentials: 'include'
 })
 
 const authLink = setContext((_, { headers }) => {

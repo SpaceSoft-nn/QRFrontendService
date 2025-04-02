@@ -12,8 +12,9 @@ module.exports = {
   rules: {
     'react-refresh/only-export-components': [
       'warn',
-      { allowConstantExport: true },
-    ],
-    'no-mixed-spaces-and-tabs': ['error', 'smart-tabs']
-  },
+			{ allowConstantExport: true }
+		],
+		'@typescript-eslint/no-explicit-any': 'off',
+		'no-mixed-spaces-and-tabs': ['error', 'smart-tabs']
+	}
 }
