@@ -1,0 +1,11 @@
+.layout {
+	@apply flex h-screen;
+
+	.layout__content {
+		@apply flex flex-col w-full overflow-auto;
+
+		> main {
+			@apply flex-1 px-4;
+		}
+	}
+}

@@ -1,13 +1,20 @@
-# build stage
-FROM node:18.16.0-alpine as build
+FROM node:20-alpine AS build
 WORKDIR /app
-COPY . /app
-RUN npm install 
+
+ARG GRAPHQL_URL
+ENV GRAPHQL_URL=${GRAPHQL_URL}
+
+COPY package.json package-lock.json ./
+RUN npm install
+
+COPY . .
+
 RUN npm run build
 
 FROM ubuntu
 RUN apt-get update
 RUN apt-get install nginx -y
-COPY --from=build /app/dist /var/www/html/
+COPY --from=build /app/dist /usr/share/nginx/html
+COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
