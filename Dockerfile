@@ -9,13 +9,6 @@ RUN npm ci
 
 COPY . .
 
-RUN echo "=== Checking project structure ===" && \
-	ls -la && \
-	echo "=== Checking src directory ===" && \
-	ls -la src && \
-	echo "=== Checking pages directory ===" && \
-	ls -la src/pages && 
-
 RUN npm run build
 
 FROM nginx:alpine
