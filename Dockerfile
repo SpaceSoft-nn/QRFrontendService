@@ -1,13 +1,20 @@
 FROM node:20-alpine AS build
 WORKDIR /react-app
 
+ARG GRAPHQL_URL
+ENV GRAPHQL_URL=${GRAPHQL_URL}
+
 COPY package.json package-lock.json ./
 RUN npm ci
 
 COPY . .
 
-ENV GRAPHQL_URL=http://185.247.185.17:8876/graphql
-RUN curl -f ${GRAPHQL_URL} || echo "GraphQL server is not available"
+RUN echo "=== Checking project structure ===" && \
+	ls -la && \
+	echo "=== Checking src directory ===" && \
+	ls -la src && \
+	echo "=== Checking pages directory ===" && \
+	ls -la src/pages && 
 
 RUN npm run build
 
