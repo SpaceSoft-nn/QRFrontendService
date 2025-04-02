@@ -1,18 +1,20 @@
 FROM node:20-alpine AS build
-WORKDIR /react-app
+WORKDIR /app
 
 ARG GRAPHQL_URL
 ENV GRAPHQL_URL=${GRAPHQL_URL}
 
 COPY package.json package-lock.json ./
-RUN npm ci
+RUN npm install
 
 COPY . .
 
 RUN npm run build
 
-FROM nginx:alpine
-COPY --from=build /react-app/dist /usr/share/nginx/html
+FROM ubuntu
+RUN apt-get update
+RUN apt-get install nginx -y
+COPY --from=build /app/dist /usr/share/nginx/html
 COPY nginx.conf /etc/nginx/conf.d/default.conf
 EXPOSE 80
 CMD ["nginx", "-g", "daemon off;"]
