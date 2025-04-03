@@ -13,7 +13,7 @@
 		"codegen": "graphql-codegen",
 		"codegen:watch": "graphql-codegen -w",
 		"prepare": "husky install",
-		"version": "node scripts/update-version.ts"
+		"version": "node scripts/update-version.js"
 	},
 	"dependencies": {
 		"@apollo/client": "^3.13.5",
