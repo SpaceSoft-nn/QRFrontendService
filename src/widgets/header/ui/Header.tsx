@@ -1,5 +1,6 @@
+import { Breadcrumbs } from '@/features/breadcrumbs'
 import { ThemeToggleButton } from '@/features/theme-toggle'
-import { Separator, TextGenerateEffect } from '@/shared/ui'
+import { Separator } from '@/shared/ui'
 import { SidebarTrigger } from '@/shared/ui/Sidebar'
 
 export const Header: React.FC = () => {
@@ -8,7 +9,7 @@ export const Header: React.FC = () => {
 			<div className='flex items-center gap-2 w-full px-4'>
 				<SidebarTrigger />
 				<Separator orientation='vertical' className='h-4' />
-				<TextGenerateEffect text='QR Prosto' className='font-semibold' />
+				<Breadcrumbs />
 				<ThemeToggleButton className='ml-auto' />
 			</div>
 		</header>

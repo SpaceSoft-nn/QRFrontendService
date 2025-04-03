@@ -24,22 +24,22 @@ const sidebarMainMenu: SidebarMenuList[] = [
 		url: urls.dashboard.main
 	},
 	{
+		title: 'Терминал',
+		icon: Terminal,
+		url: urls.dashboard.terminal
+	},
+	{
 		title: 'Оплаты',
 		icon: CreditCard,
 		url: urls.dashboard.payments,
 		subItems: [
-			{
-				title: 'Терминал',
-				icon: Terminal,
-				url: urls.dashboard.terminal
-			},
 			{
 				title: 'История',
 				icon: History,
 				url: urls.dashboard.paymentsHistory
 			},
 			{
-				title: 'Методы оплаты',
+				title: 'Методы',
 				icon: Grid2X2,
 				url: urls.dashboard.paymentsMethods
 			}

@@ -34,4 +34,34 @@ export const urls = {
 	}
 } as const
 
+type UrlPaths = typeof urls.dashboard
+
+export const urlLabels: Record<keyof UrlPaths, string> = {
+	main: 'Главная',
+	terminal: 'Терминал',
+
+	users: 'Пользователи',
+	usersAdd: 'Добавление',
+
+	organizations: 'Организации',
+	organizationsAdd: 'Добавление',
+
+	workSpaces: 'АРМ',
+	workSpacesAdd: 'Добавление АРМ',
+
+	payments: 'Оплаты',
+	paymentsAdd: 'Создание',
+	paymentsHistory: 'История',
+	paymentsMethods: 'Методы',
+
+	integrations: 'Интеграции',
+	integrationsAdd: 'Добавление',
+	integrationsBanks: 'Банки',
+	integrations1C: '1С',
+	integrationsExternal: 'Внешние',
+
+	settings: 'Настройки',
+	help: 'Помощь'
+}
+
 export type Urls = typeof urls
