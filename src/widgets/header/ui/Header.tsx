@@ -1,6 +1,6 @@
 import { ThemeToggleButton } from '@/features/theme-toggle'
 import { Separator, TextGenerateEffect } from '@/shared/ui'
-import { SidebarTrigger } from '@/shared/ui/sidebar'
+import { SidebarTrigger } from '@/shared/ui/Sidebar'
 
 export const Header: React.FC = () => {
 	return (

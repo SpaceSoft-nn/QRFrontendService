@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { BellIcon, ChevronRightIcon, LogOutIcon, SettingsIcon, UserCircleIcon } from 'lucide-react'
+import { BellIcon, ChevronRightIcon, LogOutIcon, UserCircleIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { authStore } from '@/features/auth'
 import {
@@ -13,7 +13,7 @@ import {
 	DropdownMenuTrigger,
 	Skeleton
 } from '@/shared/ui'
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/shared/ui/sidebar'
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/shared/ui/Sidebar'
 import { urls } from '@/shared/config'
 
 export const NavUser: React.FC = observer(() => {
@@ -81,10 +81,6 @@ export const NavUser: React.FC = observer(() => {
 								<DropdownMenuItem>
 									<UserCircleIcon className='mr-2 size-4' />
 									Профиль
-								</DropdownMenuItem>
-								<DropdownMenuItem>
-									<SettingsIcon className='mr-2 size-4' />
-									Настройки
 								</DropdownMenuItem>
 								<DropdownMenuItem>
 									<BellIcon className='mr-2 size-4' />

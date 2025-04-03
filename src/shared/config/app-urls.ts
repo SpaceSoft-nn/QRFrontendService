@@ -2,8 +2,27 @@ export const urls = {
 	dashboard: {
 		main: '/',
 		terminal: '/terminal',
-		orders: '/orders',
-		paymentHistory: '/payment_history',
+
+		users: '/users',
+		usersAdd: '/users' + '/add',
+
+		organizations: '/organizations',
+		organizationsAdd: '/organizations' + '/add',
+
+		workSpaces: '/work_spaces',
+		workSpacesAdd: '/work_spaces' + '/add',
+
+		payments: '/payments',
+		paymentsAdd: '/payments' + '/add',
+		paymentsHistory: '/payments' + '/history',
+		paymentsMethods: '/payments' + '/methods',
+
+		integrations: '/integrations',
+		integrationsAdd: '/integrations' + '/add',
+		integrationsBanks: '/integrations' + '/banks',
+		integrations1C: '/integrations' + '/1c',
+		integrationsExternal: '/integrations' + '/external',
+
 		settings: '/settings',
 		help: '/help'
 	},

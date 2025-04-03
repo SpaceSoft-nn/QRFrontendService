@@ -8,8 +8,8 @@ import {
 	DropdownMenuSeparator,
 	DropdownMenuTrigger
 } from '@/shared/ui/dropdown-menu'
-import { useSidebar } from '@/shared/ui/sidebar'
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/shared/ui/sidebar'
+import { useSidebar } from '@/shared/ui/Sidebar'
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/shared/ui/Sidebar'
 
 export const OrganizationSwitcher: React.FC<{ organizations?: { id: string; name: string; role: string }[] }> = ({
 	organizations = []
@@ -51,7 +51,7 @@ export const OrganizationSwitcher: React.FC<{ organizations?: { id: string; name
 						<DropdownMenuLabel className='text-xs text-muted-foreground'>Организации</DropdownMenuLabel>
 						{organizations.length > 0 ? (
 							<>
-								{organizations.map((organization, index) => (
+								{organizations.map(organization => (
 									<DropdownMenuItem
 										key={organization.name}
 										onClick={() => setActiveOrganization(organization)}
