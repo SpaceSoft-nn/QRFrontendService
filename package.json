@@ -7,11 +7,13 @@
 		"dev": "vite",
 		"prettier": "prettier --write 'src/**/*.{ts,tsx}'",
 		"build": "npm run codegen && vite build",
+		"prebuild": "husky run pre-build",
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
 		"preview": "vite preview",
 		"codegen": "graphql-codegen",
 		"codegen:watch": "graphql-codegen -w",
-		"prepare": "husky install"
+		"prepare": "husky install",
+		"version": "node -e \"const pkg=require('./package.json'); pkg.version=pkg.version.replace(/\\.(\\d+)$/, (_, n) => '.' + (parseInt(n) + 1)); require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\\n');\""
 	},
 	"dependencies": {
 		"@apollo/client": "^3.13.5",
