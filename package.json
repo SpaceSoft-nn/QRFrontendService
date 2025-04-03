@@ -13,7 +13,7 @@
 		"codegen": "graphql-codegen",
 		"codegen:watch": "graphql-codegen -w",
 		"prepare": "husky install",
-		"version": "node -e \"const pkg=require('./package.json'); pkg.version=pkg.version.replace(/\\.(\\d+)$/, (_, n) => '.' + (parseInt(n) + 1)); require('fs').writeFileSync('package.json', JSON.stringify(pkg, null, 2) + '\\n');\""
+		"version": "node scripts/update-version.ts"
 	},
 	"dependencies": {
 		"@apollo/client": "^3.13.5",
