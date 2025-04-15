@@ -23,14 +23,7 @@ export default defineConfig({
 	},
 	server: {
 		port: 4000,
-		proxy: {
-			'/api/graphql': {
-				target: 'http://185.247.185.17:8876',
-				changeOrigin: true,
-				secure: false,
-				ws: true
-			}
-		}
+		open: true
 	},
 	build: {
 		chunkSizeWarningLimit: 500,

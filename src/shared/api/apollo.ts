@@ -26,12 +26,13 @@ const handleUnauthenticated = async (operation: Operation) => {
 		const success = await authStore.refreshToken()
 		if (!success) {
 			await authStore.logout()
+			localStorage.removeItem('token')
 			if (!isRefreshOperation) {
 				window.location.href = urls.auth.login
 			}
 		}
 	} catch (error) {
-		await authStore.logout()
+		localStorage.removeItem('token')
 		if (!isRefreshOperation) {
 			window.location.href = urls.auth.login
 		}

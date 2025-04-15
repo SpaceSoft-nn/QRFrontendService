@@ -1,7 +1,14 @@
 import { makeAutoObservable } from 'mobx'
 import { apolloClient } from '@/shared/api/apollo'
 import { User } from '@/shared/api/graphql'
-import { GET_CURRENT_USER, LOGIN_MUTATION, LOGOUT_MUTATION, REFRESH_MUTATION } from '../../gql/queries'
+import {
+	GET_CURRENT_USER,
+	LOGIN_MUTATION,
+	LOGOUT_MUTATION,
+	REFRESH_MUTATION,
+	REGISTER_MUTATION
+} from '../../gql/queries'
+import { TypeRegisterSchema } from '../schemas'
 import { TypeLoginSchema } from '../schemas/login.schema'
 import { AuthState } from './types'
 
@@ -52,14 +59,38 @@ class AuthStore implements AuthState {
 				variables: { input }
 			})
 
-			if (data?.authLogin?.access_token) {
-				this.setAccessToken(data.authLogin.access_token)
+			if (data?.login?.access_token) {
+				this.setAccessToken(data.login.access_token)
 				return true
 			}
 
 			return false
 		} catch (error) {
 			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при входе')
+			return false
+		} finally {
+			this.setLoading(false)
+		}
+	}
+
+	async register(input: TypeRegisterSchema) {
+		try {
+			this.setLoading(true)
+			this.setError(null)
+
+			const { data } = await apolloClient.mutate({
+				mutation: REGISTER_MUTATION,
+				variables: { input }
+			})
+
+			if (data?.registration?.access_token) {
+				this.setAccessToken(data.registration.access_token)
+				return true
+			}
+
+			return false
+		} catch (error) {
+			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при регистрации')
 			return false
 		} finally {
 			this.setLoading(false)
@@ -92,6 +123,7 @@ class AuthStore implements AuthState {
 	async logout() {
 		try {
 			this.setLoading(true)
+			this.setError(null)
 
 			await apolloClient.mutate({
 				mutation: LOGOUT_MUTATION
@@ -100,7 +132,6 @@ class AuthStore implements AuthState {
 			this.accessToken = null
 			this.user = null
 			this.isAuthenticated = false
-			this.error = null
 			localStorage.removeItem('token')
 			return true
 		} catch (error) {

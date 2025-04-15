@@ -2,15 +2,17 @@ import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import { zodResolver } from '@hookform/resolvers/zod'
+import { authStore } from '@/features/auth'
 import { Button } from '@/shared/ui'
 import { Form, FormErrorMessage, FormInput } from '@/shared/ui/Forms'
 import { loginSchema, TypeLoginSchema } from '../model/schemas/login.schema'
-import { authStore } from '../model/store/auth.store'
 import { AuthMethodSelector } from './AuthMethodSelector'
+import { AuthWrapper } from './AuthWrapper'
 import { urls } from '@/shared/config'
 
 export const SignInForm: React.FC = observer(() => {
 	const navigate = useNavigate()
+	const { loading, error } = authStore
 
 	const form = useForm<TypeLoginSchema>({
 		resolver: zodResolver(loginSchema),
@@ -29,26 +31,28 @@ export const SignInForm: React.FC = observer(() => {
 	}
 
 	return (
-		<Form ctx={form} onSubmit={onSubmit} className='space-y-3'>
-			<AuthMethodSelector disabled={authStore.loading} />
-			<FormInput
-				name='password'
-				type='password'
-				autoComplete='new-password'
-				placeholder='Пароль'
-				disabled={authStore.loading}
-			/>
+		<AuthWrapper title='Вход' redirectTo={urls.auth.register} redirectText='Зарегистрироваться'>
+			<Form ctx={form} onSubmit={onSubmit} className='space-y-3'>
+				<AuthMethodSelector disabled={loading} />
+				<FormInput
+					name='password'
+					type='password'
+					autoComplete='new-password'
+					placeholder='Пароль'
+					disabled={loading}
+				/>
 
-			{authStore.error && <FormErrorMessage>{authStore.error}</FormErrorMessage>}
+				{error && <FormErrorMessage>{error}</FormErrorMessage>}
 
-			<Button
-				type='submit'
-				className='w-full'
-				loading={authStore.loading}
-				disabled={!form.formState.isValid || authStore.loading}
-			>
-				Войти
-			</Button>
-		</Form>
+				<Button
+					type='submit'
+					className='w-full'
+					loading={loading}
+					disabled={!form.formState.isValid || loading}
+				>
+					Войти
+				</Button>
+			</Form>
+		</AuthWrapper>
 	)
 })
