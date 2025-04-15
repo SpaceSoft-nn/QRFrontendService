@@ -10,10 +10,9 @@
 		"prebuild": "husky run pre-build",
 		"lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
 		"preview": "vite preview",
-		"codegen": "graphql-codegen",
+		"codegen": "graphql-codegen --verbose",
 		"codegen:watch": "graphql-codegen -w",
-		"prepare": "husky install",
-		"version": "node scripts/update-version.js"
+		"prepare": "husky install"
 	},
 	"dependencies": {
 		"@apollo/client": "^3.13.5",

@@ -477,7 +477,7 @@ const SidebarMenuButton = React.forwardRef<
 		)
 
 		if (loading) {
-			return <Skeleton className='h-8 w-full rounded-md' />
+			return <Skeleton className={cn(sidebarMenuButtonVariants({ variant, size }), className)} />
 		}
 
 		if (!tooltip) {
