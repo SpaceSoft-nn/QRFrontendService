@@ -1,7 +1,8 @@
-import { createBrowserRouter } from 'react-router-dom'
-import { MainLayout } from './layouts/main'
+import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { LoginForm, RegisterForm } from '@/features/auth'
+import { AuthLayout, DashboardLayout } from './layouts'
 import { ProtectedRoute } from './protected-route'
-import { HomePage, NotFoundPage, SignInPage, SignUpPage } from '@/Pages'
+import { HomePage, NotFoundPage, OrganizationsPage, ProfilePage, WorkSpacesPage } from '@/Pages'
 import { urls } from '@/shared/config'
 
 export const AppRouter = createBrowserRouter([
@@ -9,7 +10,7 @@ export const AppRouter = createBrowserRouter([
 		path: '/',
 		element: (
 			<ProtectedRoute>
-				<MainLayout />
+				<DashboardLayout />
 			</ProtectedRoute>
 		),
 		children: [
@@ -24,6 +25,10 @@ export const AppRouter = createBrowserRouter([
 			{
 				path: urls.dashboard.terminal,
 				element: <HomePage />
+			},
+			{
+				path: urls.dashboard.profile,
+				element: <ProfilePage />
 			},
 			{
 				path: urls.dashboard.users,
@@ -43,7 +48,7 @@ export const AppRouter = createBrowserRouter([
 				children: [
 					{
 						index: true,
-						element: <HomePage />
+						element: <OrganizationsPage />
 					},
 					{
 						path: urls.dashboard.organizationsAdd,
@@ -56,7 +61,7 @@ export const AppRouter = createBrowserRouter([
 				children: [
 					{
 						index: true,
-						element: <HomePage />
+						element: <WorkSpacesPage />
 					},
 					{
 						path: urls.dashboard.workSpacesAdd,
@@ -121,20 +126,26 @@ export const AppRouter = createBrowserRouter([
 		]
 	},
 	{
-		path: urls.auth.login,
+		path: urls.auth.main,
 		element: (
 			<ProtectedRoute requireAuth={false}>
-				<SignInPage />
+				<AuthLayout />
 			</ProtectedRoute>
-		)
-	},
-	{
-		path: urls.auth.register,
-		element: (
-			<ProtectedRoute requireAuth={false}>
-				<SignUpPage />
-			</ProtectedRoute>
-		)
+		),
+		children: [
+			{
+				path: urls.auth.login,
+				element: <LoginForm />
+			},
+			{
+				path: urls.auth.register,
+				element: <RegisterForm />
+			},
+			{
+				path: '*',
+				element: <Navigate to={urls.auth.login} />
+			}
+		]
 	},
 	{
 		path: '*',
