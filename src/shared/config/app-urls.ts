@@ -3,6 +3,8 @@ export const urls = {
 		main: '/',
 		terminal: '/terminal',
 
+		profile: '/profile',
+
 		users: '/users',
 		usersAdd: '/users' + '/add',
 
@@ -27,10 +29,11 @@ export const urls = {
 		help: '/help'
 	},
 	auth: {
-		login: '/login',
-		register: '/register',
-		verify: '/register_verify',
-		forgotPassword: '/forgot_password'
+		main: '/auth',
+		login: '/auth/login',
+		register: '/auth/register',
+		verify: '/auth/register_verify',
+		forgotPassword: '/auth/forgot_password'
 	}
 } as const
 
@@ -39,6 +42,8 @@ type UrlPaths = typeof urls.dashboard
 export const urlLabels: Record<keyof UrlPaths, string> = {
 	main: 'Главная',
 	terminal: 'Терминал',
+
+	profile: 'Профиль',
 
 	users: 'Пользователи',
 	usersAdd: 'Добавление',
