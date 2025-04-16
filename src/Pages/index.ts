@@ -1,3 +1,7 @@
-export * from './auth'
-export * from './home'
-export * from './not-found'
+export * from './organizations'
+export * from './workspaces'
+
+export * from './HomePage'
+
+export * from './NotFoundPage'
+export * from './ProfilePage'

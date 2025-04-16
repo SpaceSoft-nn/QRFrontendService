@@ -1,5 +1,8 @@
-import { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { Building2, ChevronsUpDown, Plus } from 'lucide-react'
+import { observer } from 'mobx-react-lite'
+import { OrganizationWithOpf } from '@/features/organization'
+import { organizationStore } from '@/features/organization'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -11,13 +14,33 @@ import {
 import { useSidebar } from '@/shared/ui/Sidebar'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/shared/ui/Sidebar'
 
-export const OrganizationSwitcher: React.FC<{ organizations?: { id: string; name: string; role: string }[] }> = ({
-	organizations = []
-}) => {
-	const { isMobile } = useSidebar()
-	const [activeOrganization, setActiveOrganization] = useState<(typeof organizations)[0] | null>(
-		organizations[0] || null
+const OrganizationItem = ({ organization }: { organization: OrganizationWithOpf | null }) => {
+	return (
+		<div className='flex items-center gap-2'>
+			<div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
+				<Building2 className='size-4' />
+			</div>
+			<div className='grid flex-1 text-left text-sm leading-tight'>
+				<span className='truncate font-semibold'>{organization?.nameWithOpf || 'Нет организации'}</span>
+				<span className='truncate text-xs text-muted-foreground'>
+					{organization?.inn ? `ИНН ${organization.inn}` : 'Выберите организацию'}
+				</span>
+			</div>
+		</div>
 	)
+}
+
+// TODO: Добавить возможность добавлять организацию, устанавливать активную организацию
+export const OrganizationSwitcher: React.FC = observer(() => {
+	const { isMobile } = useSidebar()
+	const { organizations, loading, error } = organizationStore
+	const [activeOrganization, setActiveOrganization] = useState<(typeof organizations)[0] | null>(null)
+
+	useEffect(() => {
+		if (organizations.length > 0 && !activeOrganization) {
+			setActiveOrganization(organizations[0])
+		}
+	}, [organizations, activeOrganization])
 
 	return (
 		<SidebarMenu>
@@ -26,19 +49,10 @@ export const OrganizationSwitcher: React.FC<{ organizations?: { id: string; name
 					<DropdownMenuTrigger asChild>
 						<SidebarMenuButton
 							size='lg'
+							loading={loading || !!error}
 							className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
 						>
-							<div className='flex aspect-square size-8 items-center justify-center rounded-lg bg-sidebar-primary text-sidebar-primary-foreground'>
-								<Building2 className='size-4' />
-							</div>
-							<div className='grid flex-1 text-left text-sm leading-tight'>
-								<span className='truncate font-semibold'>
-									{activeOrganization?.name || 'Нет организации'}
-								</span>
-								<span className='truncate text-xs text-muted-foreground'>
-									{activeOrganization?.role || 'Создайте организацию'}
-								</span>
-							</div>
+							<OrganizationItem organization={activeOrganization} />
 							<ChevronsUpDown className='ml-auto' />
 						</SidebarMenuButton>
 					</DropdownMenuTrigger>
@@ -73,4 +87,4 @@ export const OrganizationSwitcher: React.FC<{ organizations?: { id: string; name
 			</SidebarMenuItem>
 		</SidebarMenu>
 	)
-}
+})
