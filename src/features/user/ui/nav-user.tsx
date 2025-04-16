@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { BellIcon, ChevronRightIcon, LogOutIcon, UserCircleIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { authStore } from '@/features/auth'
+import { userStore } from '@/features/user'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -19,18 +20,21 @@ export const NavUser: React.FC = observer(() => {
 	const { isMobile } = useSidebar()
 	const navigate = useNavigate()
 
+	const { loading, error, isAuthenticated } = authStore
+	const { fullName, contactInfo } = userStore
+
 	useEffect(() => {
-		if (!authStore.user && authStore.isAuthenticated) {
-			authStore.getUser()
+		if (isAuthenticated) {
+			userStore.getUser()
 		}
-	}, [authStore.isAuthenticated])
+	}, [isAuthenticated])
 
 	const handleLogout = async () => {
-		await authStore.logout()
-		navigate(urls.auth.login)
+		const success = await userStore.logout()
+		if (success) {
+			navigate(urls.auth.login)
+		}
 	}
-
-	if (!authStore.user && !authStore.loading) return null
 
 	return (
 		<SidebarMenu>
@@ -39,16 +43,14 @@ export const NavUser: React.FC = observer(() => {
 					<DropdownMenuTrigger asChild>
 						<SidebarMenuButton
 							tooltip='Личный кабинет'
-							loading={authStore.loading || !authStore.user}
+							loading={loading || !userStore.user || !!error}
 							className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
 						>
 							<UserCircleIcon />
 							<div className='grid flex-1 text-left text-sm leading-tight'>
-								<span className='truncate'>{authStore.user?.email}</span>
-								{authStore.user?.phone && (
-									<span className='truncate text-xs text-muted-foreground'>
-										{authStore.user.phone}
-									</span>
+								<span className='truncate'>{fullName}</span>
+								{contactInfo.phone && (
+									<span className='truncate text-xs text-muted-foreground'>{contactInfo.phone}</span>
 								)}
 							</div>
 							<ChevronRightIcon className='ml-auto size-4' />
@@ -62,17 +64,15 @@ export const NavUser: React.FC = observer(() => {
 					>
 						<DropdownMenuLabel className='font-normal'>
 							<div className='grid flex-1 text-left text-sm leading-tight'>
-								<span className='truncate font-medium'>{authStore.user?.email}</span>
-								{authStore.user?.phone && (
-									<span className='truncate text-xs text-muted-foreground'>
-										{authStore.user.phone}
-									</span>
+								<span className='truncate font-medium'>{contactInfo.email}</span>
+								{contactInfo.phone && (
+									<span className='truncate text-xs text-muted-foreground'>{contactInfo.phone}</span>
 								)}
 							</div>
 						</DropdownMenuLabel>
 						<DropdownMenuSeparator />
 						<DropdownMenuGroup>
-							<DropdownMenuItem>
+							<DropdownMenuItem onClick={() => navigate(urls.dashboard.profile)}>
 								<UserCircleIcon className='mr-2 size-4' />
 								Профиль
 							</DropdownMenuItem>
