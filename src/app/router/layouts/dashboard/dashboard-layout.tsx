@@ -1,12 +1,11 @@
-import React from 'react'
 import { Outlet } from 'react-router-dom'
 import { Header } from '@/widgets/header'
 import { AppSidebar } from '@/widgets/sidebar'
-import { ErrorBoundary } from '@/shared/ui/ErrorBoundary/ErrorBoundary'
+import { ErrorBoundary } from '@/shared/ui'
 import { SidebarProvider } from '@/shared/ui/Sidebar'
-import s from './main-layout.module.scss'
+import s from './dashboard-layout.module.scss'
 
-export const MainLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
+export const DashboardLayout: React.FC<React.PropsWithChildren> = ({ children }) => {
 	return (
 		<div className={s.layout}>
 			<SidebarProvider>

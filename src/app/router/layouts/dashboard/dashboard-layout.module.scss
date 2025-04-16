@@ -2,10 +2,10 @@
 	@apply flex h-screen;
 
 	.layout__content {
-		@apply flex flex-col w-full overflow-auto;
+		@apply flex flex-col gap-1 px-5 w-full overflow-auto;
 
 		> main {
-			@apply flex-1 px-4;
+			@apply flex-1;
 		}
 	}
 }

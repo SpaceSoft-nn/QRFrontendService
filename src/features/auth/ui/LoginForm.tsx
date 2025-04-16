@@ -10,7 +10,7 @@ import { AuthMethodSelector } from './AuthMethodSelector'
 import { AuthWrapper } from './AuthWrapper'
 import { urls } from '@/shared/config'
 
-export const SignInForm: React.FC = observer(() => {
+export const LoginForm: React.FC = observer(() => {
 	const navigate = useNavigate()
 	const { loading, error } = authStore
 
