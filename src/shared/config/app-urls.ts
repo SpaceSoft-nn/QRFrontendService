@@ -1,3 +1,5 @@
+import { slugify } from '../lib/utils'
+
 export const urls = {
 	dashboard: {
 		main: '/',
@@ -11,8 +13,9 @@ export const urls = {
 		organizations: '/organizations',
 		organizationsAdd: '/organizations' + '/add',
 
-		workSpaces: '/work_spaces',
-		workSpacesAdd: '/work_spaces' + '/add',
+		workSpaces: '/workspaces',
+		workSpacesAdd: '/workspaces' + '/add',
+		workSpaceBySlug: (slug: string) => `/workspaces/${slugify(slug)}`,
 
 		payments: '/payments',
 		paymentsAdd: '/payments' + '/add',
@@ -39,7 +42,7 @@ export const urls = {
 
 type UrlPaths = typeof urls.dashboard
 
-export const urlLabels: Record<keyof UrlPaths, string> = {
+export const urlLabels: Record<string, string> = {
 	main: 'Главная',
 	terminal: 'Терминал',
 
@@ -52,7 +55,7 @@ export const urlLabels: Record<keyof UrlPaths, string> = {
 	organizationsAdd: 'Добавление',
 
 	workSpaces: 'АРМ',
-	workSpacesAdd: 'Добавление АРМ',
+	workSpacesAdd: 'Создание',
 
 	payments: 'Оплаты',
 	paymentsAdd: 'Создание',
