@@ -31,6 +31,7 @@ export default defineConfig({
 			output: {
 				manualChunks: {
 					'vendor-react': ['react', 'react-dom'],
+					'vendor-dadata': ['react-dadata'],
 					'vendor-ui': [
 						'@radix-ui/react-accordion',
 						'@radix-ui/react-checkbox',
@@ -51,7 +52,8 @@ export default defineConfig({
 						'lucide-react',
 						'react-icons',
 						'react-table',
-						'react-day-picker'
+						'react-day-picker',
+						'framer-motion'
 					],
 					'vendor-gql': ['@apollo/client', 'graphql']
 				}
