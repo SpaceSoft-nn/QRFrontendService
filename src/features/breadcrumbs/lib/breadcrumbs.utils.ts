@@ -22,6 +22,7 @@ const pathToKeyMap = createPathToKeyMap()
 
 // Получение названия пути
 export const getPathLabel = (path: string): string => {
+	// Проверяем, существует ли путь в нашей карте путей
 	if (path in pathToKeyMap) {
 		const keyPath = pathToKeyMap[path]
 
@@ -34,13 +35,13 @@ export const getPathLabel = (path: string): string => {
 		}
 	}
 
-	const lastPart = path.split('/').pop() || ''
-	return (
-		lastPart
-			.split('-')
-			.map(word => word.charAt(0).toUpperCase() + word.slice(1))
-			.join(' ') || 'Неизвестная страница'
-	)
+	// Если путь не найден в карте, проверяем, является ли он корневым путем
+	if (path === '/') {
+		return 'Главная'
+	}
+
+	// Для неопределенных маршрутов возвращаем "Неизвестная страница"
+	return 'Неизвестная страница'
 }
 
 // Получение всех путей из объекта urls
