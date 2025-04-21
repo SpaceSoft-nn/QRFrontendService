@@ -1,12 +1,15 @@
 import { ApolloClient, createHttpLink, from, InMemoryCache, Operation } from '@apollo/client'
 import { setContext } from '@apollo/client/link/context'
 import { onError } from '@apollo/client/link/error'
-import { authStore } from '@/features/auth/model/store/auth.store'
+import { authStore } from '@/features/auth'
 import { urls } from '@/shared/config'
 
 const httpLink = createHttpLink({
 	uri: import.meta.env.VITE_GQL_URL,
-	credentials: 'include'
+	credentials: 'include',
+	fetchOptions: {
+		timeout: 30000
+	}
 })
 
 const authLink = setContext((_, { headers }) => {
@@ -20,22 +23,16 @@ const authLink = setContext((_, { headers }) => {
 })
 
 const handleUnauthenticated = async (operation: Operation) => {
-	const isRefreshOperation = operation.operationName === 'AuthRefresh'
-
 	try {
 		const success = await authStore.refreshToken()
 		if (!success) {
-			await authStore.logout()
-			localStorage.removeItem('token')
-			if (!isRefreshOperation) {
-				window.location.href = urls.auth.login
-			}
-		}
-	} catch (error) {
-		localStorage.removeItem('token')
-		if (!isRefreshOperation) {
+			authStore.logout()
 			window.location.href = urls.auth.login
 		}
+	} catch (error) {
+		console.error(error)
+		authStore.logout()
+		window.location.href = urls.auth.login
 	}
 }
 

@@ -19,6 +19,11 @@ export type Scalars = {
 	Date: { input: any; output: any }
 }
 
+export type AddPaymentWorkspaceInput = {
+	payment_method_id: Scalars['ID']['input']
+	workspace_id: Scalars['ID']['input']
+}
+
 export type AddUserWorkspaceInput = {
 	/** пользователь который добавляется к workspace */
 	user_id: Scalars['String']['input']
@@ -50,6 +55,18 @@ export type BalanceLog = {
 	updated_at: Scalars['Date']['output']
 }
 
+export type CreateTransactionInput = {
+	/** Сумма для оплаты */
+	amount: Scalars['String']['input']
+	/** Количество товара */
+	count_product?: InputMaybe<Scalars['String']['input']>
+	/** Название продукта */
+	name_product?: InputMaybe<Scalars['String']['input']>
+	/** Тип продукта, услуга/товар и т.д...  */
+	type_product?: InputMaybe<Scalars['String']['input']>
+	workspace_id: Scalars['ID']['input']
+}
+
 export type DeleteUserResponse = {
 	__typename?: 'DeleteUserResponse'
 	/** статус удаления */
@@ -65,6 +82,7 @@ export type DeleteUserWorkspaceInput = {
 	workspace_id: Scalars['String']['input']
 }
 
+/** Таблица 'значения => ключь' для подключения к внешнему сервису */
 export type DriverInfo = {
 	__typename?: 'DriverInfo'
 	created_at: Scalars['Date']['output']
@@ -72,13 +90,24 @@ export type DriverInfo = {
 	/** Название ключа например API Key или Seecret Key */
 	key: Scalars['String']['output']
 	/** К какой организации относится этот пользователь */
-	organizaion: Organization
-	payment_method?: Maybe<PaymentMethod>
+	organization: Organization
+	payment_method: PaymentMethod
 	updated_at: Scalars['Date']['output']
 	/** Пользователь который указал значение */
-	user: Scalars['String']['output']
+	user: User
 	/** Значение ключа */
 	value: Scalars['String']['output']
+}
+
+export type DriverInfoInput = {
+	/** Название ключа например API Key или Seecret Key */
+	key: Scalars['String']['input']
+	/** К какой организации относится этот пользователь */
+	organization_id: Scalars['ID']['input']
+	/** Driver платежа */
+	payment_method_id: Scalars['ID']['input']
+	/** Значение ключа */
+	value: Scalars['String']['input']
 }
 
 export type EmailList = {
@@ -91,6 +120,8 @@ export type EmailList = {
 
 export type Mutation = {
 	__typename?: 'Mutation'
+	/** Добавление Payment к workspace */
+	addPaymentWorkspace: Workspace
 	/** Добавление Пользователя к workspace */
 	addUserWorkspace: User
 	/** Выходим из авторизации - токены инвалидируются */
@@ -99,8 +130,12 @@ export type Mutation = {
 	authRefresh: AuthToken
 	/** Устанавливаем полезную нагрузку, получаем новый access токен */
 	authSetPayload: AuthToken
+	/** Создание записи апи ключей: key => value */
+	createDriverInfo: DriverInfo
 	/** Создание организации по авторизированному пользователю */
 	createOrganization: Organization
+	/** Создание организации по авторизированному пользователю */
+	createTransaction: Transaction
 	/** Создание рабочего места по авторизированному пользователю */
 	createWorkspace: Workspace
 	/** Удаляем пользователя из workspace */
@@ -114,6 +149,10 @@ export type Mutation = {
 	userCreate: User
 }
 
+export type MutationAddPaymentWorkspaceArgs = {
+	input?: InputMaybe<AddPaymentWorkspaceInput>
+}
+
 export type MutationAddUserWorkspaceArgs = {
 	input: AddUserWorkspaceInput
 }
@@ -122,8 +161,16 @@ export type MutationAuthSetPayloadArgs = {
 	organization_id: Scalars['ID']['input']
 }
 
+export type MutationCreateDriverInfoArgs = {
+	input: DriverInfoInput
+}
+
 export type MutationCreateOrganizationArgs = {
-	input: OrganizationCreate
+	input: OrganizationCreateInput
+}
+
+export type MutationCreateTransactionArgs = {
+	input: CreateTransactionInput
 }
 
 export type MutationCreateWorkspaceArgs = {
@@ -209,7 +256,7 @@ export type Organization = {
 	website?: Maybe<Scalars['String']['output']>
 }
 
-export type OrganizationCreate = {
+export type OrganizationCreateInput = {
 	address: Scalars['String']['input']
 	description?: InputMaybe<Scalars['String']['input']>
 	email?: InputMaybe<Scalars['String']['input']>
@@ -233,13 +280,30 @@ export enum OrganizationTypeEnum {
 	Legal = 'legal'
 }
 
+export type PaginatorInfo = {
+	__typename?: 'PaginatorInfo'
+	/** Номер текущей страницы */
+	currentPage: Scalars['Int']['output']
+	/** Элементов на странице */
+	limit: Scalars['Int']['output']
+	/** Всего элементов */
+	total: Scalars['Int']['output']
+	/** Сколько всего страниц */
+	totalPages: Scalars['Int']['output']
+}
+
+/** Подразумевает некий выбор категории платежей пример: Банки, Внешние интеграции, API - просто названия категорий */
 export type Payment = {
 	__typename?: 'Payment'
 	created_at: Scalars['Date']['output']
-	driver?: Maybe<Scalars['String']['output']>
+	/** Uuid */
 	id: Scalars['ID']['output']
+	/** Название платежного метода */
 	name: Scalars['String']['output']
-	number_uuid: Scalars['String']['output']
+	/** Автоинкриментированный id - сделан для удобности обращения */
+	number_id: Scalars['ID']['output']
+	payment_methods: Array<Maybe<PaymentMethod>>
+	/** Статус Активена ли категория Payment () */
 	status: Scalars['Boolean']['output']
 	updated_at: Scalars['Date']['output']
 }
@@ -248,17 +312,20 @@ export type PaymentMethod = {
 	__typename?: 'PaymentMethod'
 	active: Scalars['Boolean']['output']
 	created_at: Scalars['Date']['output']
-	driver: Scalars['String']['output']
 	driver_infos?: Maybe<DriverInfo>
+	/** Название драйвера например: Сбербанк, Точка банк */
+	driver_name: Scalars['String']['output']
+	/** Uuid */
 	id: Scalars['ID']['output']
-	name: Scalars['String']['output']
+	/** Автоинкриментированный id - сделан для удобности обращения */
+	number_id: Scalars['Int']['output']
 	payment?: Maybe<Payment>
 	updated_at: Scalars['Date']['output']
 }
 
 export type PersonalArea = {
 	__typename?: 'PersonalArea'
-	balance: Scalars['Float']['output']
+	balance: Scalars['String']['output']
 	created_at: Scalars['Date']['output']
 	id: Scalars['ID']['output']
 	owner: User
@@ -281,6 +348,7 @@ export type QrCode = {
 	id: Scalars['ID']['output']
 	name_product?: Maybe<Scalars['String']['output']>
 	qr_url: Scalars['String']['output']
+	transaction: Transaction
 	updated_at: Scalars['Date']['output']
 }
 
@@ -288,14 +356,64 @@ export type Query = {
 	__typename?: 'Query'
 	/** Получаем модель User */
 	authMe?: Maybe<User>
+	/** Возвратить DriverInfo по id */
+	driverInfoById: DriverInfo
+	/** Возвратить DriverInfo по organization_id и payment_id */
+	driverInfoByOrganizationId?: Maybe<DriverInfo>
 	organization?: Maybe<Organization>
 	organizations: Array<Maybe<Organization>>
+	/** Найти по id */
+	paymentById?: Maybe<Payment>
+	/** Найти по автоинкрементированному-уникальному ключу id */
+	paymentByNumberId?: Maybe<Payment>
+	paymentMethodById: PaymentMethod
+	paymentMethodByNumberId?: Maybe<PaymentMethod>
+	paymentMethods: Array<Maybe<PaymentMethod>>
+	payments: Array<Maybe<Payment>>
+	/** Вернуть qrCode по ID */
+	qrCode?: Maybe<QrCode>
+	/** Вернуть транзакцию по ID */
+	transaction?: Maybe<Transaction>
 	userById?: Maybe<User>
+	/** Вернуть workspace по id */
 	workspace?: Maybe<Workspace>
-	workspaces: Array<Maybe<Workspace>>
+	/** Вернуть все workspaces */
+	workspaces: WorkspacePaginator
+}
+
+export type QueryDriverInfoByIdArgs = {
+	id: Scalars['ID']['input']
+}
+
+export type QueryDriverInfoByOrganizationIdArgs = {
+	input?: InputMaybe<DriverInfoByOrganizationIdInput>
 }
 
 export type QueryOrganizationArgs = {
+	id: Scalars['ID']['input']
+}
+
+export type QueryPaymentByIdArgs = {
+	id: Scalars['ID']['input']
+}
+
+export type QueryPaymentByNumberIdArgs = {
+	number_id?: InputMaybe<Scalars['Int']['input']>
+}
+
+export type QueryPaymentMethodByIdArgs = {
+	id: Scalars['ID']['input']
+}
+
+export type QueryPaymentMethodByNumberIdArgs = {
+	number_id: Scalars['Int']['input']
+}
+
+export type QueryQrCodeArgs = {
+	id: Scalars['ID']['input']
+}
+
+export type QueryTransactionArgs = {
 	id: Scalars['ID']['input']
 }
 
@@ -305,6 +423,11 @@ export type QueryUserByIdArgs = {
 
 export type QueryWorkspaceArgs = {
 	id: Scalars['ID']['input']
+}
+
+export type QueryWorkspacesArgs = {
+	count?: InputMaybe<Scalars['Int']['input']>
+	page?: InputMaybe<Scalars['Int']['input']>
 }
 
 export type SetWorkUserWorkspaceInput = {
@@ -334,15 +457,15 @@ export type SubscriptionPlan = {
 
 export type Transaction = {
 	__typename?: 'Transaction'
-	amount: Scalars['Float']['output']
-	count_product: Scalars['String']['output']
+	amount: Scalars['String']['output']
+	count_product?: Maybe<Scalars['String']['output']>
 	created_at: Scalars['Date']['output']
 	id: Scalars['ID']['output']
-	name_product: Scalars['String']['output']
-	nubmer_uuid: Scalars['String']['output']
+	name_product?: Maybe<Scalars['String']['output']>
+	number_uuid: Scalars['String']['output']
 	qr_code: QrCode
-	status?: Maybe<TransactionStatusEnum>
-	type_product: Scalars['String']['output']
+	status: TransactionStatusEnum
+	type_product?: Maybe<Scalars['String']['output']>
 	updated_at: Scalars['Date']['output']
 	workspace: Workspace
 }
@@ -396,7 +519,6 @@ export type User = {
 }
 
 export type UserCreate = {
-	agreement: Scalars['Boolean']['input']
 	/** В запросе должен быть обязательно либо email, либо phone */
 	email: Scalars['String']['input']
 	/** Отчество */
@@ -437,6 +559,7 @@ export type UserRegistration = {
 }
 
 export enum UserRoleEnum {
+	Admin = 'admin',
 	Cassier = 'cassier',
 	Manager = 'manager'
 }
@@ -449,7 +572,8 @@ export type Workspace = {
 	is_active: Scalars['Boolean']['output']
 	name: Scalars['String']['output']
 	organization: Organization
-	payment?: Maybe<Payment>
+	paymentMethod?: Maybe<PaymentMethod>
+	transactions: Array<Maybe<Transaction>>
 	updated_at: Scalars['Date']['output']
 	user_owner: User
 	/** Пользователь который работает в данный момент под workspace */
@@ -461,7 +585,356 @@ export type WorkspaceCreateInput = {
 	is_active?: InputMaybe<Scalars['Boolean']['input']>
 	name: Scalars['String']['input']
 	organization_id: Scalars['String']['input']
-	payment_id?: InputMaybe<Scalars['String']['input']>
+	/** Драйвер оплаты: Тинькофф, Сберабанк, Точка */
+	payment_method_id?: InputMaybe<Scalars['String']['input']>
+}
+
+export type WorkspacePaginator = {
+	__typename?: 'WorkspacePaginator'
+	data: Array<Maybe<Workspace>>
+	paginatorInfo: PaginatorInfo
+}
+
+export type DriverInfoByOrganizationIdInput = {
+	organization_id: Scalars['ID']['input']
+	payment_method_id: Scalars['ID']['input']
+}
+
+export type GetMembersQueryVariables = Exact<{
+	organizationId: Scalars['ID']['input']
+}>
+
+export type GetMembersQuery = {
+	__typename?: 'Query'
+	organization?: {
+		__typename?: 'Organization'
+		users: Array<{
+			__typename?: 'User'
+			id: string
+			first_name?: string | null
+			last_name?: string | null
+			father_name?: string | null
+			role: UserRoleEnum
+			active: boolean
+			email?: string | null
+			phone?: string | null
+			created_at: any
+		}>
+	} | null
+}
+
+export type CreateMemberMutationVariables = Exact<{
+	input: UserCreate
+}>
+
+export type CreateMemberMutation = {
+	__typename?: 'Mutation'
+	userCreate: {
+		__typename?: 'User'
+		id: string
+		first_name?: string | null
+		last_name?: string | null
+		father_name?: string | null
+		role: UserRoleEnum
+		active: boolean
+		email?: string | null
+		phone?: string | null
+		created_at: any
+	}
+}
+
+export type GetOrganizationsQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetOrganizationsQuery = {
+	__typename?: 'Query'
+	organizations: Array<{
+		__typename?: 'Organization'
+		id: string
+		name: string
+		address: string
+		type: OrganizationTypeEnum
+		okved?: string | null
+		founded_date?: string | null
+		registration_number: string
+		inn: string
+		kpp?: string | null
+	} | null>
+}
+
+export type GetOrganizationQueryVariables = Exact<{
+	id: Scalars['ID']['input']
+}>
+
+export type GetOrganizationQuery = {
+	__typename?: 'Query'
+	organization?: {
+		__typename?: 'Organization'
+		id: string
+		name: string
+		address: string
+		type: OrganizationTypeEnum
+		okved?: string | null
+		founded_date?: string | null
+		registration_number: string
+		inn: string
+		kpp?: string | null
+	} | null
+}
+
+export type CreateOrganizationMutationVariables = Exact<{
+	input: OrganizationCreateInput
+}>
+
+export type CreateOrganizationMutation = {
+	__typename?: 'Mutation'
+	createOrganization: {
+		__typename?: 'Organization'
+		id: string
+		name: string
+		address: string
+		type: OrganizationTypeEnum
+		okved?: string | null
+		founded_date?: string | null
+		registration_number: string
+		inn: string
+		kpp?: string | null
+	}
+}
+
+export type GetPaymentMethodsQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetPaymentMethodsQuery = {
+	__typename?: 'Query'
+	paymentMethods: Array<{
+		__typename?: 'PaymentMethod'
+		id: string
+		active: boolean
+		driver_name: string
+		created_at: any
+	} | null>
+}
+
+export type GetMeQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetMeQuery = {
+	__typename?: 'Query'
+	authMe?: {
+		__typename?: 'User'
+		id: string
+		first_name?: string | null
+		last_name?: string | null
+		father_name?: string | null
+		role: UserRoleEnum
+		active: boolean
+		email?: string | null
+		phone?: string | null
+		created_at: any
+		personalAreas: Array<{
+			__typename?: 'PersonalArea'
+			id: string
+			created_at: any
+			owner: {
+				__typename?: 'User'
+				id: string
+				first_name?: string | null
+				last_name?: string | null
+				father_name?: string | null
+				role: UserRoleEnum
+				active: boolean
+				email?: string | null
+				phone?: string | null
+				created_at: any
+			}
+		}>
+	} | null
+}
+
+export type GetWorkspacesQueryVariables = Exact<{
+	page?: InputMaybe<Scalars['Int']['input']>
+	count?: InputMaybe<Scalars['Int']['input']>
+}>
+
+export type GetWorkspacesQuery = {
+	__typename?: 'Query'
+	workspaces: {
+		__typename?: 'WorkspacePaginator'
+		data: Array<{
+			__typename?: 'Workspace'
+			id: string
+			name: string
+			description?: string | null
+			is_active: boolean
+			created_at: any
+			organization: {
+				__typename?: 'Organization'
+				id: string
+				name: string
+				address: string
+				type: OrganizationTypeEnum
+				okved?: string | null
+				founded_date?: string | null
+				registration_number: string
+				inn: string
+				kpp?: string | null
+			}
+			user_worker?: {
+				__typename?: 'User'
+				id: string
+				first_name?: string | null
+				last_name?: string | null
+				father_name?: string | null
+				role: UserRoleEnum
+				active: boolean
+				email?: string | null
+				phone?: string | null
+				created_at: any
+			} | null
+			user_owner: {
+				__typename?: 'User'
+				id: string
+				first_name?: string | null
+				last_name?: string | null
+				father_name?: string | null
+				role: UserRoleEnum
+				active: boolean
+				email?: string | null
+				phone?: string | null
+				created_at: any
+			}
+			paymentMethod?: {
+				__typename?: 'PaymentMethod'
+				id: string
+				active: boolean
+				driver_name: string
+				created_at: any
+			} | null
+		} | null>
+		paginatorInfo: {
+			__typename?: 'PaginatorInfo'
+			limit: number
+			currentPage: number
+			total: number
+			totalPages: number
+		}
+	}
+}
+
+export type GetWorkspaceQueryVariables = Exact<{
+	id: Scalars['ID']['input']
+}>
+
+export type GetWorkspaceQuery = {
+	__typename?: 'Query'
+	workspace?: {
+		__typename?: 'Workspace'
+		id: string
+		name: string
+		description?: string | null
+		is_active: boolean
+		created_at: any
+		organization: {
+			__typename?: 'Organization'
+			id: string
+			name: string
+			address: string
+			type: OrganizationTypeEnum
+			okved?: string | null
+			founded_date?: string | null
+			registration_number: string
+			inn: string
+			kpp?: string | null
+		}
+		user_worker?: {
+			__typename?: 'User'
+			id: string
+			first_name?: string | null
+			last_name?: string | null
+			father_name?: string | null
+			role: UserRoleEnum
+			active: boolean
+			email?: string | null
+			phone?: string | null
+			created_at: any
+		} | null
+		user_owner: {
+			__typename?: 'User'
+			id: string
+			first_name?: string | null
+			last_name?: string | null
+			father_name?: string | null
+			role: UserRoleEnum
+			active: boolean
+			email?: string | null
+			phone?: string | null
+			created_at: any
+		}
+		paymentMethod?: {
+			__typename?: 'PaymentMethod'
+			id: string
+			active: boolean
+			driver_name: string
+			created_at: any
+		} | null
+	} | null
+}
+
+export type CreateWorkspaceMutationVariables = Exact<{
+	input: WorkspaceCreateInput
+}>
+
+export type CreateWorkspaceMutation = {
+	__typename?: 'Mutation'
+	createWorkspace: {
+		__typename?: 'Workspace'
+		id: string
+		name: string
+		description?: string | null
+		is_active: boolean
+		created_at: any
+		organization: {
+			__typename?: 'Organization'
+			id: string
+			name: string
+			address: string
+			type: OrganizationTypeEnum
+			okved?: string | null
+			founded_date?: string | null
+			registration_number: string
+			inn: string
+			kpp?: string | null
+		}
+		user_worker?: {
+			__typename?: 'User'
+			id: string
+			first_name?: string | null
+			last_name?: string | null
+			father_name?: string | null
+			role: UserRoleEnum
+			active: boolean
+			email?: string | null
+			phone?: string | null
+			created_at: any
+		} | null
+		user_owner: {
+			__typename?: 'User'
+			id: string
+			first_name?: string | null
+			last_name?: string | null
+			father_name?: string | null
+			role: UserRoleEnum
+			active: boolean
+			email?: string | null
+			phone?: string | null
+			created_at: any
+		}
+		paymentMethod?: {
+			__typename?: 'PaymentMethod'
+			id: string
+			active: boolean
+			driver_name: string
+			created_at: any
+		} | null
+	}
 }
 
 export type LoginMutationVariables = Exact<{
@@ -504,7 +977,7 @@ export type SubscriptionInfoFragment = {
 export type PersonalAreaInfoFragment = {
 	__typename?: 'PersonalArea'
 	id: string
-	balance: number
+	balance: string
 	created_at: any
 	owner: {
 		__typename?: 'User'
@@ -522,90 +995,12 @@ export type PersonalAreaInfoFragment = {
 	}
 }
 
-export type GetMeQueryVariables = Exact<{ [key: string]: never }>
-
-export type GetMeQuery = {
-	__typename?: 'Query'
-	authMe?: {
-		__typename?: 'User'
-		id: string
-		first_name?: string | null
-		last_name?: string | null
-		father_name?: string | null
-		role: UserRoleEnum
-		active: boolean
-		email?: string | null
-		phone?: string | null
-		created_at: any
-		workspaces: Array<{
-			__typename?: 'Workspace'
-			id: string
-			name: string
-			description?: string | null
-			is_active: boolean
-			created_at: any
-		} | null>
-		organizations?: Array<{
-			__typename?: 'Organization'
-			id: string
-			name: string
-			address: string
-			type: OrganizationTypeEnum
-			okved?: string | null
-			founded_date?: string | null
-			inn: string
-			kpp?: string | null
-		} | null> | null
-	} | null
-}
-
-export type GetWorkspacesQueryVariables = Exact<{ [key: string]: never }>
-
-export type GetWorkspacesQuery = {
-	__typename?: 'Query'
-	workspaces: Array<{
-		__typename?: 'Workspace'
-		id: string
-		name: string
-		description?: string | null
-		is_active: boolean
-		created_at: any
-		organization: {
-			__typename?: 'Organization'
-			id: string
-			name: string
-			address: string
-			type: OrganizationTypeEnum
-			okved?: string | null
-			founded_date?: string | null
-			inn: string
-			kpp?: string | null
-		}
-		user_worker?: {
-			__typename?: 'User'
-			id: string
-			first_name?: string | null
-			last_name?: string | null
-			father_name?: string | null
-			role: UserRoleEnum
-			active: boolean
-			email?: string | null
-			phone?: string | null
-			created_at: any
-		} | null
-		user_owner: {
-			__typename?: 'User'
-			id: string
-			first_name?: string | null
-			last_name?: string | null
-			father_name?: string | null
-			role: UserRoleEnum
-			active: boolean
-			email?: string | null
-			phone?: string | null
-			created_at: any
-		}
-	} | null>
+export type PaginationFragmentFragment = {
+	__typename?: 'PaginatorInfo'
+	limit: number
+	currentPage: number
+	total: number
+	totalPages: number
 }
 
 export type OrganizationBaseFragmentFragment = {
@@ -616,6 +1011,7 @@ export type OrganizationBaseFragmentFragment = {
 	type: OrganizationTypeEnum
 	okved?: string | null
 	founded_date?: string | null
+	registration_number: string
 	inn: string
 	kpp?: string | null
 }
@@ -633,6 +1029,14 @@ export type UserBaseFragmentFragment = {
 	created_at: any
 }
 
+export type PaymentMethodBaseFragmentFragment = {
+	__typename?: 'PaymentMethod'
+	id: string
+	active: boolean
+	driver_name: string
+	created_at: any
+}
+
 export type WorkspaceBaseFragmentFragment = {
 	__typename?: 'Workspace'
 	id: string
@@ -640,6 +1044,39 @@ export type WorkspaceBaseFragmentFragment = {
 	description?: string | null
 	is_active: boolean
 	created_at: any
+	paymentMethod?: {
+		__typename?: 'PaymentMethod'
+		id: string
+		active: boolean
+		driver_name: string
+		created_at: any
+	} | null
+}
+
+export type SubscriptionFragmentFragment = {
+	__typename?: 'SubscriptionPlan'
+	id: string
+	plan_name: string
+	price: number
+	expires_at: any
+}
+
+export type PersonalAreaBaseFragmentFragment = {
+	__typename?: 'PersonalArea'
+	id: string
+	created_at: any
+	owner: {
+		__typename?: 'User'
+		id: string
+		first_name?: string | null
+		last_name?: string | null
+		father_name?: string | null
+		role: UserRoleEnum
+		active: boolean
+		email?: string | null
+		phone?: string | null
+		created_at: any
+	}
 }
 
 export type OrganizationFragmentFragment = {
@@ -650,6 +1087,7 @@ export type OrganizationFragmentFragment = {
 	type: OrganizationTypeEnum
 	okved?: string | null
 	founded_date?: string | null
+	registration_number: string
 	inn: string
 	kpp?: string | null
 }
@@ -672,6 +1110,13 @@ export type UserFragmentFragment = {
 		description?: string | null
 		is_active: boolean
 		created_at: any
+		paymentMethod?: {
+			__typename?: 'PaymentMethod'
+			id: string
+			active: boolean
+			driver_name: string
+			created_at: any
+		} | null
 	} | null>
 	organizations?: Array<{
 		__typename?: 'Organization'
@@ -681,6 +1126,7 @@ export type UserFragmentFragment = {
 		type: OrganizationTypeEnum
 		okved?: string | null
 		founded_date?: string | null
+		registration_number: string
 		inn: string
 		kpp?: string | null
 	} | null> | null
@@ -701,6 +1147,7 @@ export type WorkspaceFragmentFragment = {
 		type: OrganizationTypeEnum
 		okved?: string | null
 		founded_date?: string | null
+		registration_number: string
 		inn: string
 		kpp?: string | null
 	}
@@ -728,6 +1175,75 @@ export type WorkspaceFragmentFragment = {
 		phone?: string | null
 		created_at: any
 	}
+	paymentMethod?: {
+		__typename?: 'PaymentMethod'
+		id: string
+		active: boolean
+		driver_name: string
+		created_at: any
+	} | null
+}
+
+export type WorkspacePaginatedFragmentFragment = {
+	__typename?: 'WorkspacePaginator'
+	data: Array<{
+		__typename?: 'Workspace'
+		id: string
+		name: string
+		description?: string | null
+		is_active: boolean
+		created_at: any
+		organization: {
+			__typename?: 'Organization'
+			id: string
+			name: string
+			address: string
+			type: OrganizationTypeEnum
+			okved?: string | null
+			founded_date?: string | null
+			registration_number: string
+			inn: string
+			kpp?: string | null
+		}
+		user_worker?: {
+			__typename?: 'User'
+			id: string
+			first_name?: string | null
+			last_name?: string | null
+			father_name?: string | null
+			role: UserRoleEnum
+			active: boolean
+			email?: string | null
+			phone?: string | null
+			created_at: any
+		} | null
+		user_owner: {
+			__typename?: 'User'
+			id: string
+			first_name?: string | null
+			last_name?: string | null
+			father_name?: string | null
+			role: UserRoleEnum
+			active: boolean
+			email?: string | null
+			phone?: string | null
+			created_at: any
+		}
+		paymentMethod?: {
+			__typename?: 'PaymentMethod'
+			id: string
+			active: boolean
+			driver_name: string
+			created_at: any
+		} | null
+	} | null>
+	paginatorInfo: {
+		__typename?: 'PaginatorInfo'
+		limit: number
+		currentPage: number
+		total: number
+		totalPages: number
+	}
 }
 
 export const SubscriptionInfoFragmentDoc = gql`
@@ -754,21 +1270,12 @@ export const PersonalAreaInfoFragmentDoc = gql`
 		created_at
 	}
 `
-export const OrganizationBaseFragmentFragmentDoc = gql`
-	fragment OrganizationBaseFragment on Organization {
+export const SubscriptionFragmentFragmentDoc = gql`
+	fragment SubscriptionFragment on SubscriptionPlan {
 		id
-		name
-		address
-		type
-		okved
-		founded_date
-		inn
-		kpp
-	}
-`
-export const OrganizationFragmentFragmentDoc = gql`
-	fragment OrganizationFragment on Organization {
-		...OrganizationBaseFragment
+		plan_name
+		price
+		expires_at
 	}
 `
 export const UserBaseFragmentFragmentDoc = gql`
@@ -784,10 +1291,48 @@ export const UserBaseFragmentFragmentDoc = gql`
 		created_at
 	}
 `
+export const PersonalAreaBaseFragmentFragmentDoc = gql`
+	fragment PersonalAreaBaseFragment on PersonalArea {
+		id
+		owner {
+			...UserBaseFragment
+		}
+		created_at
+	}
+`
+export const OrganizationBaseFragmentFragmentDoc = gql`
+	fragment OrganizationBaseFragment on Organization {
+		id
+		name
+		address
+		type
+		okved
+		founded_date
+		registration_number
+		inn
+		kpp
+	}
+`
+export const OrganizationFragmentFragmentDoc = gql`
+	fragment OrganizationFragment on Organization {
+		...OrganizationBaseFragment
+	}
+`
+export const PaymentMethodBaseFragmentFragmentDoc = gql`
+	fragment PaymentMethodBaseFragment on PaymentMethod {
+		id
+		active
+		driver_name
+		created_at
+	}
+`
 export const WorkspaceBaseFragmentFragmentDoc = gql`
 	fragment WorkspaceBaseFragment on Workspace {
 		id
 		name
+		paymentMethod {
+			...PaymentMethodBaseFragment
+		}
 		description
 		is_active
 		created_at
@@ -818,6 +1363,520 @@ export const WorkspaceFragmentFragmentDoc = gql`
 		}
 	}
 `
+export const PaginationFragmentFragmentDoc = gql`
+	fragment PaginationFragment on PaginatorInfo {
+		limit
+		currentPage
+		total
+		totalPages
+	}
+`
+export const WorkspacePaginatedFragmentFragmentDoc = gql`
+	fragment WorkspacePaginatedFragment on WorkspacePaginator {
+		data {
+			...WorkspaceFragment
+		}
+		paginatorInfo {
+			...PaginationFragment
+		}
+	}
+`
+export const GetMembersDocument = gql`
+	query GetMembers($organizationId: ID!) {
+		organization(id: $organizationId) {
+			users {
+				...UserBaseFragment
+			}
+		}
+	}
+	${UserBaseFragmentFragmentDoc}
+`
+
+/**
+ * __useGetMembersQuery__
+ *
+ * To run a query within a React component, call `useGetMembersQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMembersQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMembersQuery({
+ *   variables: {
+ *      organizationId: // value for 'organizationId'
+ *   },
+ * });
+ */
+export function useGetMembersQuery(
+	baseOptions: Apollo.QueryHookOptions<GetMembersQuery, GetMembersQueryVariables> &
+		({ variables: GetMembersQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useQuery<GetMembersQuery, GetMembersQueryVariables>(GetMembersDocument, options)
+}
+export function useGetMembersLazyQuery(
+	baseOptions?: Apollo.LazyQueryHookOptions<GetMembersQuery, GetMembersQueryVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useLazyQuery<GetMembersQuery, GetMembersQueryVariables>(GetMembersDocument, options)
+}
+export function useGetMembersSuspenseQuery(
+	baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMembersQuery, GetMembersQueryVariables>
+) {
+	const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+	return Apollo.useSuspenseQuery<GetMembersQuery, GetMembersQueryVariables>(GetMembersDocument, options)
+}
+export type GetMembersQueryHookResult = ReturnType<typeof useGetMembersQuery>
+export type GetMembersLazyQueryHookResult = ReturnType<typeof useGetMembersLazyQuery>
+export type GetMembersSuspenseQueryHookResult = ReturnType<typeof useGetMembersSuspenseQuery>
+export type GetMembersQueryResult = Apollo.QueryResult<GetMembersQuery, GetMembersQueryVariables>
+export const CreateMemberDocument = gql`
+	mutation CreateMember($input: UserCreate!) {
+		userCreate(input: $input) {
+			...UserBaseFragment
+		}
+	}
+	${UserBaseFragmentFragmentDoc}
+`
+export type CreateMemberMutationFn = Apollo.MutationFunction<CreateMemberMutation, CreateMemberMutationVariables>
+
+/**
+ * __useCreateMemberMutation__
+ *
+ * To run a mutation, you first call `useCreateMemberMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateMemberMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createMemberMutation, { data, loading, error }] = useCreateMemberMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateMemberMutation(
+	baseOptions?: Apollo.MutationHookOptions<CreateMemberMutation, CreateMemberMutationVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useMutation<CreateMemberMutation, CreateMemberMutationVariables>(CreateMemberDocument, options)
+}
+export type CreateMemberMutationHookResult = ReturnType<typeof useCreateMemberMutation>
+export type CreateMemberMutationResult = Apollo.MutationResult<CreateMemberMutation>
+export type CreateMemberMutationOptions = Apollo.BaseMutationOptions<
+	CreateMemberMutation,
+	CreateMemberMutationVariables
+>
+export const GetOrganizationsDocument = gql`
+	query GetOrganizations {
+		organizations {
+			...OrganizationFragment
+		}
+	}
+	${OrganizationFragmentFragmentDoc}
+	${OrganizationBaseFragmentFragmentDoc}
+`
+
+/**
+ * __useGetOrganizationsQuery__
+ *
+ * To run a query within a React component, call `useGetOrganizationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetOrganizationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetOrganizationsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetOrganizationsQuery(
+	baseOptions?: Apollo.QueryHookOptions<GetOrganizationsQuery, GetOrganizationsQueryVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useQuery<GetOrganizationsQuery, GetOrganizationsQueryVariables>(GetOrganizationsDocument, options)
+}
+export function useGetOrganizationsLazyQuery(
+	baseOptions?: Apollo.LazyQueryHookOptions<GetOrganizationsQuery, GetOrganizationsQueryVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useLazyQuery<GetOrganizationsQuery, GetOrganizationsQueryVariables>(GetOrganizationsDocument, options)
+}
+export function useGetOrganizationsSuspenseQuery(
+	baseOptions?:
+		| Apollo.SkipToken
+		| Apollo.SuspenseQueryHookOptions<GetOrganizationsQuery, GetOrganizationsQueryVariables>
+) {
+	const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+	return Apollo.useSuspenseQuery<GetOrganizationsQuery, GetOrganizationsQueryVariables>(
+		GetOrganizationsDocument,
+		options
+	)
+}
+export type GetOrganizationsQueryHookResult = ReturnType<typeof useGetOrganizationsQuery>
+export type GetOrganizationsLazyQueryHookResult = ReturnType<typeof useGetOrganizationsLazyQuery>
+export type GetOrganizationsSuspenseQueryHookResult = ReturnType<typeof useGetOrganizationsSuspenseQuery>
+export type GetOrganizationsQueryResult = Apollo.QueryResult<GetOrganizationsQuery, GetOrganizationsQueryVariables>
+export const GetOrganizationDocument = gql`
+	query GetOrganization($id: ID!) {
+		organization(id: $id) {
+			...OrganizationFragment
+		}
+	}
+	${OrganizationFragmentFragmentDoc}
+	${OrganizationBaseFragmentFragmentDoc}
+`
+
+/**
+ * __useGetOrganizationQuery__
+ *
+ * To run a query within a React component, call `useGetOrganizationQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetOrganizationQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetOrganizationQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetOrganizationQuery(
+	baseOptions: Apollo.QueryHookOptions<GetOrganizationQuery, GetOrganizationQueryVariables> &
+		({ variables: GetOrganizationQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useQuery<GetOrganizationQuery, GetOrganizationQueryVariables>(GetOrganizationDocument, options)
+}
+export function useGetOrganizationLazyQuery(
+	baseOptions?: Apollo.LazyQueryHookOptions<GetOrganizationQuery, GetOrganizationQueryVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useLazyQuery<GetOrganizationQuery, GetOrganizationQueryVariables>(GetOrganizationDocument, options)
+}
+export function useGetOrganizationSuspenseQuery(
+	baseOptions?:
+		| Apollo.SkipToken
+		| Apollo.SuspenseQueryHookOptions<GetOrganizationQuery, GetOrganizationQueryVariables>
+) {
+	const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+	return Apollo.useSuspenseQuery<GetOrganizationQuery, GetOrganizationQueryVariables>(
+		GetOrganizationDocument,
+		options
+	)
+}
+export type GetOrganizationQueryHookResult = ReturnType<typeof useGetOrganizationQuery>
+export type GetOrganizationLazyQueryHookResult = ReturnType<typeof useGetOrganizationLazyQuery>
+export type GetOrganizationSuspenseQueryHookResult = ReturnType<typeof useGetOrganizationSuspenseQuery>
+export type GetOrganizationQueryResult = Apollo.QueryResult<GetOrganizationQuery, GetOrganizationQueryVariables>
+export const CreateOrganizationDocument = gql`
+	mutation CreateOrganization($input: OrganizationCreateInput!) {
+		createOrganization(input: $input) {
+			...OrganizationFragment
+		}
+	}
+	${OrganizationFragmentFragmentDoc}
+	${OrganizationBaseFragmentFragmentDoc}
+`
+export type CreateOrganizationMutationFn = Apollo.MutationFunction<
+	CreateOrganizationMutation,
+	CreateOrganizationMutationVariables
+>
+
+/**
+ * __useCreateOrganizationMutation__
+ *
+ * To run a mutation, you first call `useCreateOrganizationMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateOrganizationMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createOrganizationMutation, { data, loading, error }] = useCreateOrganizationMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateOrganizationMutation(
+	baseOptions?: Apollo.MutationHookOptions<CreateOrganizationMutation, CreateOrganizationMutationVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useMutation<CreateOrganizationMutation, CreateOrganizationMutationVariables>(
+		CreateOrganizationDocument,
+		options
+	)
+}
+export type CreateOrganizationMutationHookResult = ReturnType<typeof useCreateOrganizationMutation>
+export type CreateOrganizationMutationResult = Apollo.MutationResult<CreateOrganizationMutation>
+export type CreateOrganizationMutationOptions = Apollo.BaseMutationOptions<
+	CreateOrganizationMutation,
+	CreateOrganizationMutationVariables
+>
+export const GetPaymentMethodsDocument = gql`
+	query GetPaymentMethods {
+		paymentMethods {
+			...PaymentMethodBaseFragment
+		}
+	}
+	${PaymentMethodBaseFragmentFragmentDoc}
+`
+
+/**
+ * __useGetPaymentMethodsQuery__
+ *
+ * To run a query within a React component, call `useGetPaymentMethodsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetPaymentMethodsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetPaymentMethodsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetPaymentMethodsQuery(
+	baseOptions?: Apollo.QueryHookOptions<GetPaymentMethodsQuery, GetPaymentMethodsQueryVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useQuery<GetPaymentMethodsQuery, GetPaymentMethodsQueryVariables>(GetPaymentMethodsDocument, options)
+}
+export function useGetPaymentMethodsLazyQuery(
+	baseOptions?: Apollo.LazyQueryHookOptions<GetPaymentMethodsQuery, GetPaymentMethodsQueryVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useLazyQuery<GetPaymentMethodsQuery, GetPaymentMethodsQueryVariables>(
+		GetPaymentMethodsDocument,
+		options
+	)
+}
+export function useGetPaymentMethodsSuspenseQuery(
+	baseOptions?:
+		| Apollo.SkipToken
+		| Apollo.SuspenseQueryHookOptions<GetPaymentMethodsQuery, GetPaymentMethodsQueryVariables>
+) {
+	const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+	return Apollo.useSuspenseQuery<GetPaymentMethodsQuery, GetPaymentMethodsQueryVariables>(
+		GetPaymentMethodsDocument,
+		options
+	)
+}
+export type GetPaymentMethodsQueryHookResult = ReturnType<typeof useGetPaymentMethodsQuery>
+export type GetPaymentMethodsLazyQueryHookResult = ReturnType<typeof useGetPaymentMethodsLazyQuery>
+export type GetPaymentMethodsSuspenseQueryHookResult = ReturnType<typeof useGetPaymentMethodsSuspenseQuery>
+export type GetPaymentMethodsQueryResult = Apollo.QueryResult<GetPaymentMethodsQuery, GetPaymentMethodsQueryVariables>
+export const GetMeDocument = gql`
+	query GetMe {
+		authMe {
+			...UserBaseFragment
+			personalAreas {
+				...PersonalAreaBaseFragment
+			}
+		}
+	}
+	${UserBaseFragmentFragmentDoc}
+	${PersonalAreaBaseFragmentFragmentDoc}
+`
+
+/**
+ * __useGetMeQuery__
+ *
+ * To run a query within a React component, call `useGetMeQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetMeQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetMeQuery(baseOptions?: Apollo.QueryHookOptions<GetMeQuery, GetMeQueryVariables>) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useQuery<GetMeQuery, GetMeQueryVariables>(GetMeDocument, options)
+}
+export function useGetMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMeQuery, GetMeQueryVariables>) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useLazyQuery<GetMeQuery, GetMeQueryVariables>(GetMeDocument, options)
+}
+export function useGetMeSuspenseQuery(
+	baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMeQuery, GetMeQueryVariables>
+) {
+	const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+	return Apollo.useSuspenseQuery<GetMeQuery, GetMeQueryVariables>(GetMeDocument, options)
+}
+export type GetMeQueryHookResult = ReturnType<typeof useGetMeQuery>
+export type GetMeLazyQueryHookResult = ReturnType<typeof useGetMeLazyQuery>
+export type GetMeSuspenseQueryHookResult = ReturnType<typeof useGetMeSuspenseQuery>
+export type GetMeQueryResult = Apollo.QueryResult<GetMeQuery, GetMeQueryVariables>
+export const GetWorkspacesDocument = gql`
+	query GetWorkspaces($page: Int, $count: Int) {
+		workspaces(page: $page, count: $count) {
+			...WorkspacePaginatedFragment
+		}
+	}
+	${WorkspacePaginatedFragmentFragmentDoc}
+	${WorkspaceFragmentFragmentDoc}
+	${WorkspaceBaseFragmentFragmentDoc}
+	${PaymentMethodBaseFragmentFragmentDoc}
+	${OrganizationBaseFragmentFragmentDoc}
+	${UserBaseFragmentFragmentDoc}
+	${PaginationFragmentFragmentDoc}
+`
+
+/**
+ * __useGetWorkspacesQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspacesQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspacesQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspacesQuery({
+ *   variables: {
+ *      page: // value for 'page'
+ *      count: // value for 'count'
+ *   },
+ * });
+ */
+export function useGetWorkspacesQuery(
+	baseOptions?: Apollo.QueryHookOptions<GetWorkspacesQuery, GetWorkspacesQueryVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useQuery<GetWorkspacesQuery, GetWorkspacesQueryVariables>(GetWorkspacesDocument, options)
+}
+export function useGetWorkspacesLazyQuery(
+	baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspacesQuery, GetWorkspacesQueryVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useLazyQuery<GetWorkspacesQuery, GetWorkspacesQueryVariables>(GetWorkspacesDocument, options)
+}
+export function useGetWorkspacesSuspenseQuery(
+	baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetWorkspacesQuery, GetWorkspacesQueryVariables>
+) {
+	const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+	return Apollo.useSuspenseQuery<GetWorkspacesQuery, GetWorkspacesQueryVariables>(GetWorkspacesDocument, options)
+}
+export type GetWorkspacesQueryHookResult = ReturnType<typeof useGetWorkspacesQuery>
+export type GetWorkspacesLazyQueryHookResult = ReturnType<typeof useGetWorkspacesLazyQuery>
+export type GetWorkspacesSuspenseQueryHookResult = ReturnType<typeof useGetWorkspacesSuspenseQuery>
+export type GetWorkspacesQueryResult = Apollo.QueryResult<GetWorkspacesQuery, GetWorkspacesQueryVariables>
+export const GetWorkspaceDocument = gql`
+	query GetWorkspace($id: ID!) {
+		workspace(id: $id) {
+			...WorkspaceFragment
+		}
+	}
+	${WorkspaceFragmentFragmentDoc}
+	${WorkspaceBaseFragmentFragmentDoc}
+	${PaymentMethodBaseFragmentFragmentDoc}
+	${OrganizationBaseFragmentFragmentDoc}
+	${UserBaseFragmentFragmentDoc}
+`
+
+/**
+ * __useGetWorkspaceQuery__
+ *
+ * To run a query within a React component, call `useGetWorkspaceQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetWorkspaceQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetWorkspaceQuery({
+ *   variables: {
+ *      id: // value for 'id'
+ *   },
+ * });
+ */
+export function useGetWorkspaceQuery(
+	baseOptions: Apollo.QueryHookOptions<GetWorkspaceQuery, GetWorkspaceQueryVariables> &
+		({ variables: GetWorkspaceQueryVariables; skip?: boolean } | { skip: boolean })
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useQuery<GetWorkspaceQuery, GetWorkspaceQueryVariables>(GetWorkspaceDocument, options)
+}
+export function useGetWorkspaceLazyQuery(
+	baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspaceQuery, GetWorkspaceQueryVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useLazyQuery<GetWorkspaceQuery, GetWorkspaceQueryVariables>(GetWorkspaceDocument, options)
+}
+export function useGetWorkspaceSuspenseQuery(
+	baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetWorkspaceQuery, GetWorkspaceQueryVariables>
+) {
+	const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+	return Apollo.useSuspenseQuery<GetWorkspaceQuery, GetWorkspaceQueryVariables>(GetWorkspaceDocument, options)
+}
+export type GetWorkspaceQueryHookResult = ReturnType<typeof useGetWorkspaceQuery>
+export type GetWorkspaceLazyQueryHookResult = ReturnType<typeof useGetWorkspaceLazyQuery>
+export type GetWorkspaceSuspenseQueryHookResult = ReturnType<typeof useGetWorkspaceSuspenseQuery>
+export type GetWorkspaceQueryResult = Apollo.QueryResult<GetWorkspaceQuery, GetWorkspaceQueryVariables>
+export const CreateWorkspaceDocument = gql`
+	mutation CreateWorkspace($input: WorkspaceCreateInput!) {
+		createWorkspace(input: $input) {
+			...WorkspaceFragment
+		}
+	}
+	${WorkspaceFragmentFragmentDoc}
+	${WorkspaceBaseFragmentFragmentDoc}
+	${PaymentMethodBaseFragmentFragmentDoc}
+	${OrganizationBaseFragmentFragmentDoc}
+	${UserBaseFragmentFragmentDoc}
+`
+export type CreateWorkspaceMutationFn = Apollo.MutationFunction<
+	CreateWorkspaceMutation,
+	CreateWorkspaceMutationVariables
+>
+
+/**
+ * __useCreateWorkspaceMutation__
+ *
+ * To run a mutation, you first call `useCreateWorkspaceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useCreateWorkspaceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [createWorkspaceMutation, { data, loading, error }] = useCreateWorkspaceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useCreateWorkspaceMutation(
+	baseOptions?: Apollo.MutationHookOptions<CreateWorkspaceMutation, CreateWorkspaceMutationVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useMutation<CreateWorkspaceMutation, CreateWorkspaceMutationVariables>(
+		CreateWorkspaceDocument,
+		options
+	)
+}
+export type CreateWorkspaceMutationHookResult = ReturnType<typeof useCreateWorkspaceMutation>
+export type CreateWorkspaceMutationResult = Apollo.MutationResult<CreateWorkspaceMutation>
+export type CreateWorkspaceMutationOptions = Apollo.BaseMutationOptions<
+	CreateWorkspaceMutation,
+	CreateWorkspaceMutationVariables
+>
 export const LoginDocument = gql`
 	mutation login($input: UserLogin!) {
 		login(input: $input) {
@@ -961,97 +2020,3 @@ export type AuthRefreshTokenMutationOptions = Apollo.BaseMutationOptions<
 	AuthRefreshTokenMutation,
 	AuthRefreshTokenMutationVariables
 >
-export const GetMeDocument = gql`
-	query GetMe {
-		authMe {
-			...UserFragment
-		}
-	}
-	${UserFragmentFragmentDoc}
-	${UserBaseFragmentFragmentDoc}
-	${WorkspaceBaseFragmentFragmentDoc}
-	${OrganizationBaseFragmentFragmentDoc}
-`
-
-/**
- * __useGetMeQuery__
- *
- * To run a query within a React component, call `useGetMeQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetMeQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetMeQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetMeQuery(baseOptions?: Apollo.QueryHookOptions<GetMeQuery, GetMeQueryVariables>) {
-	const options = { ...defaultOptions, ...baseOptions }
-	return Apollo.useQuery<GetMeQuery, GetMeQueryVariables>(GetMeDocument, options)
-}
-export function useGetMeLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<GetMeQuery, GetMeQueryVariables>) {
-	const options = { ...defaultOptions, ...baseOptions }
-	return Apollo.useLazyQuery<GetMeQuery, GetMeQueryVariables>(GetMeDocument, options)
-}
-export function useGetMeSuspenseQuery(
-	baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetMeQuery, GetMeQueryVariables>
-) {
-	const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
-	return Apollo.useSuspenseQuery<GetMeQuery, GetMeQueryVariables>(GetMeDocument, options)
-}
-export type GetMeQueryHookResult = ReturnType<typeof useGetMeQuery>
-export type GetMeLazyQueryHookResult = ReturnType<typeof useGetMeLazyQuery>
-export type GetMeSuspenseQueryHookResult = ReturnType<typeof useGetMeSuspenseQuery>
-export type GetMeQueryResult = Apollo.QueryResult<GetMeQuery, GetMeQueryVariables>
-export const GetWorkspacesDocument = gql`
-	query GetWorkspaces {
-		workspaces {
-			...WorkspaceFragment
-		}
-	}
-	${WorkspaceFragmentFragmentDoc}
-	${WorkspaceBaseFragmentFragmentDoc}
-	${OrganizationBaseFragmentFragmentDoc}
-	${UserBaseFragmentFragmentDoc}
-`
-
-/**
- * __useGetWorkspacesQuery__
- *
- * To run a query within a React component, call `useGetWorkspacesQuery` and pass it any options that fit your needs.
- * When your component renders, `useGetWorkspacesQuery` returns an object from Apollo Client that contains loading, error, and data properties
- * you can use to render your UI.
- *
- * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
- *
- * @example
- * const { data, loading, error } = useGetWorkspacesQuery({
- *   variables: {
- *   },
- * });
- */
-export function useGetWorkspacesQuery(
-	baseOptions?: Apollo.QueryHookOptions<GetWorkspacesQuery, GetWorkspacesQueryVariables>
-) {
-	const options = { ...defaultOptions, ...baseOptions }
-	return Apollo.useQuery<GetWorkspacesQuery, GetWorkspacesQueryVariables>(GetWorkspacesDocument, options)
-}
-export function useGetWorkspacesLazyQuery(
-	baseOptions?: Apollo.LazyQueryHookOptions<GetWorkspacesQuery, GetWorkspacesQueryVariables>
-) {
-	const options = { ...defaultOptions, ...baseOptions }
-	return Apollo.useLazyQuery<GetWorkspacesQuery, GetWorkspacesQueryVariables>(GetWorkspacesDocument, options)
-}
-export function useGetWorkspacesSuspenseQuery(
-	baseOptions?: Apollo.SkipToken | Apollo.SuspenseQueryHookOptions<GetWorkspacesQuery, GetWorkspacesQueryVariables>
-) {
-	const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
-	return Apollo.useSuspenseQuery<GetWorkspacesQuery, GetWorkspacesQueryVariables>(GetWorkspacesDocument, options)
-}
-export type GetWorkspacesQueryHookResult = ReturnType<typeof useGetWorkspacesQuery>
-export type GetWorkspacesLazyQueryHookResult = ReturnType<typeof useGetWorkspacesLazyQuery>
-export type GetWorkspacesSuspenseQueryHookResult = ReturnType<typeof useGetWorkspacesSuspenseQuery>
-export type GetWorkspacesQueryResult = Apollo.QueryResult<GetWorkspacesQuery, GetWorkspacesQueryVariables>

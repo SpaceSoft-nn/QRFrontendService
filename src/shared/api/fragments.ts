@@ -1,6 +1,14 @@
 import { gql } from '@apollo/client'
 
-// Базовые фрагменты
+export const PAGINATION_FRAGMENT = gql`
+	fragment PaginationFragment on PaginatorInfo {
+		limit
+		currentPage
+		total
+		totalPages
+	}
+`
+
 export const ORGANIZATION_BASE_FRAGMENT = gql`
 	fragment OrganizationBaseFragment on Organization {
 		id
@@ -9,6 +17,7 @@ export const ORGANIZATION_BASE_FRAGMENT = gql`
 		type
 		okved
 		founded_date
+		registration_number
 		inn
 		kpp
 	}
@@ -28,17 +37,49 @@ export const USER_BASE_FRAGMENT = gql`
 	}
 `
 
-export const WORKSPACE_BASE_FRAGMENT = gql`
-	fragment WorkspaceBaseFragment on Workspace {
+export const PAYMENT_METHOD_BASE_FRAGMENT = gql`
+	fragment PaymentMethodBaseFragment on PaymentMethod {
 		id
-		name
-		description
-		is_active
+		active
+		driver_name
 		created_at
 	}
 `
 
-// Составные фрагменты
+export const WORKSPACE_BASE_FRAGMENT = gql`
+	fragment WorkspaceBaseFragment on Workspace {
+		id
+		name
+		paymentMethod {
+			...PaymentMethodBaseFragment
+		}
+		description
+		is_active
+		created_at
+	}
+	${PAYMENT_METHOD_BASE_FRAGMENT}
+`
+
+export const SUBSCRIPTION_FRAGMENT = gql`
+	fragment SubscriptionFragment on SubscriptionPlan {
+		id
+		plan_name
+		price
+		expires_at
+	}
+`
+
+export const PERSONAL_AREA_BASE_FRAGMENT = gql`
+	fragment PersonalAreaBaseFragment on PersonalArea {
+		id
+		owner {
+			...UserBaseFragment
+		}
+		created_at
+	}
+	${USER_BASE_FRAGMENT}
+`
+
 export const ORGANIZATION_FRAGMENT = gql`
 	fragment OrganizationFragment on Organization {
 		...OrganizationBaseFragment
@@ -77,4 +118,17 @@ export const WORKSPACE_FRAGMENT = gql`
 	${WORKSPACE_BASE_FRAGMENT}
 	${ORGANIZATION_BASE_FRAGMENT}
 	${USER_BASE_FRAGMENT}
+`
+
+export const WORKSPACE_PAGINATED_FRAGMENT = gql`
+	fragment WorkspacePaginatedFragment on WorkspacePaginator {
+		data {
+			...WorkspaceFragment
+		}
+		paginatorInfo {
+			...PaginationFragment
+		}
+	}
+	${WORKSPACE_FRAGMENT}
+	${PAGINATION_FRAGMENT}
 `
