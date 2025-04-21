@@ -1,9 +1,8 @@
 import { Link } from 'react-router-dom'
-import { ExternalLinkIcon, SettingsIcon, TrashIcon } from 'lucide-react'
-import { Button } from '@/shared/ui/button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Workspace } from '@/shared/api/graphql'
 import { WorkSpaceBadgeStatus } from '../badge/WorkSpaceBadgeStatus'
+import { urls } from '@/shared/config'
 
 interface WorkSpaceCardProps {
 	workspace: Workspace
@@ -12,15 +11,15 @@ interface WorkSpaceCardProps {
 // TODO: Продумать взаимодействие с АРМ, сделать slug, модалку для назначения сотрудника
 export const WorkSpaceCard: React.FC<WorkSpaceCardProps> = ({ workspace }) => {
 	return (
-		<Card className='hover:bg-card/10 transition-all cursor-pointer duration-300'>
+		<Card variant='hover' href={`${urls.dashboard.workSpaceBySlug(workspace.name)}`}>
 			<CardHeader>
 				<CardTitle className='flex items-center gap-2'>
 					<span>{workspace.name}</span>
 					<WorkSpaceBadgeStatus status={workspace.is_active} />
 				</CardTitle>
-				<CardDescription>{workspace.description}</CardDescription>
+				<CardDescription>{workspace.created_at}</CardDescription>
 			</CardHeader>
-			<CardContent className='flex flex-col gap-2 text-sm'>
+			<CardContent className='flex flex-col gap-1 !pt-3 text-sm'>
 				<div className='flex justify-between gap-2'>
 					<span className='text-muted-foreground'>Создал</span>
 					<p className='text-right'>
@@ -39,14 +38,13 @@ export const WorkSpaceCard: React.FC<WorkSpaceCardProps> = ({ workspace }) => {
 				</div>
 				<div className='flex justify-between gap-2'>
 					<span className='text-muted-foreground'>Интеграция</span>
-					{workspace.payment ? <p>{workspace.payment.name}</p> : <Link to='#'>Настроить</Link>}
+					{workspace.paymentMethod ? (
+						<p>{workspace.paymentMethod.driver_name}</p>
+					) : (
+						<Link to='#'>Настроить</Link>
+					)}
 				</div>
 			</CardContent>
-			<CardFooter className='flex gap-2'>
-				<Button variant='destructive' icon={TrashIcon} size='icon' tooltip='Удалить' />
-				<Button variant='outline' icon={SettingsIcon} size='icon' tooltip='Настройки' />
-				<Button variant='outline' icon={ExternalLinkIcon} size='icon' tooltip='Подробнее' />
-			</CardFooter>
 		</Card>
 	)
 }
