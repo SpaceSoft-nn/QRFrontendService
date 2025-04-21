@@ -18,14 +18,16 @@ export interface BaseFormFieldProps {
 	labelStyle?: string
 	placeholder?: string
 	required?: boolean
+	disabled?: boolean
 	className?: string
+	description?: string
 }
 
 export interface FormCheckboxProps extends Omit<CheckboxProps, 'name'>, Omit<BaseFormFieldProps, 'label'> {
 	label?: string | JSX.Element
 }
 
-export interface FormDateInputProps extends Omit<DayPickerProps, 'mode'>, BaseFormFieldProps {
+export interface FormDateInputProps extends Omit<DayPickerProps, 'mode' | 'disabled'>, BaseFormFieldProps {
 	dateType?: string
 	value?: string
 	onChange?: (date: string) => void
@@ -56,6 +58,8 @@ export interface FormCommandProps
 	disabled?: boolean
 	loading?: boolean
 	emptyMessage?: string
+	fetchError?: string | null
 	actions?: JSX.Element
 	onValueChange?: (value: string, label: string) => void
+	onOpen?: () => void
 }

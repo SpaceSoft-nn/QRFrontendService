@@ -95,6 +95,13 @@ const CommandSeparator = React.forwardRef<
 ))
 CommandSeparator.displayName = CommandPrimitive.Separator.displayName
 
+const CommandLoading = React.forwardRef<
+	React.ElementRef<typeof CommandPrimitive.Loading>,
+	React.ComponentPropsWithoutRef<typeof CommandPrimitive.Loading>
+>(({ className, ...props }, ref) => (
+	<CommandPrimitive.Loading ref={ref} className={cn('py-6 text-center text-sm', className)} {...props} />
+))
+CommandLoading.displayName = CommandPrimitive.Loading.displayName
 const CommandItem = React.forwardRef<
 	React.ElementRef<typeof CommandPrimitive.Item>,
 	React.ComponentPropsWithoutRef<typeof CommandPrimitive.Item>
@@ -102,7 +109,7 @@ const CommandItem = React.forwardRef<
 	<CommandPrimitive.Item
 		ref={ref}
 		className={cn(
-			'relative flex cursor-default gap-2 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
+			'relative flex cursor-pointer gap-2 select-none items-center rounded-sm px-2 py-1.5 text-sm outline-none hover:bg-accent/70 data-[disabled=true]:pointer-events-none data-[selected=true]:bg-accent data-[selected=true]:text-accent-foreground data-[disabled=true]:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0',
 			className
 		)}
 		{...props}
@@ -124,6 +131,7 @@ export {
 	CommandEmpty,
 	CommandGroup,
 	CommandItem,
+	CommandLoading,
 	CommandShortcut,
 	CommandSeparator
 }

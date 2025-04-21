@@ -1,5 +1,6 @@
 import { cva, type VariantProps } from 'class-variance-authority'
 import * as React from 'react'
+import { Link } from 'react-router-dom'
 import { Loader2 } from 'lucide-react'
 import { Slot } from '@radix-ui/react-slot'
 import { cn } from '@/shared/lib/utils/tw-merge'
@@ -39,6 +40,7 @@ export interface ButtonProps
 	loading?: boolean
 	icon?: React.ElementType
 	tooltip?: React.ReactNode
+	href?: string
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
@@ -52,6 +54,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 			children,
 			icon: Icon,
 			tooltip,
+			href,
 			...props
 		},
 		ref
@@ -77,7 +80,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 			</Comp>
 		)
 
-		if (!tooltip) return button
+		if (!tooltip) return href ? <Link to={href}>{button}</Link> : button
 
 		return (
 			<TooltipProvider>

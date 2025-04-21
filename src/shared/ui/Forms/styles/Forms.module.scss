@@ -59,3 +59,11 @@
 		@apply border-destructive bg-destructive/10;
 	}
 }
+
+.formField__description {
+	@apply text-xs text-muted-foreground;
+}
+
+.formField__error {
+	@apply text-destructive text-xs;
+}
