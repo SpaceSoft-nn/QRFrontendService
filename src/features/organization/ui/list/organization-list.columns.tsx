@@ -1,7 +1,7 @@
-import { useState } from 'react'
-import { Check, Copy, CopyCheck, ExternalLink, MoreHorizontal, Pencil } from 'lucide-react'
+import { ExternalLink, MoreHorizontal, Pencil } from 'lucide-react'
 import { ColumnDef } from '@tanstack/react-table'
-import { OrganizationWithOpf } from '@/features/organization'
+import { OrganizationWithOpf } from '@/entities/organization'
+import { CopyableUi } from '@/shared/ui'
 import { Button } from '@/shared/ui/button'
 import {
 	DropdownMenu,
@@ -20,17 +20,7 @@ const OrganizationNameWithAddress = ({ organization }: { organization: Organizat
 	)
 }
 
-const OrganizationActions = ({ organization }: { organization: OrganizationWithOpf }) => {
-	const [isCopied, setIsCopied] = useState(false)
-
-	const handleCopyInn = () => {
-		navigator.clipboard.writeText(organization.inn)
-		setIsCopied(true)
-		setTimeout(() => {
-			setIsCopied(false)
-		}, 2000)
-	}
-
+const OrganizationActions = () => {
 	return (
 		<DropdownMenu>
 			<DropdownMenuTrigger asChild>
@@ -40,10 +30,6 @@ const OrganizationActions = ({ organization }: { organization: OrganizationWithO
 				<DropdownMenuItem>
 					<Pencil className='size-4' />
 					Редактировать
-				</DropdownMenuItem>
-				<DropdownMenuItem className='cursor-pointer' onClick={handleCopyInn}>
-					{isCopied ? <Check className='size-4' /> : <Copy className='size-4' />}
-					{isCopied ? 'ИНН скопирован' : 'Скопировать ИНН'}
 				</DropdownMenuItem>
 				<DropdownMenuSeparator />
 				<DropdownMenuItem>
@@ -64,25 +50,31 @@ export const organizationListColumns: ColumnDef<OrganizationWithOpf>[] = [
 	{
 		header: 'ИНН',
 		accessorKey: 'inn',
-		cell: ({ row }) => <span>{row.original.inn}</span>
+		cell: ({ row }) => {
+			return <CopyableUi value={row.original.inn} />
+		}
 	},
 	{
 		header: 'КПП',
 		accessorKey: 'kpp',
-		cell: ({ row }) => <span>{row.original.kpp ? row.original.kpp : '-'}</span>
+		cell: ({ row }) => {
+			return row.original.kpp ? <CopyableUi value={row.original.kpp} /> : '-'
+		}
 	},
 	{
 		header: 'ОГРН/ОГРНИП',
 		accessorKey: 'registration_number',
-		cell: ({ row }) => <span>{row.original.registration_number ? row.original.registration_number : '-'}</span>
+		cell: ({ row }) => {
+			return row.original.registration_number ? <CopyableUi value={row.original.registration_number} /> : '-'
+		}
 	},
 	{
 		id: 'actions',
 		header: () => <div className='text-right'>Действия</div>,
-		cell: ({ row }) => {
+		cell: () => {
 			return (
 				<div className='flex justify-end'>
-					<OrganizationActions organization={row.original} />
+					<OrganizationActions />
 				</div>
 			)
 		}

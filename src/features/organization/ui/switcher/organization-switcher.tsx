@@ -1,18 +1,16 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { Building2, ChevronsUpDown, Plus } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
-import { OrganizationWithOpf } from '@/features/organization'
-import { organizationStore } from '@/features/organization'
+import { organizationStore, OrganizationWithOpf } from '@/entities/organization'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
 	DropdownMenuItem,
 	DropdownMenuLabel,
-	DropdownMenuSeparator,
 	DropdownMenuTrigger
 } from '@/shared/ui/dropdown-menu'
-import { useSidebar } from '@/shared/ui/Sidebar'
-import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from '@/shared/ui/Sidebar'
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/shared/ui/Sidebar'
+import { cn } from '@/shared/lib/utils'
 
 const OrganizationItem = ({ organization }: { organization: OrganizationWithOpf | null }) => {
 	return (
@@ -30,17 +28,19 @@ const OrganizationItem = ({ organization }: { organization: OrganizationWithOpf 
 	)
 }
 
-// TODO: Добавить возможность добавлять организацию, устанавливать активную организацию
 export const OrganizationSwitcher: React.FC = observer(() => {
 	const { isMobile } = useSidebar()
-	const { organizations, loading, error } = organizationStore
-	const [activeOrganization, setActiveOrganization] = useState<(typeof organizations)[0] | null>(null)
+	const { organizations, loading, activeOrganization, setActiveOrganization } = organizationStore
+
+	useEffect(() => {
+		organizationStore.getOrganizations()
+	}, [])
 
 	useEffect(() => {
 		if (organizations.length > 0 && !activeOrganization) {
 			setActiveOrganization(organizations[0])
 		}
-	}, [organizations, activeOrganization])
+	}, [organizations])
 
 	return (
 		<SidebarMenu>
@@ -49,7 +49,7 @@ export const OrganizationSwitcher: React.FC = observer(() => {
 					<DropdownMenuTrigger asChild>
 						<SidebarMenuButton
 							size='lg'
-							loading={loading || !!error}
+							loading={loading}
 							className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
 						>
 							<OrganizationItem organization={activeOrganization} />
@@ -62,26 +62,31 @@ export const OrganizationSwitcher: React.FC = observer(() => {
 						side={isMobile ? 'bottom' : 'right'}
 						sideOffset={4}
 					>
-						<DropdownMenuLabel className='text-xs text-muted-foreground'>Организации</DropdownMenuLabel>
+						<DropdownMenuLabel className='text-xs text-muted-foreground'>
+							Ваши организации
+						</DropdownMenuLabel>
 						{organizations.length > 0 ? (
 							<>
 								{organizations.map(organization => (
 									<DropdownMenuItem
-										key={organization.name}
+										key={organization.nameWithOpf}
 										onClick={() => setActiveOrganization(organization)}
+										className={cn(
+											activeOrganization?.id === organization.id && 'bg-sidebar-accent'
+										)}
 									>
-										{organization.name}
+										{organization.nameWithOpf}
 									</DropdownMenuItem>
 								))}
-								<DropdownMenuSeparator />
 							</>
-						) : null}
-						<DropdownMenuItem className='gap-2 p-1'>
-							<div className='flex size-6 items-center justify-center rounded-md border bg-background'>
-								<Plus className='size-4' />
-							</div>
-							<div className='font-medium text-muted-foreground'>Добавить организацию</div>
-						</DropdownMenuItem>
+						) : (
+							<DropdownMenuItem className='gap-2 p-1'>
+								<div className='flex size-6 items-center justify-center rounded-md border bg-background'>
+									<Plus className='size-4' />
+								</div>
+								<div className='font-medium text-muted-foreground'>Добавить организацию</div>
+							</DropdownMenuItem>
+						)}
 					</DropdownMenuContent>
 				</DropdownMenu>
 			</SidebarMenuItem>

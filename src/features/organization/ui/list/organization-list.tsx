@@ -1,6 +1,6 @@
 import { useEffect } from 'react'
 import { observer } from 'mobx-react-lite'
-import { organizationStore } from '@/features/organization'
+import { organizationStore } from '@/entities/organization'
 import { DataTable } from '@/shared/ui'
 import { organizationListColumns } from './organization-list.columns'
 

@@ -18,3 +18,12 @@ export const GET_ORGANIZATION_QUERY = gql`
 	}
 	${ORGANIZATION_FRAGMENT}
 `
+
+export const CREATE_ORGANIZATION_MUTATION = gql`
+	mutation CreateOrganization($input: OrganizationCreateInput!) {
+		createOrganization(input: $input) {
+			...OrganizationFragment
+		}
+	}
+	${ORGANIZATION_FRAGMENT}
+`

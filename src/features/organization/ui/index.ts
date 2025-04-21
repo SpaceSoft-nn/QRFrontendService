@@ -1,2 +1,5 @@
 export { OrganizationSwitcher } from './switcher/organization-switcher'
 export { OrganizationList } from './list/organization-list'
+export { OrganizationSuggestions } from './suggestions/organization-suggestions'
+export { OrganizationCreateForm } from './create/organization-create-form'
+export { NeedToChooseOrganization } from './need-to-choose/need-to-choose-organization'
