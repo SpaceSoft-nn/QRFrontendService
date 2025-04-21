@@ -2,7 +2,7 @@ import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { LoginForm, RegisterForm } from '@/features/auth'
 import { AuthLayout, DashboardLayout } from './layouts'
 import { ProtectedRoute } from './protected-route'
-import { HomePage, NotFoundPage, OrganizationsPage, ProfilePage, WorkSpacesPage } from '@/Pages'
+import { HomePage, MembersPage, NotFoundPage, OrganizationsPage, ProfilePage, WorkSpacesPage } from '@/Pages'
 import { urls } from '@/shared/config'
 
 export const AppRouter = createBrowserRouter([
@@ -35,7 +35,7 @@ export const AppRouter = createBrowserRouter([
 				children: [
 					{
 						index: true,
-						element: <HomePage />
+						element: <MembersPage />
 					},
 					{
 						path: urls.dashboard.usersAdd,
@@ -64,8 +64,8 @@ export const AppRouter = createBrowserRouter([
 						element: <WorkSpacesPage />
 					},
 					{
-						path: urls.dashboard.workSpacesAdd,
-						element: <HomePage />
+						path: ':slug',
+						element: <div>slug</div>
 					}
 				]
 			},
@@ -122,6 +122,10 @@ export const AppRouter = createBrowserRouter([
 			{
 				path: urls.dashboard.help,
 				element: <HomePage />
+			},
+			{
+				path: '*',
+				element: <NotFoundPage withButton={false} />
 			}
 		]
 	},
