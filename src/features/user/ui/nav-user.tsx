@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { BellIcon, ChevronRightIcon, LogOutIcon, UserCircleIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { authStore } from '@/features/auth'
-import { userStore } from '@/features/user'
+import { userStore } from '@/entities/user'
 import {
 	DropdownMenu,
 	DropdownMenuContent,
@@ -32,7 +32,7 @@ export const NavUser: React.FC = observer(() => {
 	const handleLogout = async () => {
 		const success = await userStore.logout()
 		if (success) {
-			navigate(urls.auth.login)
+			navigate(urls.auth.login, { replace: true })
 		}
 	}
 

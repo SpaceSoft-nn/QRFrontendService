@@ -1,12 +1,19 @@
 import { makeAutoObservable } from 'mobx'
 import { authStore } from '@/features/auth'
-import { OrganizationWithOpf } from '@/features/organization'
-import { GET_CURRENT_USER } from '@/features/user/gql'
+import { OrganizationWithOpf } from '@/entities/organization'
+import { GET_CURRENT_USER } from '@/entities/user/gql'
 import { apolloClient } from '@/shared/api/apollo'
-import { OrganizationTypeEnum, PersonalArea, User, Workspace } from '@/shared/api/graphql'
+import { OrganizationTypeEnum, PersonalArea, User } from '@/shared/api/graphql'
 
-class UserStore {
+interface UserStore {
+	user: User | null
+	loading: boolean
+	error: string | null
+}
+
+class UserStore implements UserStore {
 	user: User | null = null
+	personalArea: PersonalArea | null = null
 	loading: boolean = false
 	error: string | null = null
 
@@ -24,6 +31,10 @@ class UserStore {
 
 	setError(error: string | null) {
 		this.error = error
+	}
+
+	setPersonalArea(personalArea: PersonalArea | null) {
+		this.personalArea = personalArea
 	}
 
 	get fullName(): string {
@@ -73,11 +84,13 @@ class UserStore {
 
 			if (data?.authMe) {
 				this.setUser(data.authMe)
+				this.setPersonalArea(data.authMe.personalAreas[0])
 				return true
 			}
 
 			return false
 		} catch (error) {
+			console.error('[getUser] error: ', error)
 			this.setError(error instanceof Error ? error.message : 'Ошибка при получении данных пользователя')
 			return false
 		} finally {
@@ -97,6 +110,7 @@ class UserStore {
 
 			return success
 		} catch (error) {
+			console.error('[logout] error: ', error)
 			this.setError(error instanceof Error ? error.message : 'Ошибка при выходе из системы')
 			return false
 		} finally {
