@@ -1,5 +1,5 @@
-import { ProfileForm } from '@/features/profile'
+import { ProfileCard } from '@/features/user'
 
 export const ProfilePage = () => {
-	return <ProfileForm />
+	return <ProfileCard />
 }

@@ -1,6 +1,6 @@
 export * from './organizations'
 export * from './workspaces'
-
+export * from './members'
 export * from './HomePage'
 
 export * from './NotFoundPage'
