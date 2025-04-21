@@ -6,10 +6,7 @@ const baseRegisterSchema = {
 	password_confirmation: z.string().min(8, 'Пароль должен быть не менее 8 символов'),
 	first_name: z.string().min(1, 'Имя должно быть не менее 1 символа'),
 	last_name: z.string().min(1, 'Фамилия должна быть не менее 1 символа'),
-	father_name: z.string().min(1, 'Отчество должно быть не менее 1 символа'),
-	agreement: z.boolean().refine(value => value, {
-		message: 'Вы должны согласиться с условиями использования'
-	})
+	father_name: z.string().min(1, 'Отчество должно быть не менее 1 символа')
 }
 
 export const registerSchema = z

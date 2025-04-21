@@ -5,7 +5,7 @@ import { observer } from 'mobx-react-lite'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { authStore } from '@/features/auth'
 import { Button } from '@/shared/ui'
-import { Form, FormCheckbox, FormErrorMessage, FormInput } from '@/shared/ui/Forms'
+import { Form, FormErrorMessage, FormInput } from '@/shared/ui/Forms'
 import { registerSchema, TypeRegisterSchema } from '../model/schemas'
 import { AuthMethodSelector } from './AuthMethodSelector'
 import { AuthWrapper } from './AuthWrapper'
@@ -60,8 +60,6 @@ export const RegisterForm: React.FC = observer(() => {
 					placeholder='Подтвердите пароль'
 					disabled={loading}
 				/>
-
-				<FormCheckbox name='agreement' label='Я согласен с условиями использования' disabled={loading} />
 
 				{error && <FormErrorMessage>{error}</FormErrorMessage>}
 

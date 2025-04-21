@@ -1,8 +1,17 @@
 import { makeAutoObservable } from 'mobx'
 import { LOGIN_MUTATION, LOGOUT_MUTATION, REFRESH_MUTATION, REGISTER_MUTATION } from '@/features/auth/gql'
+import { TypeLoginSchema, TypeRegisterSchema } from '@/features/auth/model/schemas'
+import { organizationStore } from '@/entities/organization/model/store/organization.store'
+import { userStore } from '@/entities/user/model/store/user.store'
+import { workspaceStore } from '@/entities/workspace/model/store/workspace.store'
 import { apolloClient } from '@/shared/api/apollo'
-import { TypeLoginSchema, TypeRegisterSchema } from '../schemas'
-import { AuthState } from './auth.state'
+
+interface AuthState {
+	accessToken: string | null
+	isAuthenticated: boolean
+	loading: boolean
+	error: string | null
+}
 
 class AuthStore implements AuthState {
 	accessToken: string | null = null
@@ -46,7 +55,7 @@ class AuthStore implements AuthState {
 				variables: { input }
 			})
 
-			if (data?.login?.access_token) {
+			if (data?.login.access_token) {
 				this.setAccessToken(data.login.access_token)
 				return true
 			}
@@ -89,13 +98,18 @@ class AuthStore implements AuthState {
 			this.setLoading(true)
 			this.setError(null)
 
+			localStorage.removeItem('token')
+			this.accessToken = null
+			this.isAuthenticated = false
+
 			await apolloClient.mutate({
 				mutation: LOGOUT_MUTATION
 			})
 
-			this.accessToken = null
-			this.isAuthenticated = false
-			localStorage.removeItem('token')
+			userStore.setUser(null)
+			workspaceStore.setWorkspaces([])
+			organizationStore.setOrganizations([])
+
 			return true
 		} catch (error) {
 			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при выходе')
@@ -122,6 +136,7 @@ class AuthStore implements AuthState {
 			return false
 		} catch (error) {
 			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при обновлении токена')
+			await this.logout()
 			return false
 		} finally {
 			this.setLoading(false)

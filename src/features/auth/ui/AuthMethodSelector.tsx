@@ -20,7 +20,11 @@ export const AuthMethodSelector = ({ disabled }: { disabled?: boolean }) => {
 	}, [authMethod, setValue, clearErrors, getValues])
 
 	return (
-		<Tabs value={authMethod} onValueChange={value => setValue('authMethod', value as AuthMethod)}>
+		<Tabs
+			value={authMethod}
+			defaultValue='email'
+			onValueChange={value => setValue('authMethod', value as AuthMethod)}
+		>
 			<TabsList className='w-full'>
 				<TabsTrigger value='email' className='w-full' disabled={disabled}>
 					Email
