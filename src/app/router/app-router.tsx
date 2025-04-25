@@ -1,5 +1,6 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
 import { LoginForm, RegisterForm } from '@/features/auth'
+import { WorkspaceDetails } from '@/features/workspace'
 import { AuthLayout, DashboardLayout } from './layouts'
 import { ProtectedRoute } from './protected-route'
 import { HomePage, MembersPage, NotFoundPage, OrganizationsPage, ProfilePage, WorkSpacesPage } from '@/Pages'
@@ -49,10 +50,6 @@ export const AppRouter = createBrowserRouter([
 					{
 						index: true,
 						element: <OrganizationsPage />
-					},
-					{
-						path: urls.dashboard.organizationsAdd,
-						element: <HomePage />
 					}
 				]
 			},
@@ -64,8 +61,8 @@ export const AppRouter = createBrowserRouter([
 						element: <WorkSpacesPage />
 					},
 					{
-						path: ':slug',
-						element: <div>slug</div>
+						path: ':workspaceId',
+						element: <WorkspaceDetails />
 					}
 				]
 			},
@@ -74,10 +71,6 @@ export const AppRouter = createBrowserRouter([
 				children: [
 					{
 						index: true,
-						element: <HomePage />
-					},
-					{
-						path: urls.dashboard.paymentsAdd,
 						element: <HomePage />
 					},
 					{
@@ -95,10 +88,6 @@ export const AppRouter = createBrowserRouter([
 				children: [
 					{
 						index: true,
-						element: <HomePage />
-					},
-					{
-						path: urls.dashboard.integrationsAdd,
 						element: <HomePage />
 					},
 					{

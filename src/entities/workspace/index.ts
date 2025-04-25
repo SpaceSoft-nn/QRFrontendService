@@ -1,1 +1,1 @@
-export { workspaceStore } from './model/store/workspace.store'
+export * from './model/store/workspace.store'

@@ -4,18 +4,20 @@ import { Plus } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { organizationStore } from '@/entities/organization'
-import { PaymentMethodSelector } from '@/entities/payment-method'
+import { PaymentMethodFormSelector } from '@/entities/payment-method'
+import { userStore } from '@/entities/user'
 import { workspaceStore } from '@/entities/workspace'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/ui'
 import { Button } from '@/shared/ui/button'
 import { FormErrorMessage, FormInput, FormTextarea } from '@/shared/ui/Forms'
 import { Form } from '@/shared/ui/Forms'
-import { WorkspaceCreateInput } from '@/shared/api/graphql'
-import { createWorkspaceSchema } from './create-workspace.schema'
+import { UserRoleEnum, WorkspaceCreateInput } from '@/shared/api/graphql'
+import { createWorkspaceSchema } from './CreateWorkspaceForm.schema.ts'
 
 export const CreateWorkspaceForm = observer(() => {
 	const { activeOrganization } = organizationStore
 	const { loading, error } = workspaceStore
+	const { user } = userStore
 	const [open, setOpen] = useState(false)
 
 	const form = useForm<WorkspaceCreateInput>({
@@ -42,12 +44,12 @@ export const CreateWorkspaceForm = observer(() => {
 		})
 	}
 
+	if (user?.role === UserRoleEnum.Cassier) return null
+
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button variant='outline' icon={Plus}>
-					Добавить
-				</Button>
+				<Button icon={Plus}>Добавить</Button>
 			</DialogTrigger>
 			<DialogContent>
 				<DialogHeader>
@@ -56,15 +58,12 @@ export const CreateWorkspaceForm = observer(() => {
 				</DialogHeader>
 				<Form ctx={form} onSubmit={onSubmit} className='flex flex-col gap-4'>
 					<FormInput name='name' placeholder='Название' disabled={loading} />
-					<PaymentMethodSelector />
+					<PaymentMethodFormSelector name='payment_method_id' />
 					<FormTextarea name='description' placeholder='Описание' disabled={loading} />
-					{error ||
-						(form.formState.errors.organization_id && (
-							<FormErrorMessage>
-								{error || form.formState.errors.organization_id?.message}
-							</FormErrorMessage>
-						))}
-					<Button type='submit' loading={loading}>
+					{form.formState.errors.organization_id && (
+						<FormErrorMessage>{error || form.formState.errors.organization_id?.message}</FormErrorMessage>
+					)}
+					<Button type='submit' loading={loading} disabled={!form.formState.isValid}>
 						Создать
 					</Button>
 				</Form>

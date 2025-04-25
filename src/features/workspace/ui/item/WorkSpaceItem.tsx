@@ -1,37 +1,19 @@
-import { BanknoteIcon, Building2Icon, ShieldUserIcon, User, UsersIcon } from 'lucide-react'
+import { Building2, CreditCard, User } from 'lucide-react'
+import { observer } from 'mobx-react-lite'
 import { formatOrganizationWithOpf } from '@/entities/organization'
-import { PaymentMethodSelector } from '@/entities/payment-method/ui/payment-method-selector'
 import { formatFullName } from '@/entities/user'
-import { workspaceStore } from '@/entities/workspace'
 import { DataGroup } from '@/shared/ui'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
 import { Workspace } from '@/shared/api/graphql'
 import { WorkSpaceBadgeStatus } from '../badge/WorkSpaceBadgeStatus'
 import { urls } from '@/shared/config'
 
-export const WorkSpaceCard = ({ workspace }: { workspace: Workspace }) => {
+export const WorkSpaceItem = observer(({ workspace }: { workspace: Workspace }) => {
 	const workspaceData = [
 		{
 			label: 'Организация',
 			data: formatOrganizationWithOpf(workspace.organization).nameWithOpf,
-			icon: Building2Icon,
-			link: urls.dashboard.organizationById(workspace.organization.id)
-		},
-		{
-			label: 'Метод оплаты',
-			data: workspace.paymentMethod?.driver_name ?? (
-				<PaymentMethodSelector
-					size='xs'
-					variant='secondary'
-					onValueChange={value => {
-						workspaceStore.addPaymentMethodToWorkspace({
-							workspace_id: workspace.id,
-							payment_method_id: value
-						})
-					}}
-				/>
-			),
-			icon: BanknoteIcon
+			icon: Building2
 		},
 		{
 			label: 'Занимает',
@@ -39,14 +21,14 @@ export const WorkSpaceCard = ({ workspace }: { workspace: Workspace }) => {
 			icon: User
 		},
 		{
-			label: 'Пользователей',
-			data: workspace.users?.length,
-			icon: UsersIcon
+			label: 'Метод платы',
+			data: workspace.paymentMethod ? `${workspace.paymentMethod.driver_name}` : '-',
+			icon: CreditCard
 		}
 	]
 
 	return (
-		<Card className='flex-1'>
+		<Card variant='hover' href={urls.dashboard.workSpaceById(workspace.id)}>
 			<CardHeader>
 				<CardTitle className='flex items-center justify-between gap-2'>
 					<span>{workspace.name}</span>
@@ -59,4 +41,4 @@ export const WorkSpaceCard = ({ workspace }: { workspace: Workspace }) => {
 			</CardContent>
 		</Card>
 	)
-}
+})

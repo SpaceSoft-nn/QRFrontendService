@@ -1,9 +1,7 @@
 import { useEffect } from 'react'
 import { RefreshCwIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
-import { NeedToChooseOrganization } from '@/features/organization'
-import { WorkSpaceCard } from '@/features/workspace'
-import { organizationStore } from '@/entities/organization'
+import { WorkSpaceItem } from '@/features/workspace'
 import { workspaceStore } from '@/entities/workspace'
 import { PaginationUi } from '@/shared/ui'
 import { Button } from '@/shared/ui/button'
@@ -27,7 +25,6 @@ const WorkSpaceListError = ({ error }: { error: string | null }) => {
 	)
 }
 
-// TODO: Добавить кнопку для создания АРМ
 const WorkSpaceListEmpty = () => {
 	return (
 		<Card>
@@ -41,19 +38,17 @@ const WorkSpaceListEmpty = () => {
 
 export const WorkSpaceList = observer(() => {
 	const { workspaces, loading, error, pagination } = workspaceStore
-	const { activeOrganization, loading: organizationLoading } = organizationStore
 
 	useEffect(() => {
 		workspaceStore.getWorkspaces()
-	}, [activeOrganization])
+	}, [])
 
 	const renderList = () => {
-		if (loading || organizationLoading) return <WorkSpaceListSkeleton />
+		if (loading) return <WorkSpaceListSkeleton />
 		if (error) return <WorkSpaceListError error={error} />
-		if (!activeOrganization) return <NeedToChooseOrganization />
 		if (workspaces.length === 0) return <WorkSpaceListEmpty />
 
-		return workspaces.map(workspace => <WorkSpaceCard key={workspace.id} workspace={workspace} />)
+		return workspaces.map(workspace => <WorkSpaceItem key={workspace.id} workspace={workspace} />)
 	}
 
 	return (
@@ -62,7 +57,7 @@ export const WorkSpaceList = observer(() => {
 				<PaginationUi pagination={pagination} onChangePage={workspaceStore.changePage} />
 			)}
 
-			<div className='grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4'>{renderList()}</div>
+			<div className='grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3'>{renderList()}</div>
 		</div>
 	)
 })
