@@ -1,9 +1,9 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
+import { HomePage, MembersPage, NotFoundPage, OrganizationsPage, ProfilePage, WorkSpacesPage } from '@/pages'
 import { LoginForm, RegisterForm } from '@/features/auth'
 import { WorkspaceDetails } from '@/features/workspace'
 import { AuthLayout, DashboardLayout } from './layouts'
 import { ProtectedRoute } from './protected-route'
-import { HomePage, MembersPage, NotFoundPage, OrganizationsPage, ProfilePage, WorkSpacesPage } from '@/Pages'
 import { urls } from '@/shared/config'
 
 export const AppRouter = createBrowserRouter([
