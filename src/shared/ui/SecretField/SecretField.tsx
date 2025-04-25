@@ -27,7 +27,7 @@ export function SecretField({ value, label, hideValue = true, className, ...prop
 		}
 	}
 
-	const displayValue = isHidden ? '0'.repeat(Math.min(value.length, 24)) : value
+	const displayValue = isHidden ? '*'.repeat(Math.min(value.length, 24)) : value
 
 	return (
 		<div className={cn('w-full space-y-1.5', className)} {...props}>

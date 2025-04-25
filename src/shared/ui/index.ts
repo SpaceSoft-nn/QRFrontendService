@@ -9,6 +9,7 @@ export { CopyableUi } from './CopyableUi/CopyableUi'
 export { CommandUi } from './CommandUi/CommandUi'
 export { NotFound } from './NotFound/NotFound'
 export { SecretField } from './SecretField/SecretField'
+export { SkeletonListUi } from './SkeletonListUi/SkeletonListUi'
 
 export * from './ImageUi'
 export * from './accordion'
