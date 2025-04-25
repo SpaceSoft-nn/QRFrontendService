@@ -21,7 +21,12 @@ const createPathToKeyMap = () => {
 const pathToKeyMap = createPathToKeyMap()
 
 // Получение названия пути
-export const getPathLabel = (path: string): string => {
+export const getPathLabel = (path: string, dynamicLabels: Record<string, string> = {}): string => {
+	// Проверяем, есть ли динамическая метка для этого пути
+	if (path in dynamicLabels) {
+		return dynamicLabels[path]
+	}
+
 	// Проверяем, существует ли путь в нашей карте путей
 	if (path in pathToKeyMap) {
 		const keyPath = pathToKeyMap[path]
@@ -40,11 +45,9 @@ export const getPathLabel = (path: string): string => {
 		return 'Главная'
 	}
 
-	// Для неопределенных маршрутов возвращаем "Неизвестная страница"
-	return 'Неизвестная страница'
+	return ''
 }
 
-// Получение всех путей из объекта urls
 export const getAllPaths = (): string[] => {
 	const allPaths: string[] = []
 

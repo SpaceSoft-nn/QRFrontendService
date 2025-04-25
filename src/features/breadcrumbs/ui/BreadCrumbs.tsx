@@ -10,6 +10,7 @@ import {
 	BreadcrumbSeparator
 } from '@/shared/ui'
 import { getParentPaths, getPathLabel } from '../lib/breadcrumbs.utils'
+import { useBreadcrumbs } from '../lib/hooks/use-breadcrumbs'
 
 interface BreadcrumbPath {
 	name: string
@@ -20,6 +21,7 @@ interface BreadcrumbPath {
 export function Breadcrumbs() {
 	const location = useLocation()
 	const currentPath = location.pathname
+	const { dynamicLabels } = useBreadcrumbs()
 
 	const breadcrumbPaths = React.useMemo(() => {
 		const paths: BreadcrumbPath[] = []
@@ -32,7 +34,7 @@ export function Breadcrumbs() {
 			const isLast = index === parentPaths.length - 1
 
 			paths.push({
-				name: getPathLabel(path),
+				name: getPathLabel(path, dynamicLabels),
 				path,
 				isCurrentPage: isLast && path === currentPath
 			})
@@ -41,7 +43,7 @@ export function Breadcrumbs() {
 		// Если текущий путь не был добавлен (например, он не существует в urls)
 		if (!paths.some(p => p.path === currentPath)) {
 			paths.push({
-				name: getPathLabel(currentPath),
+				name: getPathLabel(currentPath, dynamicLabels),
 				path: currentPath,
 				isCurrentPage: true
 			})
@@ -51,12 +53,18 @@ export function Breadcrumbs() {
 		return Array.from(new Map(paths.map(item => [item.path, item])).values()).sort(
 			(a, b) => a.path.split('/').length - b.path.split('/').length
 		)
-	}, [currentPath])
+	}, [currentPath, dynamicLabels])
 
 	// Если нет хлебных крошек или только одна (главная), не показываем
 	if (breadcrumbPaths.length <= 1) {
 		return null
 	}
+
+	// // Если для текущего пути есть динамическая метка, но она еще не загружена,
+	// // не показываем хлебные крошки
+	// if (currentPath in dynamicLabels === false && currentPath.includes('/')) {
+	// 	return null
+	// }
 
 	return (
 		<Breadcrumb>
