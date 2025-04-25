@@ -1,8 +1,9 @@
 import { makeAutoObservable, runInAction } from 'mobx'
+import { organizationStore } from '@/entities/organization'
 import { apolloClient } from '@/shared/api'
 import { DriverInfo, DriverInfoInput, Mutation, Query } from '@/shared/api/graphql'
 import { toast } from '@/shared/lib'
-import { CREATE_INTEGRATION_MUTATION, GET_INTEGRATION_QUERY } from '../../gql'
+import { CREATE_INTEGRATION_MUTATION, GET_INTEGRATION_QUERY, GET_INTEGRATIONS_QUERY } from '../../gql'
 
 class IntegrationStore {
 	intergations: DriverInfo[] = []
@@ -11,6 +12,33 @@ class IntegrationStore {
 
 	constructor() {
 		makeAutoObservable(this)
+	}
+
+	async getIntegrations() {
+		try {
+			this.loading = true
+			this.error = null
+
+			const { data } = await apolloClient.query<Pick<Query, 'driverInfosByUser'>>({
+				query: GET_INTEGRATIONS_QUERY
+			})
+
+			runInAction(() => {
+				this.intergations = data?.driverInfosByUser.filter(integration => integration !== null) || []
+			})
+		} catch (error) {
+			console.error('[getIntegrations] error: ', error)
+			this.error = error instanceof Error ? error.message : 'Произошла ошибка при получении интеграций'
+			toast({
+				title: 'Ошибка при получении интеграций',
+				variant: 'destructive',
+				description: this.error
+			})
+		} finally {
+			runInAction(() => {
+				this.loading = false
+			})
+		}
 	}
 
 	async getIntegation(id: string) {
@@ -44,13 +72,24 @@ class IntegrationStore {
 	}
 
 	async createIntergration(input: DriverInfoInput) {
+		const { activeOrganization } = organizationStore
+
+		if (!activeOrganization) {
+			toast({
+				title: 'Ошибка при создании интеграции',
+				variant: 'destructive',
+				description: 'Не выбрана организация'
+			})
+			return
+		}
+
 		try {
 			this.loading = true
 			this.error = null
 
 			const { data } = await apolloClient.mutate<Pick<Mutation, 'createDriverInfo'>>({
 				mutation: CREATE_INTEGRATION_MUTATION,
-				variables: { input }
+				variables: { input: { ...input, organization_id: activeOrganization.id } }
 			})
 
 			runInAction(() => {
@@ -60,11 +99,10 @@ class IntegrationStore {
 			})
 		} catch (error) {
 			console.error('[createIntergration] error: ', error)
-			this.error = error instanceof Error ? error.message : 'Произошла ошибка при создании интеграции'
 			toast({
 				title: 'Ошибка при создании интеграции',
 				variant: 'destructive',
-				description: this.error
+				description: error instanceof Error ? error.message : 'Произошла ошибка при создании интеграции'
 			})
 		} finally {
 			runInAction(() => {

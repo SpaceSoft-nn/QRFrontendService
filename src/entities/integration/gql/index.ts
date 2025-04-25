@@ -18,3 +18,12 @@ export const GET_INTEGRATION_QUERY = gql`
 	}
 	${DRIVER_INFO_FRAGMENT}
 `
+
+export const GET_INTEGRATIONS_QUERY = gql`
+	query getIntegrations {
+		driverInfosByUser {
+			...DriverInfoFragment
+		}
+	}
+	${DRIVER_INFO_FRAGMENT}
+`
