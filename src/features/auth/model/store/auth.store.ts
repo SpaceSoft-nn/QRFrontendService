@@ -1,10 +1,9 @@
 import { makeAutoObservable } from 'mobx'
 import { LOGIN_MUTATION, LOGOUT_MUTATION, REFRESH_MUTATION, REGISTER_MUTATION } from '@/features/auth/gql'
 import { organizationStore } from '@/entities/organization'
-import { userStore } from '@/entities/user'
 import { workspaceStore } from '@/entities/workspace'
 import { apolloClient } from '@/shared/api/apollo'
-import { Mutation, UserLogin, UserRegistration } from '@/shared/api/graphql'
+import { Mutation, UserLoginInput, UserRegistration } from '@/shared/api/graphql'
 import { toast } from '@/shared/lib'
 
 interface Token {
@@ -45,7 +44,7 @@ class AuthStore {
 		localStorage.removeItem('token')
 	}
 
-	login = async (input: UserLogin) => {
+	login = async (input: UserLoginInput) => {
 		this.loading = true
 		this.error = null
 

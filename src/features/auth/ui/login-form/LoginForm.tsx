@@ -5,7 +5,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { authStore } from '@/features/auth'
 import { Button } from '@/shared/ui'
 import { Form, FormErrorMessage, FormInput } from '@/shared/ui/Forms'
-import { UserLogin } from '@/shared/api/graphql'
+import { UserLoginInput } from '@/shared/api/graphql'
 import { AuthWrapper } from '../AuthWrapper'
 import { AuthMethodSelector } from '../method-selector/AuthMethodSelector'
 import { loginSchema, TypeLoginSchema } from './LoginForm.schema'
@@ -25,7 +25,7 @@ export const LoginForm = observer(() => {
 
 	const onSubmit = async (data: TypeLoginSchema) => {
 		console.log(data)
-		const success = await authStore.login(data as UserLogin)
+		const success = await authStore.login(data as UserLoginInput)
 		if (success) {
 			navigate(urls.dashboard.main)
 		}
