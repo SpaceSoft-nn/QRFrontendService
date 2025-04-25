@@ -348,7 +348,12 @@ class WorkspaceStore {
 			if (data?.addPaymentWorkspace) {
 				runInAction(() => {
 					this.workspaces = this.workspaces.map(workspace =>
-						workspace.id === input.workspace_id ? data.addPaymentWorkspace : workspace
+						workspace.id === input.workspace_id
+							? {
+									...data.addPaymentWorkspace,
+									created_at: formatDateTime(data.addPaymentWorkspace.created_at)
+								}
+							: workspace
 					)
 				})
 			}
