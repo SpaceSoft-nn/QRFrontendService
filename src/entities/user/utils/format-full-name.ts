@@ -7,10 +7,13 @@ interface FormatFullNameOptions {
 
 export const formatFullName = (user: User, options?: FormatFullNameOptions) => {
 	const { withFatherName = true, initials = false } = options || {}
+	const { last_name, first_name, father_name } = user
+
+	if (!last_name || !first_name || !father_name) return 'Неизвестный пользователь'
 
 	if (initials) {
-		return `${user.last_name} ${user.first_name?.charAt(0)}. ${withFatherName ? `${user.father_name?.charAt(0)}.` : ''}`
+		return `${last_name} ${first_name?.charAt(0)}. ${withFatherName ? `${father_name?.charAt(0)}.` : ''}`
 	}
 
-	return `${user.last_name} ${user.first_name} ${withFatherName ? user.father_name : ''}`
+	return `${last_name} ${first_name} ${withFatherName ? father_name : ''}`
 }
