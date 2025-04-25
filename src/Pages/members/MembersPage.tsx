@@ -1,4 +1,4 @@
-import { CreateMemberForm, MembersList } from '@/features/members'
+import { CreateOrganizationMemberForm, OrganizationMembersList } from '@/features/organization/ui/members'
 import { TitleUi } from '@/shared/ui'
 
 export const MembersPage = () => {
@@ -6,9 +6,9 @@ export const MembersPage = () => {
 		<div className='flex flex-col gap-4'>
 			<div className='flex justify-between items-center'>
 				<TitleUi text='Пользователи' />
-				<CreateMemberForm />
+				<CreateOrganizationMemberForm />
 			</div>
-			<MembersList />
+			<OrganizationMembersList />
 		</div>
 	)
 }
