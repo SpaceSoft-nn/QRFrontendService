@@ -11,18 +11,15 @@ interface BaseFormFieldProps extends React.HTMLAttributes<HTMLDivElement> {
 	className?: string
 	error?: string | null
 	children: ReactNode
-	description?: string
+	description?: React.ReactNode
 }
 
 const FormFieldFooter = ({ error, description }: Pick<BaseFormFieldProps, 'error' | 'description'>) => {
 	return (
-		<>
-			{error ? (
-				<FormErrorMessage>{error}</FormErrorMessage>
-			) : (
-				description && <FormFieldDescription>{description}</FormFieldDescription>
-			)}
-		</>
+		<div className='flex items-center gap-1 justify-between'>
+			{error && <FormErrorMessage>{error}</FormErrorMessage>}
+			{description && <FormFieldDescription>{description}</FormFieldDescription>}
+		</div>
 	)
 }
 

@@ -14,7 +14,7 @@ import {
 	CommandSeparator
 } from '@/shared/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/shared/ui/popover'
-import { cn } from '@/shared/lib'
+import { cn, commandFilter } from '@/shared/lib'
 import { Skeleton } from '../..'
 import { BaseFormField } from '../BaseFormField'
 import { useFormField } from '../hooks/useFormField'
@@ -45,6 +45,8 @@ export const FormCommand: React.FC<FormCommandProps> = ({
 	loading,
 	fetchError,
 	onOpen,
+	variant = 'outline',
+	size,
 	...props
 }) => {
 	const [open, setOpen] = useState(false)
@@ -55,17 +57,6 @@ export const FormCommand: React.FC<FormCommandProps> = ({
 		if (isOpen && onOpen) {
 			onOpen()
 		}
-	}
-
-	const filter = (value: string, search: string) => {
-		if (!search) return 1
-		const item = items.find(item => item.value === value)
-		if (!item) return 0
-		const searchLower = search.toLowerCase()
-		return item.label.toLowerCase().includes(searchLower) ||
-			(item.description && item.description.toLowerCase().includes(searchLower))
-			? 1
-			: 0
 	}
 
 	return (
@@ -84,7 +75,8 @@ export const FormCommand: React.FC<FormCommandProps> = ({
 					<Popover open={open} onOpenChange={handleOpenChange}>
 						<PopoverTrigger asChild className={cn(s.formField__input, error && s.formField__input__error)}>
 							<Button
-								variant='outline'
+								variant={variant}
+								size={size}
 								role='combobox'
 								aria-controls='command-list'
 								disabled={disabled}
@@ -95,7 +87,7 @@ export const FormCommand: React.FC<FormCommandProps> = ({
 							</Button>
 						</PopoverTrigger>
 						<PopoverContent className='!p-0' align='start'>
-							<Command {...props} onValueChange={field.onChange} filter={filter}>
+							<Command {...props} onValueChange={field.onChange} filter={commandFilter(items)}>
 								<CommandInput placeholder='Поиск' disabled={loading} enterKeyHint='search' />
 								<CommandList>
 									{actions && (
@@ -117,14 +109,14 @@ export const FormCommand: React.FC<FormCommandProps> = ({
 													disabled={item.disabled}
 													onSelect={value => {
 														field.onChange(value)
-														setOpen(false)
 														props.onValueChange?.(value, item.label)
+														setOpen(false)
 													}}
 												>
 													<div className='flex items-center gap-3'>
 														{item.icon && <item.icon />}
 														<div className='flex flex-col'>
-															<span className='text-sm font-medium'>{item.label}</span>
+															<span className='text-sm'>{item.label}</span>
 															<span className='text-sm text-muted-foreground'>
 																{item.description}
 															</span>

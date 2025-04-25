@@ -25,7 +25,6 @@ export const CopyableUi = ({ value, className, children, ...props }: CopyableUiP
 			variant='ghost'
 			size='xs'
 			onClick={handleCopy}
-			tooltip={isCopied ? 'Скопировано' : 'Скопировать'}
 			className={cn('flex text-sm !px-[2px] font-normal justify-start gap-1 items-center w-fit', className)}
 			{...props}
 			onMouseEnter={() => setIsHovered(true)}

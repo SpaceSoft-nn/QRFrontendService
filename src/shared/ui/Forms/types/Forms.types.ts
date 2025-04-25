@@ -1,14 +1,16 @@
+import type { VariantProps } from 'class-variance-authority'
 import type { DayPickerProps } from 'react-day-picker'
 import type { CheckboxProps } from '@radix-ui/react-checkbox'
 import type { SelectProps } from '@radix-ui/react-select'
 import type { TabsProps } from '@radix-ui/react-tabs'
+import { buttonVariants } from '@/shared/ui/button'
 import type { Command } from '@/shared/ui/command'
 
 export type SelectItem = {
 	value: string
 	label: string
 	icon?: React.ElementType
-	description?: string
+	description?: string | null
 	disabled?: boolean
 }
 
@@ -20,7 +22,7 @@ export interface BaseFormFieldProps {
 	required?: boolean
 	disabled?: boolean
 	className?: string
-	description?: string
+	description?: React.ReactNode
 }
 
 export interface FormCheckboxProps extends Omit<CheckboxProps, 'name'>, Omit<BaseFormFieldProps, 'label'> {
@@ -53,7 +55,8 @@ export interface FormTabsProps extends Omit<BaseFormFieldProps, 'placeholder'>, 
 
 export interface FormCommandProps
 	extends Omit<BaseFormFieldProps, 'onChange'>,
-		Omit<React.ComponentPropsWithoutRef<typeof Command>, 'onValueChange'> {
+		Omit<React.ComponentPropsWithoutRef<typeof Command>, 'onValueChange'>,
+		VariantProps<typeof buttonVariants> {
 	items: SelectItem[]
 	disabled?: boolean
 	loading?: boolean

@@ -49,7 +49,7 @@ export function DataTable<TData, TValue>({
 			</TableHeader>
 			<TableBody>
 				{loading ? (
-					Array.from({ length: 10 }).map((_, index) => (
+					Array.from({ length: 5 }).map((_, index) => (
 						<TableRow key={index}>
 							{Array.from({ length: columns.length }).map((_, index) => (
 								<TableCell key={index}>
@@ -69,7 +69,7 @@ export function DataTable<TData, TValue>({
 						</TableRow>
 					))
 				) : (
-					<TableRow>
+					<TableRow className='hover:bg-inherit'>
 						<TableCell
 							colSpan={columns.length}
 							className={cn('h-24 text-center', error !== null && 'text-destructive')}

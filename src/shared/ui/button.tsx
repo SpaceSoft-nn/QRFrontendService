@@ -39,6 +39,7 @@ export interface ButtonProps
 	asChild?: boolean
 	loading?: boolean
 	icon?: React.ElementType
+	iconDir?: 'left' | 'right'
 	tooltip?: React.ReactNode
 	href?: string
 }
@@ -53,6 +54,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 			loading = false,
 			children,
 			icon: Icon,
+			iconDir = 'left',
 			tooltip,
 			href,
 			...props
@@ -60,9 +62,10 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 		ref
 	) => {
 		const Comp = asChild ? Slot : 'button'
+
 		const button = (
 			<Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props}>
-				{Icon && !loading && (
+				{Icon && !loading && iconDir === 'left' && (
 					<Icon
 						className={cn(
 							{
@@ -72,11 +75,25 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 								lg: 'w-5 h-5',
 								icon: 'w-4 h-4'
 							}[size as keyof typeof size],
-							children && 'mr-2'
+							children && iconDir === 'left' && 'mr-1.5'
 						)}
 					/>
 				)}
 				{!loading ? children : <Loader2 className='w-5 h-5 animate-spin' />}
+				{Icon && !loading && iconDir === 'right' && (
+					<Icon
+						className={cn(
+							{
+								default: 'w-4 h-4',
+								xs: 'w-3 h-3',
+								sm: 'w-4 h-4',
+								lg: 'w-5 h-5',
+								icon: 'w-4 h-4'
+							}[size as keyof typeof size],
+							children && iconDir === 'right' && 'ml-1.5'
+						)}
+					/>
+				)}
 			</Comp>
 		)
 
@@ -84,7 +101,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
 		return (
 			<TooltipProvider>
-				<Tooltip delayDuration={100}>
+				<Tooltip delayDuration={50}>
 					<TooltipTrigger asChild>{button}</TooltipTrigger>
 					<TooltipContent>{tooltip}</TooltipContent>
 				</Tooltip>
