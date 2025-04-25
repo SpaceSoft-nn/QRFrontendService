@@ -14,12 +14,12 @@ import * as types from './graphql'
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-	'\n  mutation Login($input: UserLogin!) {\n    authLogin(input: $input) {\n      access_token\n      token_type\n      expires_in_access\n      expires_in_refresh\n    }\n  }\n': typeof types.AuthLoginDocument
+	'\n  mutation Login($input: UserLogin!) {\n    authLogin(input: $input) {\n      access_token\n      token_type\n      expires_in_access\n      expires_in_refresh\n    }\n  }\n': typeof types.LoginDocument
 	'\n  query GetCurrentUser {\n    authMe {\n      id\n      email\n      phone\n    }\n  }\n': typeof types.GetMeDocument
 }
 const documents: Documents = {
 	'\n  mutation Login($input: UserLogin!) {\n    authLogin(input: $input) {\n      access_token\n      token_type\n      expires_in_access\n      expires_in_refresh\n    }\n  }\n':
-		types.AuthLoginDocument,
+		types.LoginDocument,
 	'\n  query GetCurrentUser {\n    authMe {\n      id\n      email\n      phone\n    }\n  }\n': types.GetMeDocument
 }
 

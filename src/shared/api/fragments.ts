@@ -75,9 +75,14 @@ export const PERSONAL_AREA_BASE_FRAGMENT = gql`
 		owner {
 			...UserBaseFragment
 		}
+		balance
+		subscription {
+			...SubscriptionFragment
+		}
 		created_at
 	}
 	${USER_BASE_FRAGMENT}
+	${SUBSCRIPTION_FRAGMENT}
 `
 
 export const ORGANIZATION_FRAGMENT = gql`
@@ -108,6 +113,9 @@ export const WORKSPACE_FRAGMENT = gql`
 		organization {
 			...OrganizationBaseFragment
 		}
+		users {
+			...UserBaseFragment
+		}
 		user_worker {
 			...UserBaseFragment
 		}
@@ -131,4 +139,22 @@ export const WORKSPACE_PAGINATED_FRAGMENT = gql`
 	}
 	${WORKSPACE_FRAGMENT}
 	${PAGINATION_FRAGMENT}
+`
+
+export const TRANSACTION_FRAGMENT = gql`
+	fragment TransactionFragment on Transaction {
+		id
+		status
+		amount
+		type_product
+		count_product
+		name_product
+		workspace {
+			id
+		}
+		qr_code {
+			qr_url
+		}
+		created_at
+	}
 `
