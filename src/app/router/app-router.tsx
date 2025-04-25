@@ -1,5 +1,13 @@
 import { createBrowserRouter, Navigate } from 'react-router-dom'
-import { HomePage, MembersPage, NotFoundPage, OrganizationsPage, ProfilePage, WorkSpacesPage } from '@/pages'
+import {
+	HomePage,
+	IntegrationsPage,
+	MembersPage,
+	NotFoundPage,
+	OrganizationsPage,
+	ProfilePage,
+	WorkSpacesPage
+} from '@/pages'
 import { LoginForm, RegisterForm } from '@/features/auth'
 import { WorkspaceDetails } from '@/features/workspace'
 import { AuthLayout, DashboardLayout } from './layouts'
@@ -88,7 +96,7 @@ export const AppRouter = createBrowserRouter([
 				children: [
 					{
 						index: true,
-						element: <HomePage />
+						element: <IntegrationsPage />
 					},
 					{
 						path: urls.dashboard.integrations1C,
