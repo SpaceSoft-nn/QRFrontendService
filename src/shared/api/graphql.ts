@@ -145,6 +145,7 @@ export type Mutation = {
 	registration: AuthToken
 	/** Указание user в работу (устаналиваем кто будет работать за workspace) */
 	setWorkUserWorkspace: User
+	updateUser: User
 	/** Создание пользователя cassier/manager */
 	userCreate: User
 }
@@ -191,6 +192,10 @@ export type MutationRegistrationArgs = {
 
 export type MutationSetWorkUserWorkspaceArgs = {
 	input: SetWorkUserWorkspaceInput
+}
+
+export type MutationUpdateUserArgs = {
+	input: UpdateUserInput
 }
 
 export type MutationUserCreateArgs = {
@@ -488,6 +493,12 @@ export enum Trashed {
 	Without = 'WITHOUT'
 }
 
+export type UpdateUserInput = {
+	active?: InputMaybe<Scalars['Boolean']['input']>
+	role?: InputMaybe<UserRoleEnum>
+	user_id: Scalars['String']['input']
+}
+
 export type User = {
 	__typename?: 'User'
 	/** Активирован ли user */
@@ -596,6 +607,12 @@ export type WorkspacePaginator = {
 	__typename?: 'WorkspacePaginator'
 	data: Array<Maybe<Workspace>>
 	paginatorInfo: PaginatorInfo
+}
+
+export type DeleteUserWorkspace = {
+	__typename?: 'deleteUserWorkspace'
+	status: Scalars['Boolean']['output']
+	worksapce: Workspace
 }
 
 export type DriverInfoByOrganizationIdInput = {
@@ -1073,6 +1090,77 @@ export type SetWorkUserWorkspaceMutation = {
 		email?: string | null
 		phone?: string | null
 		created_at: any
+	}
+}
+
+export type AddPaymentMethodToWorkspaceMutationVariables = Exact<{
+	input: AddPaymentWorkspaceInput
+}>
+
+export type AddPaymentMethodToWorkspaceMutation = {
+	__typename?: 'Mutation'
+	addPaymentWorkspace: {
+		__typename?: 'Workspace'
+		id: string
+		name: string
+		description?: string | null
+		is_active: boolean
+		created_at: any
+		organization: {
+			__typename?: 'Organization'
+			id: string
+			name: string
+			address: string
+			type: OrganizationTypeEnum
+			okved?: string | null
+			founded_date?: string | null
+			registration_number: string
+			inn: string
+			kpp?: string | null
+		}
+		users: Array<{
+			__typename?: 'User'
+			id: string
+			first_name?: string | null
+			last_name?: string | null
+			father_name?: string | null
+			role: UserRoleEnum
+			active: boolean
+			email?: string | null
+			phone?: string | null
+			created_at: any
+		} | null>
+		user_worker?: {
+			__typename?: 'User'
+			id: string
+			first_name?: string | null
+			last_name?: string | null
+			father_name?: string | null
+			role: UserRoleEnum
+			active: boolean
+			email?: string | null
+			phone?: string | null
+			created_at: any
+		} | null
+		user_owner: {
+			__typename?: 'User'
+			id: string
+			first_name?: string | null
+			last_name?: string | null
+			father_name?: string | null
+			role: UserRoleEnum
+			active: boolean
+			email?: string | null
+			phone?: string | null
+			created_at: any
+		}
+		paymentMethod?: {
+			__typename?: 'PaymentMethod'
+			id: string
+			active: boolean
+			driver_name: string
+			created_at: any
+		} | null
 	}
 }
 
@@ -2328,6 +2416,58 @@ export type SetWorkUserWorkspaceMutationResult = Apollo.MutationResult<SetWorkUs
 export type SetWorkUserWorkspaceMutationOptions = Apollo.BaseMutationOptions<
 	SetWorkUserWorkspaceMutation,
 	SetWorkUserWorkspaceMutationVariables
+>
+export const AddPaymentMethodToWorkspaceDocument = gql`
+	mutation AddPaymentMethodToWorkspace($input: AddPaymentWorkspaceInput!) {
+		addPaymentWorkspace(input: $input) {
+			...WorkspaceFragment
+		}
+	}
+	${WorkspaceFragmentFragmentDoc}
+	${WorkspaceBaseFragmentFragmentDoc}
+	${PaymentMethodBaseFragmentFragmentDoc}
+	${OrganizationBaseFragmentFragmentDoc}
+	${UserBaseFragmentFragmentDoc}
+`
+export type AddPaymentMethodToWorkspaceMutationFn = Apollo.MutationFunction<
+	AddPaymentMethodToWorkspaceMutation,
+	AddPaymentMethodToWorkspaceMutationVariables
+>
+
+/**
+ * __useAddPaymentMethodToWorkspaceMutation__
+ *
+ * To run a mutation, you first call `useAddPaymentMethodToWorkspaceMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useAddPaymentMethodToWorkspaceMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [addPaymentMethodToWorkspaceMutation, { data, loading, error }] = useAddPaymentMethodToWorkspaceMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useAddPaymentMethodToWorkspaceMutation(
+	baseOptions?: Apollo.MutationHookOptions<
+		AddPaymentMethodToWorkspaceMutation,
+		AddPaymentMethodToWorkspaceMutationVariables
+	>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useMutation<AddPaymentMethodToWorkspaceMutation, AddPaymentMethodToWorkspaceMutationVariables>(
+		AddPaymentMethodToWorkspaceDocument,
+		options
+	)
+}
+export type AddPaymentMethodToWorkspaceMutationHookResult = ReturnType<typeof useAddPaymentMethodToWorkspaceMutation>
+export type AddPaymentMethodToWorkspaceMutationResult = Apollo.MutationResult<AddPaymentMethodToWorkspaceMutation>
+export type AddPaymentMethodToWorkspaceMutationOptions = Apollo.BaseMutationOptions<
+	AddPaymentMethodToWorkspaceMutation,
+	AddPaymentMethodToWorkspaceMutationVariables
 >
 export const LoginDocument = gql`
 	mutation login($input: UserLogin!) {

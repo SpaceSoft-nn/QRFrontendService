@@ -158,3 +158,24 @@ export const TRANSACTION_FRAGMENT = gql`
 		created_at
 	}
 `
+
+export const DRIVER_INFO_FRAGMENT = gql`
+	fragment DriverInfoFragment on DriverInfo {
+		id
+		key
+		value
+		user {
+			...UserBaseFragment
+		}
+		organization {
+			...OrganizationBaseFragment
+		}
+		payment_method {
+			...PaymentMethodBaseFragment
+		}
+		created_at
+	}
+	${ORGANIZATION_BASE_FRAGMENT}
+	${PAYMENT_METHOD_BASE_FRAGMENT}
+	${USER_BASE_FRAGMENT}
+`
