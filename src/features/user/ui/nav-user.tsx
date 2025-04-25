@@ -21,7 +21,7 @@ export const NavUser: React.FC = observer(() => {
 	const navigate = useNavigate()
 
 	const { loading, error, isAuthenticated } = authStore
-	const { fullName, contactInfo } = userStore
+	const { user, contactInfo } = userStore
 
 	useEffect(() => {
 		if (isAuthenticated) {
@@ -43,12 +43,12 @@ export const NavUser: React.FC = observer(() => {
 					<DropdownMenuTrigger asChild>
 						<SidebarMenuButton
 							tooltip='Личный кабинет'
-							loading={loading || !userStore.user || !!error}
+							loading={loading || !user || !!error}
 							className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
 						>
 							<UserCircleIcon />
 							<div className='grid flex-1 text-left text-sm leading-tight'>
-								<span className='truncate'>{fullName}</span>
+								<span className='truncate'>{user?.first_name}</span>
 								{contactInfo.phone && (
 									<span className='truncate text-xs text-muted-foreground'>{contactInfo.phone}</span>
 								)}

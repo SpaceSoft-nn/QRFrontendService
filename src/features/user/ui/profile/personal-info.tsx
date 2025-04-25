@@ -1,19 +1,11 @@
-import React from 'react'
-import { observer } from 'mobx-react-lite'
-import { userStore } from '@/entities/user'
-import { DataItem, Skeleton } from '@/shared/ui'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
+import { Card, CardContent, CardDescription, CardHeader, CardTitle, DataItem } from '@/shared/ui'
+import { User } from '@/shared/api/graphql'
 
-const ProfileFormSkeleton = () => {
-	return <Skeleton className='h-96 w-full' />
+interface PersonalInfoProps {
+	user: User
 }
 
-export const ProfileCard: React.FC = observer(() => {
-	const { user, loading } = userStore
-
-	if (loading) return <ProfileFormSkeleton />
-	if (!user) return null
-
+export const PersonalInfo = ({ user }: PersonalInfoProps) => {
 	return (
 		<Card>
 			<CardHeader>
@@ -29,4 +21,4 @@ export const ProfileCard: React.FC = observer(() => {
 			</CardContent>
 		</Card>
 	)
-})
+}
