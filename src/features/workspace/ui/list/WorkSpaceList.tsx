@@ -3,18 +3,13 @@ import { RefreshCwIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { WorkSpaceItem } from '@/features/workspace'
 import { workspaceStore } from '@/entities/workspace'
-import { PaginationUi } from '@/shared/ui'
+import { PaginationUi, SkeletonListUi } from '@/shared/ui'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
-import { Skeleton } from '@/shared/ui/skeleton'
-
-const WorkSpaceListSkeleton = () => {
-	return Array.from({ length: 6 }).map((_, index) => <Skeleton key={index} className='h-56 w-full' />)
-}
 
 const WorkSpaceListError = ({ error }: { error: string | null }) => {
 	return (
-		<Card variant='dashed-hover'>
+		<Card>
 			<CardContent className='flex flex-col h-full items-center justify-center gap-2 !pt-0 text-muted-foreground'>
 				<p className='text-destructive text-wrap'>{error}</p>
 				<Button variant='outline' icon={RefreshCwIcon} onClick={() => workspaceStore.getWorkspaces()}>
@@ -44,7 +39,7 @@ export const WorkSpaceList = observer(() => {
 	}, [])
 
 	const renderList = () => {
-		if (loading) return <WorkSpaceListSkeleton />
+		if (loading) return <SkeletonListUi length={6} />
 		if (error) return <WorkSpaceListError error={error} />
 		if (workspaces.length === 0) return <WorkSpaceListEmpty />
 
