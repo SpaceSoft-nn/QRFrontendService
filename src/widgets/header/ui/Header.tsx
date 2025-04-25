@@ -6,7 +6,7 @@ import { SidebarTrigger } from '@/shared/ui/Sidebar'
 export const Header: React.FC = () => {
 	return (
 		<header className='flex h-16 shrink-0 sticky bg-background/80 backdrop-blur-sm top-0 z-50 justify-between items-center gap-2 transition-[width,height] ease-linear group-has-[[data-collapsible=icon]]/sidebar-wrapper:h-12'>
-			<div className='flex items-center gap-2 w-full'>
+			<div className='flex items-center gap-2 w-full px-5'>
 				<SidebarTrigger />
 				<Separator orientation='vertical' className='h-4' />
 				<Breadcrumbs />
