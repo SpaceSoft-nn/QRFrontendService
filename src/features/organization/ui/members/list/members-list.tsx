@@ -1,15 +1,15 @@
 import { observer } from 'mobx-react-lite'
-import { membersStore } from '@/entities/members'
+import { organizationStore } from '@/entities/organization'
 import { DataTable } from '@/shared/ui/data-table'
 import { membersListColumns } from './members-list.columns'
 
-export const MembersList = observer(() => {
-	const { members, loading, error } = membersStore
+export const OrganizationMembersList = observer(() => {
+	const { organizationMembers, loading, error } = organizationStore
 
 	return (
 		<DataTable
 			columns={membersListColumns}
-			data={members}
+			data={organizationMembers}
 			loading={loading}
 			error={error}
 			emptyText='Пользователи не найдены'

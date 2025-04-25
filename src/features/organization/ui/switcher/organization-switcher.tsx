@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react'
-import { Building2, ChevronsUpDown, Plus } from 'lucide-react'
+import { Building2, ChevronsUpDown } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { organizationStore, OrganizationWithOpf } from '@/entities/organization'
 import {
@@ -11,6 +11,7 @@ import {
 } from '@/shared/ui/dropdown-menu'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/shared/ui/Sidebar'
 import { cn } from '@/shared/lib/utils'
+import { OrganizationCreateForm } from '../create/organization-create-form'
 
 const OrganizationItem = ({ organization }: { organization: OrganizationWithOpf | null }) => {
 	return (
@@ -57,14 +58,12 @@ export const OrganizationSwitcher: React.FC = observer(() => {
 						</SidebarMenuButton>
 					</DropdownMenuTrigger>
 					<DropdownMenuContent
-						className='w-[--radix-dropdown-menu-trigger-width] min-w-56 rounded-lg'
+						className='min-w-56 rounded-lg'
 						align='start'
 						side={isMobile ? 'bottom' : 'right'}
 						sideOffset={4}
 					>
-						<DropdownMenuLabel className='text-xs text-muted-foreground'>
-							Ваши организации
-						</DropdownMenuLabel>
+						<DropdownMenuLabel>Ваши организации</DropdownMenuLabel>
 						{organizations.length > 0 ? (
 							<>
 								{organizations.map(organization => (
@@ -80,12 +79,7 @@ export const OrganizationSwitcher: React.FC = observer(() => {
 								))}
 							</>
 						) : (
-							<DropdownMenuItem className='gap-2 p-1'>
-								<div className='flex size-6 items-center justify-center rounded-md border bg-background'>
-									<Plus className='size-4' />
-								</div>
-								<div className='font-medium text-muted-foreground'>Добавить организацию</div>
-							</DropdownMenuItem>
+							<OrganizationCreateForm className='w-full' variant='ghost' size='sm' />
 						)}
 					</DropdownMenuContent>
 				</DropdownMenu>

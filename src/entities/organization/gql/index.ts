@@ -1,5 +1,5 @@
 import { gql } from '@apollo/client'
-import { ORGANIZATION_FRAGMENT } from '@/shared/api'
+import { ORGANIZATION_FRAGMENT, USER_BASE_FRAGMENT } from '@/shared/api'
 
 export const GET_ORGANIZATIONS_QUERY = gql`
 	query GetOrganizations {
@@ -26,4 +26,24 @@ export const CREATE_ORGANIZATION_MUTATION = gql`
 		}
 	}
 	${ORGANIZATION_FRAGMENT}
+`
+
+export const GET_ORGANIZATION_MEMBERS_QUERY = gql`
+	query GetMembers($organizationId: ID!) {
+		organization(id: $organizationId) {
+			users {
+				...UserBaseFragment
+			}
+		}
+	}
+	${USER_BASE_FRAGMENT}
+`
+
+export const CREATE_ORGANIZATION_MEMBER_MUTATION = gql`
+	mutation CreateMember($input: UserCreate!) {
+		userCreate(input: $input) {
+			...UserBaseFragment
+		}
+	}
+	${USER_BASE_FRAGMENT}
 `

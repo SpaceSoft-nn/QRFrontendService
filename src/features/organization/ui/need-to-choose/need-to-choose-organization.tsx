@@ -1,6 +1,5 @@
 import { observer } from 'mobx-react-lite'
 import { organizationStore } from '@/entities/organization'
-import { userStore } from '@/entities/user'
 import { Button } from '@/shared/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
 import { OrganizationCreateForm } from '../create/organization-create-form'

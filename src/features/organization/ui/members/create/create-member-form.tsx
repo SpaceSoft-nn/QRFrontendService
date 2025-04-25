@@ -1,54 +1,49 @@
-import { useEffect, useState } from 'react'
+import React, { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { UserPlusIcon } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
-import { AuthMethodSelector } from '@/features/auth/ui/AuthMethodSelector'
-import { memberRolesOptions, membersStore } from '@/entities/members'
-import { organizationStore } from '@/entities/organization'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { AuthMethodSelector } from '@/features/auth/ui/method-selector/AuthMethodSelector'
+import { memberRolesOptions, organizationStore } from '@/entities/organization'
 import { userStore } from '@/entities/user'
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/shared/ui'
 import { Button } from '@/shared/ui/button'
 import { Form, FormInput, FormTabs } from '@/shared/ui/Forms'
 import { UserCreate, UserRoleEnum } from '@/shared/api/graphql'
-import { toast } from '@/shared/lib'
+import { createOrganizationMemberSchema, TypeCreateOrganizationMemberSchema } from './create-member.schema'
 
-export const CreateMemberForm = observer(() => {
+interface CreateOrganizationMemberFormProps
+	extends Pick<React.ComponentProps<typeof Button>, 'size' | 'variant' | 'className'> {}
+
+export const CreateOrganizationMemberForm = observer<CreateOrganizationMemberFormProps>(({ ...props }) => {
 	const [open, setOpen] = useState(false)
-	const { activeOrganization } = organizationStore
-	const { personalArea } = userStore
-	const { loading, error } = membersStore
+	const { user } = userStore
+	const { loading } = organizationStore
 
 	const form = useForm<UserCreate>({
+		resolver: zodResolver(createOrganizationMemberSchema),
 		defaultValues: {
-			organization_id: activeOrganization?.id,
-			personalarea_id: personalArea?.id,
+			// @ts-ignore
+			authMethod: 'email',
 			role: UserRoleEnum.Cassier
 		}
 	})
 
-	useEffect(() => {
-		if (activeOrganization?.id && personalArea?.id) {
-			form.setValue('organization_id', activeOrganization.id)
-			form.setValue('personalarea_id', personalArea.id)
-		}
-	}, [activeOrganization?.id, personalArea?.id, form])
-
 	const onSubmit = async (data: UserCreate) => {
-		const success = await membersStore.createMember(data)
+		const success = await organizationStore.createOrganizationMember(data)
 		if (success) {
-			toast({
-				title: 'Пользователь успешно создан'
-			})
 			form.reset()
 			setOpen(false)
 		}
 	}
 
+	if (user?.role === UserRoleEnum.Cassier) return null
+
 	return (
 		<Dialog open={open} onOpenChange={setOpen}>
 			<DialogTrigger asChild>
-				<Button variant='outline' icon={UserPlusIcon}>
-					Создать пользователя
+				<Button icon={UserPlusIcon} {...props}>
+					Создать
 				</Button>
 			</DialogTrigger>
 			<DialogContent>
@@ -90,7 +85,7 @@ export const CreateMemberForm = observer(() => {
 						autoComplete='new-password'
 						disabled={loading}
 					/>
-					<Button type='submit' icon={UserPlusIcon} loading={loading}>
+					<Button type='submit' icon={UserPlusIcon} loading={loading} disabled={!form.formState.isValid}>
 						Создать
 					</Button>
 				</Form>
