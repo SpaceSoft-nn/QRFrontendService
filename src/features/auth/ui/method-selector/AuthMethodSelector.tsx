@@ -2,7 +2,7 @@ import { useEffect } from 'react'
 import { useFormContext } from 'react-hook-form'
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/shared/ui'
 import { FormInput } from '@/shared/ui/Forms'
-import { AuthMethod } from '../model'
+import { AuthMethod } from './AuthMethodSelector.schema'
 
 export const AuthMethodSelector = ({ disabled }: { disabled?: boolean }) => {
 	const { watch, setValue, clearErrors, getValues } = useFormContext()

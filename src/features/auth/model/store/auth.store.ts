@@ -1,20 +1,20 @@
 import { makeAutoObservable } from 'mobx'
 import { LOGIN_MUTATION, LOGOUT_MUTATION, REFRESH_MUTATION, REGISTER_MUTATION } from '@/features/auth/gql'
-import { TypeLoginSchema, TypeRegisterSchema } from '@/features/auth/model/schemas'
-import { organizationStore } from '@/entities/organization/model/store/organization.store'
-import { userStore } from '@/entities/user/model/store/user.store'
-import { workspaceStore } from '@/entities/workspace/model/store/workspace.store'
+import { organizationStore } from '@/entities/organization'
+import { userStore } from '@/entities/user'
+import { workspaceStore } from '@/entities/workspace'
 import { apolloClient } from '@/shared/api/apollo'
+import { Mutation, UserLogin, UserRegistration } from '@/shared/api/graphql'
+import { toast } from '@/shared/lib'
 
-interface AuthState {
-	accessToken: string | null
-	isAuthenticated: boolean
-	loading: boolean
-	error: string | null
+interface Token {
+	accessToken: string
+	expiresInAccess?: number
+	expiresInRefresh?: number
 }
 
-class AuthStore implements AuthState {
-	accessToken: string | null = null
+class AuthStore {
+	token: Token | null = null
 	isAuthenticated: boolean = false
 	loading: boolean = false
 	error: string | null = null
@@ -27,119 +27,147 @@ class AuthStore implements AuthState {
 	private initializeFromStorage() {
 		const token = localStorage.getItem('token')
 		if (token) {
-			this.setAccessToken(token)
+			this.setAccessToken({
+				accessToken: token
+			})
 		}
 	}
 
-	setAccessToken(token: string) {
-		this.accessToken = token
+	setAccessToken(token: Token) {
+		this.token = token
 		this.isAuthenticated = true
-		localStorage.setItem('token', token)
+		localStorage.setItem('token', token.accessToken)
 	}
 
-	setLoading(loading: boolean) {
-		this.loading = loading
+	removeAccessToken() {
+		this.token = null
+		this.isAuthenticated = false
+		localStorage.removeItem('token')
 	}
 
-	setError(error: string | null) {
-		this.error = error
-	}
+	login = async (input: UserLogin) => {
+		this.loading = true
+		this.error = null
 
-	async login(input: TypeLoginSchema) {
 		try {
-			this.setLoading(true)
-			this.setError(null)
-
-			const { data } = await apolloClient.mutate({
+			const { data } = await apolloClient.mutate<Pick<Mutation, 'login'>>({
 				mutation: LOGIN_MUTATION,
 				variables: { input }
 			})
 
 			if (data?.login.access_token) {
-				this.setAccessToken(data.login.access_token)
+				this.setAccessToken({
+					accessToken: data.login.access_token,
+					expiresInAccess: Number(data.login.expires_in_access),
+					expiresInRefresh: Number(data.login.expires_in_refresh)
+				})
 				return true
 			}
 
 			return false
 		} catch (error) {
-			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при входе')
+			console.error('[login] error: ', error)
+			toast({
+				title: 'Ошибка',
+				variant: 'destructive',
+				description: error instanceof Error ? error.message : 'Произошла ошибка при входе'
+			})
+			this.error = error instanceof Error ? error.message : 'Произошла ошибка при входе'
 			return false
 		} finally {
-			this.setLoading(false)
+			this.loading = false
 		}
 	}
 
-	async register(input: TypeRegisterSchema) {
-		try {
-			this.setLoading(true)
-			this.setError(null)
+	register = async (input: UserRegistration) => {
+		this.loading = true
+		this.error = null
 
-			const { data } = await apolloClient.mutate({
+		try {
+			const { data } = await apolloClient.mutate<Pick<Mutation, 'registration'>>({
 				mutation: REGISTER_MUTATION,
 				variables: { input }
 			})
 
 			if (data?.registration?.access_token) {
-				this.setAccessToken(data.registration.access_token)
+				this.setAccessToken({
+					accessToken: data.registration.access_token,
+					expiresInAccess: Number(data.registration.expires_in_access),
+					expiresInRefresh: Number(data.registration.expires_in_refresh)
+				})
 				return true
 			}
 
 			return false
 		} catch (error) {
-			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при регистрации')
+			console.error('[register] error: ', error)
+			toast({
+				title: 'Ошибка',
+				variant: 'destructive',
+				description: error instanceof Error ? error.message : 'Произошла ошибка при регистрации'
+			})
+			this.error = error instanceof Error ? error.message : 'Произошла ошибка при регистрации'
 			return false
 		} finally {
-			this.setLoading(false)
+			this.loading = false
 		}
 	}
 
-	async logout() {
-		try {
-			this.setLoading(true)
-			this.setError(null)
+	logout = async () => {
+		this.loading = true
+		this.error = null
 
-			localStorage.removeItem('token')
-			this.accessToken = null
-			this.isAuthenticated = false
+		try {
+			this.removeAccessToken()
 
 			await apolloClient.mutate({
 				mutation: LOGOUT_MUTATION
 			})
 
-			userStore.setUser(null)
-			workspaceStore.setWorkspaces([])
-			organizationStore.setOrganizations([])
+			workspaceStore.workspaces = []
+			organizationStore.organizations = []
 
 			return true
 		} catch (error) {
-			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при выходе')
+			console.error('[logout] error: ', error)
+			toast({
+				title: 'Ошибка',
+				variant: 'destructive',
+				description: error instanceof Error ? error.message : 'Произошла ошибка при выходе'
+			})
+			this.error = error instanceof Error ? error.message : 'Произошла ошибка при выходе'
 			return false
 		} finally {
-			this.setLoading(false)
+			this.loading = false
 		}
 	}
 
-	async refreshToken() {
-		try {
-			this.setLoading(true)
-			this.setError(null)
+	refreshToken = async () => {
+		this.loading = true
+		this.error = null
 
-			const { data } = await apolloClient.mutate({
+		try {
+			const { data } = await apolloClient.mutate<Pick<Mutation, 'authRefresh'>>({
 				mutation: REFRESH_MUTATION
 			})
 
 			if (data?.authRefresh?.access_token) {
-				this.setAccessToken(data.authRefresh.access_token)
+				this.setAccessToken({
+					accessToken: data.authRefresh.access_token,
+					expiresInAccess: Number(data.authRefresh.expires_in_access),
+					expiresInRefresh: Number(data.authRefresh.expires_in_refresh)
+				})
 				return true
 			}
 
 			return false
 		} catch (error) {
-			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при обновлении токена')
+			console.error('[refreshToken] error: ', error)
+			this.error = error instanceof Error ? error.message : 'Произошла ошибка при обновлении токена'
 			await this.logout()
 			return false
 		} finally {
-			this.setLoading(false)
+			this.loading = false
 		}
 	}
 }

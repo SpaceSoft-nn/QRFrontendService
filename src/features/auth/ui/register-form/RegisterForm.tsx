@@ -5,13 +5,14 @@ import { observer } from 'mobx-react-lite'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { authStore } from '@/features/auth'
 import { Button } from '@/shared/ui'
-import { Form, FormErrorMessage, FormInput } from '@/shared/ui/Forms'
-import { registerSchema, TypeRegisterSchema } from '../model/schemas'
-import { AuthMethodSelector } from './AuthMethodSelector'
-import { AuthWrapper } from './AuthWrapper'
+import { Form, FormCheckbox, FormErrorMessage, FormInput } from '@/shared/ui/Forms'
+import { UserRegistration } from '@/shared/api/graphql'
+import { AuthWrapper } from '../AuthWrapper'
+import { AuthMethodSelector } from '../method-selector/AuthMethodSelector'
+import { registerSchema, TypeRegisterSchema } from './RegisterForm.schema'
 import { urls } from '@/shared/config'
 
-export const RegisterForm: React.FC = observer(() => {
+export const RegisterForm = observer(() => {
 	const navigate = useNavigate()
 	const { loading, error } = authStore
 
@@ -25,19 +26,11 @@ export const RegisterForm: React.FC = observer(() => {
 
 	const onSubmit = async (data: TypeRegisterSchema) => {
 		console.log(data)
-		const success = await authStore.register(data)
+		const success = await authStore.register(data as UserRegistration)
 		if (success) {
 			navigate(urls.dashboard.main)
 		}
 	}
-
-	useEffect(() => {
-		console.group('RegisterForm')
-		console.log('form.getValues()', form.getValues())
-		console.log('form.formState.isValid', form.formState.isValid)
-		console.log('form.formState.errors', form.formState.errors)
-		console.groupEnd()
-	}, [form.formState.isValid])
 
 	return (
 		<AuthWrapper title='Регистрация' redirectTo={urls.auth.login} redirectText='Уже есть аккаунт? Войти'>
@@ -60,7 +53,7 @@ export const RegisterForm: React.FC = observer(() => {
 					placeholder='Подтвердите пароль'
 					disabled={loading}
 				/>
-
+				<FormCheckbox name='agreement' label='Я принимаю условия использования' disabled={loading} />
 				{error && <FormErrorMessage>{error}</FormErrorMessage>}
 
 				<Button

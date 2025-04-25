@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { PHONE_REGEX } from '@/shared/constants'
+import { PHONE_REGEX } from '@/shared/config'
 
 export const authMethodSchema = z.discriminatedUnion('authMethod', [
 	z.object({

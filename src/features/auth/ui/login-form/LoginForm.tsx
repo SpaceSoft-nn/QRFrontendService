@@ -5,12 +5,13 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { authStore } from '@/features/auth'
 import { Button } from '@/shared/ui'
 import { Form, FormErrorMessage, FormInput } from '@/shared/ui/Forms'
-import { loginSchema, TypeLoginSchema } from '../model/schemas/login.schema'
-import { AuthMethodSelector } from './AuthMethodSelector'
-import { AuthWrapper } from './AuthWrapper'
+import { UserLogin } from '@/shared/api/graphql'
+import { AuthWrapper } from '../AuthWrapper'
+import { AuthMethodSelector } from '../method-selector/AuthMethodSelector'
+import { loginSchema, TypeLoginSchema } from './LoginForm.schema'
 import { urls } from '@/shared/config'
 
-export const LoginForm: React.FC = observer(() => {
+export const LoginForm = observer(() => {
 	const navigate = useNavigate()
 	const { loading, error } = authStore
 
@@ -24,7 +25,7 @@ export const LoginForm: React.FC = observer(() => {
 
 	const onSubmit = async (data: TypeLoginSchema) => {
 		console.log(data)
-		const success = await authStore.login(data)
+		const success = await authStore.login(data as UserLogin)
 		if (success) {
 			navigate(urls.dashboard.main)
 		}
