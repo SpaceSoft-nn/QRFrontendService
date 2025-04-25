@@ -11,19 +11,17 @@ export const urls = {
 		usersAdd: '/users' + '/add',
 
 		organizations: '/organizations',
-		organizationsAdd: '/organizations' + '/add',
+		organizationById: (id: string) => `/organizations/${id}`,
 
 		workSpaces: '/workspaces',
-		workSpacesAdd: '/workspaces' + '/add',
 		workSpaceBySlug: (slug: string) => `/workspaces/${slugify(slug)}`,
+		workSpaceById: (id: string) => `/workspaces/${id}`,
 
 		payments: '/payments',
-		paymentsAdd: '/payments' + '/add',
 		paymentsHistory: '/payments' + '/history',
 		paymentsMethods: '/payments' + '/methods',
 
 		integrations: '/integrations',
-		integrationsAdd: '/integrations' + '/add',
 		integrationsBanks: '/integrations' + '/banks',
 		integrations1C: '/integrations' + '/1c',
 		integrationsExternal: '/integrations' + '/external',
