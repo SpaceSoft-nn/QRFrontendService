@@ -13,8 +13,7 @@ export const ThemeToggleButton: React.FC<{
 			size='icon'
 			className={className}
 			onClick={() => setTheme(theme === 'light' ? 'dark' : 'light')}
-			icon={theme === 'light' ? Moon : Sun}
-			tooltip={theme === 'light' ? 'Светлая тема' : 'Темная тема'}
+			icon={theme === 'light' ? Sun : Moon}
 		/>
 	)
 }
