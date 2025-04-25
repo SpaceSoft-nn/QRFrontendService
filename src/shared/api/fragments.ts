@@ -159,13 +159,23 @@ export const TRANSACTION_FRAGMENT = gql`
 	}
 `
 
-export const DRIVER_INFO_FRAGMENT = gql`
-	fragment DriverInfoFragment on DriverInfo {
+export const DRIVER_INFO_BASE_FRAGMENT = gql`
+	fragment DriverInfoBaseFragment on DriverInfo {
 		id
 		key
 		value
+		created_at
+	}
+`
+
+export const DRIVER_INFO_FRAGMENT = gql`
+	fragment DriverInfoFragment on DriverInfo {
+		...DriverInfoBaseFragment
 		user {
-			...UserBaseFragment
+			id
+			father_name
+			first_name
+			last_name
 		}
 		organization {
 			...OrganizationBaseFragment
@@ -173,9 +183,8 @@ export const DRIVER_INFO_FRAGMENT = gql`
 		payment_method {
 			...PaymentMethodBaseFragment
 		}
-		created_at
 	}
+	${DRIVER_INFO_BASE_FRAGMENT}
 	${ORGANIZATION_BASE_FRAGMENT}
 	${PAYMENT_METHOD_BASE_FRAGMENT}
-	${USER_BASE_FRAGMENT}
 `
