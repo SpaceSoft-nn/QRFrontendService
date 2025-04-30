@@ -14,6 +14,7 @@ export const FormTabs: React.FC<FormTabsProps> = ({
 	items,
 	className,
 	orientation = 'horizontal',
+	disabled,
 	...props
 }) => {
 	const { control, error } = useFormField(name)
@@ -31,9 +32,9 @@ export const FormTabs: React.FC<FormTabsProps> = ({
 					className={className}
 					{...props}
 				>
-					<TabsList className={cn(error && s.formField__input__error)}>
+					<TabsList className={cn('w-full', error && s.formField__input__error)}>
 						{items.map(item => (
-							<TabsTrigger key={item.value} value={item.value}>
+							<TabsTrigger key={item.value} value={item.value} className='w-full' disabled={disabled}>
 								{item.label}
 							</TabsTrigger>
 						))}

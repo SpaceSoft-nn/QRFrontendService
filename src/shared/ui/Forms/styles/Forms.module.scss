@@ -48,7 +48,7 @@
 	@apply flex items-center;
 
 	&__label {
-		@apply ml-2 border-none;
+		@apply ml-2 text-sm border-none;
 
 		&__error {
 			@apply text-red-300;
@@ -58,4 +58,12 @@
 	&__error {
 		@apply border-destructive bg-destructive/10;
 	}
+}
+
+.formField__description {
+	@apply text-xs text-muted-foreground;
+}
+
+.formField__error {
+	@apply text-destructive text-xs;
 }

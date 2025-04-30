@@ -1,7 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react'
 import { AlertCircle, RefreshCcw } from 'lucide-react'
-import { Button } from '../button'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '../card'
+import { Button, Card, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui'
 
 interface Props {
 	children: ReactNode
@@ -39,7 +38,7 @@ export class ErrorBoundary extends Component<Props, State> {
 									<CardTitle className='text-lg'>Ошибка приложения</CardTitle>
 								</div>
 								<CardDescription className='text-sm text-wrap'>
-									{this.state.error?.message || 'Произошла ошибка'}
+									{this.state.error?.message || 'Произошла неизвестная ошибка'}
 								</CardDescription>
 							</CardHeader>
 							<CardFooter>

@@ -1,6 +1,6 @@
 import { ReactNode } from 'react'
 import { cn } from '@/shared/lib'
-import { FormErrorMessage, FormRequiredSymbol } from './feedback'
+import { FormErrorMessage, FormFieldDescription, FormRequiredSymbol } from './feedback'
 import s from './styles/Forms.module.scss'
 
 interface BaseFormFieldProps extends React.HTMLAttributes<HTMLDivElement> {
@@ -9,8 +9,18 @@ interface BaseFormFieldProps extends React.HTMLAttributes<HTMLDivElement> {
 	labelStyle?: string
 	required?: boolean
 	className?: string
-	error?: string
+	error?: string | null
 	children: ReactNode
+	description?: React.ReactNode
+}
+
+const FormFieldFooter = ({ error, description }: Pick<BaseFormFieldProps, 'error' | 'description'>) => {
+	return (
+		<div className='flex items-center gap-1 justify-between'>
+			{error && <FormErrorMessage>{error}</FormErrorMessage>}
+			{description && <FormFieldDescription>{description}</FormFieldDescription>}
+		</div>
+	)
 }
 
 export const BaseFormField: React.FC<BaseFormFieldProps> = ({
@@ -20,6 +30,7 @@ export const BaseFormField: React.FC<BaseFormFieldProps> = ({
 	className,
 	error,
 	children,
+	description,
 	...props
 }) => {
 	return (
@@ -30,7 +41,7 @@ export const BaseFormField: React.FC<BaseFormFieldProps> = ({
 				</p>
 			)}
 			{children}
-			{error && <FormErrorMessage>{error}</FormErrorMessage>}
+			<FormFieldFooter error={error} description={description} />
 		</div>
 	)
 }

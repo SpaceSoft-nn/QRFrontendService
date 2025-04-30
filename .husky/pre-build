@@ -1,0 +1,10 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+echo "🔍 Проверка сборки проекта..."
+echo "📝 Проверка форматирования..."
+npm run prettier
+echo "🔍 Проверка линтером..."
+npm run lint
+echo "🏗️ Проверка сборки..."
+npm run codegen && vite build 

@@ -23,14 +23,7 @@ export default defineConfig({
 	},
 	server: {
 		port: 4000,
-		proxy: {
-			'/api/graphql': {
-				target: 'http://185.247.185.17:8876',
-				changeOrigin: true,
-				secure: false,
-				ws: true
-			}
-		}
+		open: true
 	},
 	build: {
 		chunkSizeWarningLimit: 500,
@@ -38,6 +31,7 @@ export default defineConfig({
 			output: {
 				manualChunks: {
 					'vendor-react': ['react', 'react-dom'],
+					'vendor-dadata': ['react-dadata'],
 					'vendor-ui': [
 						'@radix-ui/react-accordion',
 						'@radix-ui/react-checkbox',
@@ -53,11 +47,13 @@ export default defineConfig({
 						'@radix-ui/react-tabs',
 						'@radix-ui/react-toast',
 						'@radix-ui/react-tooltip',
+						'@radix-ui/react-collapsible',
 						'shadcn',
 						'lucide-react',
 						'react-icons',
 						'react-table',
-						'react-day-picker'
+						'react-day-picker',
+						'framer-motion'
 					],
 					'vendor-gql': ['@apollo/client', 'graphql']
 				}

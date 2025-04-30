@@ -1,13 +1,14 @@
-import { makeAutoObservable } from 'mobx'
-import { apolloClient } from '@/shared/api/apollo'
-import { User } from '@/shared/api/graphql'
-import { GET_CURRENT_USER, LOGIN_MUTATION, LOGOUT_MUTATION, REFRESH_MUTATION } from '../../gql/queries'
-import { TypeLoginSchema } from '../schemas/login.schema'
-import { AuthState } from './types'
+import { makeAutoObservable, runInAction } from 'mobx'
+import { authApi } from '@/features/auth/api/auth.api'
+import { organizationStore } from '@/entities/organization'
+import { userStore } from '@/entities/user'
+import { workspaceStore } from '@/entities/workspace'
+import { UserLoginInput, UserRegistration } from '@/shared/api/graphql'
+import { toast } from '@/shared/lib'
+import { urls } from '@/shared/config'
 
-class AuthStore implements AuthState {
-	user: User | null = null
-	accessToken: string | null = null
+class AuthStore {
+	token: string | null = null
 	isAuthenticated: boolean = false
 	loading: boolean = false
 	error: string | null = null
@@ -17,120 +18,139 @@ class AuthStore implements AuthState {
 		this.initializeFromStorage()
 	}
 
-	private initializeFromStorage() {
+	private initializeFromStorage = () => {
 		const token = localStorage.getItem('token')
 		if (token) {
 			this.setAccessToken(token)
 		}
 	}
 
-	setAccessToken(token: string) {
-		this.accessToken = token
-		this.isAuthenticated = true
-		localStorage.setItem('token', token)
+	setAccessToken = (token: string) => {
+		runInAction(() => {
+			this.token = token
+			this.isAuthenticated = true
+			localStorage.setItem('token', token)
+		})
 	}
 
-	setUser(user: User | null) {
-		this.user = user
-	}
-
-	setLoading(loading: boolean) {
-		this.loading = loading
-	}
-
-	setError(error: string | null) {
-		this.error = error
-	}
-
-	async login(input: TypeLoginSchema) {
-		try {
-			this.setLoading(true)
-			this.setError(null)
-
-			const { data } = await apolloClient.mutate({
-				mutation: LOGIN_MUTATION,
-				variables: { input }
-			})
-
-			if (data?.authLogin?.access_token) {
-				this.setAccessToken(data.authLogin.access_token)
-				return true
-			}
-
-			return false
-		} catch (error) {
-			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при входе')
-			return false
-		} finally {
-			this.setLoading(false)
-		}
-	}
-
-	async getUser() {
-		try {
-			this.setLoading(true)
-			this.setError(null)
-
-			const { data } = await apolloClient.query({
-				query: GET_CURRENT_USER
-			})
-
-			if (data?.authMe) {
-				this.setUser(data.authMe)
-				return true
-			}
-
-			return false
-		} catch (error) {
-			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при получении данных пользователя')
-			return false
-		} finally {
-			this.setLoading(false)
-		}
-	}
-
-	async logout() {
-		try {
-			this.setLoading(true)
-
-			await apolloClient.mutate({
-				mutation: LOGOUT_MUTATION
-			})
-
-			this.accessToken = null
-			this.user = null
+	removeAccessToken = () => {
+		runInAction(() => {
+			this.token = null
 			this.isAuthenticated = false
-			this.error = null
 			localStorage.removeItem('token')
+		})
+	}
+
+	login = async (input: UserLoginInput) => {
+		try {
+			this.loading = true
+			this.error = null
+
+			const token = await authApi.login(input)
+
+			if (token) {
+				this.setAccessToken(token)
+				return true
+			}
+
+			return false
+		} catch (error) {
+			console.error('[login] error: ', error)
+			toast({
+				title: 'Ошибка',
+				variant: 'destructive',
+				description: error instanceof Error ? error.message : 'Произошла ошибка при входе'
+			})
+			this.error = error instanceof Error ? error.message : 'Произошла ошибка при входе'
+			return false
+		} finally {
+			runInAction(() => {
+				this.loading = false
+			})
+		}
+	}
+
+	register = async (input: UserRegistration) => {
+		this.loading = true
+		this.error = null
+
+		try {
+			const token = await authApi.register(input)
+
+			if (token) {
+				this.setAccessToken(token)
+				return true
+			}
+
+			return false
+		} catch (error) {
+			console.error('[register] error: ', error)
+			toast({
+				title: 'Ошибка',
+				variant: 'destructive',
+				description: error instanceof Error ? error.message : 'Произошла ошибка при регистрации'
+			})
+			this.error = error instanceof Error ? error.message : 'Произошла ошибка при регистрации'
+			return false
+		} finally {
+			runInAction(() => {
+				this.loading = false
+			})
+		}
+	}
+
+	logout = async () => {
+		try {
+			this.loading = true
+			this.error = null
+
+			this.removeAccessToken()
+
+			await authApi.logout()
+
+			runInAction(() => {
+				userStore.user = null
+				workspaceStore.workspaces = []
+				organizationStore.organizations = []
+			})
+
 			return true
 		} catch (error) {
-			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при выходе')
+			console.error('[logout] error: ', error)
+			toast({
+				title: 'Ошибка',
+				variant: 'destructive',
+				description: error instanceof Error ? error.message : 'Произошла ошибка при выходе'
+			})
 			return false
 		} finally {
-			this.setLoading(false)
+			runInAction(() => {
+				this.loading = false
+			})
 		}
 	}
 
-	async refreshToken() {
+	refreshToken = async () => {
 		try {
-			this.setLoading(true)
-			this.setError(null)
+			this.loading = true
+			this.error = null
 
-			const { data } = await apolloClient.mutate({
-				mutation: REFRESH_MUTATION
-			})
+			const token = await authApi.refreshToken()
 
-			if (data?.authRefresh?.access_token) {
-				this.setAccessToken(data.authRefresh.access_token)
+			if (token) {
+				this.setAccessToken(token)
 				return true
 			}
 
 			return false
 		} catch (error) {
-			this.setError(error instanceof Error ? error.message : 'Произошла ошибка при обновлении токена')
+			console.error('[refreshToken] error: ', error)
+			this.error = error instanceof Error ? error.message : 'Произошла ошибка при обновлении токена'
 			return false
 		} finally {
-			this.setLoading(false)
+			runInAction(() => {
+				this.loading = false
+			})
 		}
 	}
 }

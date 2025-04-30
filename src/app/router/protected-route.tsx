@@ -1,5 +1,5 @@
 import { Navigate, useLocation } from 'react-router-dom'
-import { authStore } from '@/features/auth/model/store/auth.store'
+import { authStore } from '@/features/auth'
 import { urls } from '@/shared/config'
 
 interface ProtectedRouteProps {

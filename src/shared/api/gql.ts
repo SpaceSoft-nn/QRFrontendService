@@ -14,14 +14,13 @@ import * as types from './graphql'
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-	'\n  mutation Login($input: UserLogin!) {\n    authLogin(input: $input) {\n      access_token\n      token_type\n      expires_in_access\n      expires_in_refresh\n    }\n  }\n': typeof types.LoginDocument
-	'\n  query GetCurrentUser {\n    authMe {\n      id\n      email\n      phone\n    }\n  }\n': typeof types.GetCurrentUserDocument
+	'\n  mutation Login($input: UserLoginInput!) {\n    authLogin(input: $input) {\n      access_token\n      token_type\n      expires_in_access\n      expires_in_refresh\n    }\n  }\n': typeof types.LoginDocument
+	'\n  query GetCurrentUser {\n    authMe {\n      id\n      email\n      phone\n    }\n  }\n': typeof types.GetMeDocument
 }
 const documents: Documents = {
-	'\n  mutation Login($input: UserLogin!) {\n    authLogin(input: $input) {\n      access_token\n      token_type\n      expires_in_access\n      expires_in_refresh\n    }\n  }\n':
+	'\n  mutation Login($input: UserLoginInput!) {\n    authLogin(input: $input) {\n      access_token\n      token_type\n      expires_in_access\n      expires_in_refresh\n    }\n  }\n':
 		types.LoginDocument,
-	'\n  query GetCurrentUser {\n    authMe {\n      id\n      email\n      phone\n    }\n  }\n':
-		types.GetCurrentUserDocument
+	'\n  query GetCurrentUser {\n    authMe {\n      id\n      email\n      phone\n    }\n  }\n': types.GetMeDocument
 }
 
 /**
@@ -42,8 +41,8 @@ export function gql(source: string): unknown
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
 export function gql(
-	source: '\n  mutation Login($input: UserLogin!) {\n    authLogin(input: $input) {\n      access_token\n      token_type\n      expires_in_access\n      expires_in_refresh\n    }\n  }\n'
-): (typeof documents)['\n  mutation Login($input: UserLogin!) {\n    authLogin(input: $input) {\n      access_token\n      token_type\n      expires_in_access\n      expires_in_refresh\n    }\n  }\n']
+	source: '\n  mutation Login($input: UserLoginInput!) {\n    authLogin(input: $input) {\n      access_token\n      token_type\n      expires_in_access\n      expires_in_refresh\n    }\n  }\n'
+): (typeof documents)['\n  mutation Login($input: UserLoginInput!) {\n    authLogin(input: $input) {\n      access_token\n      token_type\n      expires_in_access\n      expires_in_refresh\n    }\n  }\n']
 /**
  * The gql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */

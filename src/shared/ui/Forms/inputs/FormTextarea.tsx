@@ -13,6 +13,7 @@ export const FormTextarea: React.FC<FormTextareaProps> = ({
 	labelStyle,
 	required,
 	className,
+	description,
 	...props
 }) => {
 	const { control, error, value, onClickClearButton } = useFormField(name)
@@ -22,7 +23,14 @@ export const FormTextarea: React.FC<FormTextareaProps> = ({
 			control={control}
 			name={name}
 			render={({ field }) => (
-				<BaseFormField name={name} label={label} labelStyle={labelStyle} required={required} error={error}>
+				<BaseFormField
+					name={name}
+					label={label}
+					labelStyle={labelStyle}
+					required={required}
+					description={description}
+					error={error}
+				>
 					<Textarea
 						className={cn(s.formField__input, error && s.formField__input__error)}
 						{...field}

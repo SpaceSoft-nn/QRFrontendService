@@ -13,6 +13,7 @@ export const FormSelect: React.FC<FormSelectProps> = ({
 	labelStyle,
 	required,
 	endAdorment,
+	description,
 	items,
 	...props
 }) => {
@@ -23,7 +24,14 @@ export const FormSelect: React.FC<FormSelectProps> = ({
 			control={control}
 			name={name}
 			render={({ field }) => (
-				<BaseFormField name={name} label={label} labelStyle={labelStyle} required={required} error={error}>
+				<BaseFormField
+					name={name}
+					label={label}
+					labelStyle={labelStyle}
+					required={required}
+					description={description}
+					error={error}
+				>
 					{endAdorment ? (
 						<div className='flex gap-[15px]'>
 							<Select onValueChange={field.onChange} value={field.value} {...props}>

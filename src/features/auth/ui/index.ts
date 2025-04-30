@@ -1,2 +1,2 @@
-export * from './ProtectedRoute'
-export * from './LoginForm'
+export * from './login-form/LoginForm'
+export * from './register-form/RegisterForm'

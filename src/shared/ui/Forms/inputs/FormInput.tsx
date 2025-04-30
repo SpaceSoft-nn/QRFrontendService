@@ -14,6 +14,7 @@ export const FormInput: React.FC<FormInputProps> = ({
 	labelStyle,
 	required,
 	className,
+	description,
 	mask,
 	type = 'text',
 	...props
@@ -42,6 +43,7 @@ export const FormInput: React.FC<FormInputProps> = ({
 					required={required}
 					className={className}
 					error={error}
+					description={description}
 				>
 					<div className={s.formField__inputWrapper}>
 						<Input

@@ -17,6 +17,7 @@ export const FormDateInput: React.FC<FormDateInputProps> = ({
 	label,
 	dateType = 'dd.MM.yyyy',
 	placeholder = 'Выберите дату',
+	description,
 	className,
 	onChange,
 	...calendarProps
@@ -36,6 +37,7 @@ export const FormDateInput: React.FC<FormDateInputProps> = ({
 					required={required}
 					className={className}
 					error={error}
+					description={description}
 				>
 					<Popover open={open} onOpenChange={setOpen}>
 						<PopoverTrigger asChild>
