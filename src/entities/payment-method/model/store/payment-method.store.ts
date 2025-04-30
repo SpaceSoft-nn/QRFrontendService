@@ -1,9 +1,8 @@
-import { makeAutoObservable } from 'mobx'
+import { makeAutoObservable, runInAction } from 'mobx'
 import { SelectItem } from '@/shared/ui/Forms'
-import { apolloClient } from '@/shared/api'
-import { PaymentMethod, Query } from '@/shared/api/graphql'
+import { PaymentMethod } from '@/shared/api/graphql'
 import { toast } from '@/shared/lib'
-import { GET_PAYMENT_METHODS_QUERY } from '../../gql'
+import { paymentMethodsApi } from '../../api/payment-methods.api'
 
 class PaymentMethodStore {
 	paymentMethods: PaymentMethod[] | null = null
@@ -28,21 +27,21 @@ class PaymentMethodStore {
 			this.loading = true
 			this.error = null
 
-			const { data } = await apolloClient.query<Pick<Query, 'paymentMethods'>>({
-				query: GET_PAYMENT_METHODS_QUERY
-			})
+			const response = await paymentMethodsApi.getPaymentMethods()
 
-			if (data) {
-				this.paymentMethods = data.paymentMethods.map(method => method as PaymentMethod)
-			}
+			runInAction(() => {
+				if (response) {
+					this.paymentMethods = response.filter(method => method !== null)
+				}
+			})
 		} catch (error) {
 			console.error('[getPaymentMethods] error: ', error)
+			this.error = error instanceof Error ? error.message : 'Произошла ошибка при получении методов оплаты'
 			toast({
 				title: 'Ошибка',
 				variant: 'destructive',
-				description: 'Произошла ошибка при получении методов оплаты'
+				description: this.error
 			})
-			this.error = error instanceof Error ? error.message : 'Произошла ошибка при получении методов оплаты'
 		} finally {
 			this.loading = false
 		}

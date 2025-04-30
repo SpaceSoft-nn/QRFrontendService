@@ -1,8 +1,7 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import { CREATE_TRANSCATION_MUTATION } from '@/entities/transaction/gql'
-import { apolloClient } from '@/shared/api/apollo'
-import { CreateTransactionInput, Mutation, Transaction } from '@/shared/api/graphql'
+import { CreateTransactionInput, Transaction } from '@/shared/api/graphql'
 import { toast } from '@/shared/lib'
+import { transactionApi } from '../../api/transaction.api'
 
 class TransactionStore {
 	transactions: Transaction[] = []
@@ -15,23 +14,20 @@ class TransactionStore {
 	}
 
 	createTransaction = async (input: CreateTransactionInput) => {
-		this.loading = true
-		this.error = null
-
 		try {
-			const { data } = await apolloClient.mutate<Pick<Mutation, 'createTransaction'>>({
-				mutation: CREATE_TRANSCATION_MUTATION,
-				variables: { input }
-			})
+			this.loading = true
+			this.error = null
+
+			const response = await transactionApi.createTransaction(input)
 
 			runInAction(() => {
-				if (data?.createTransaction) {
-					this.transactions.push(data.createTransaction)
-					this.lastTransaction = data.createTransaction
+				if (response) {
+					this.lastTransaction = response
+					this.transactions.push(this.lastTransaction)
 				}
 			})
 
-			return data?.createTransaction
+			return response
 		} catch (error) {
 			console.error('[createTransaction] error: ', error)
 			this.error = error instanceof Error ? error.message : 'Произошла ошибка при создании транзакции'

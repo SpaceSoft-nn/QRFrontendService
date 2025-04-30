@@ -1,9 +1,8 @@
 import { makeAutoObservable, runInAction } from 'mobx'
 import { organizationStore } from '@/entities/organization'
-import { apolloClient } from '@/shared/api'
-import { DriverInfo, DriverInfoInput, Mutation, Query } from '@/shared/api/graphql'
+import { DriverInfo, DriverInfoInput } from '@/shared/api/graphql'
 import { toast } from '@/shared/lib'
-import { CREATE_INTEGRATION_MUTATION, GET_INTEGRATION_QUERY, GET_INTEGRATIONS_QUERY } from '../../gql'
+import { integrationApi } from '../../api/integration.api'
 
 class IntegrationStore {
 	intergations: DriverInfo[] = []
@@ -14,17 +13,15 @@ class IntegrationStore {
 		makeAutoObservable(this)
 	}
 
-	async getIntegrations() {
+	getIntegrations = async () => {
 		try {
 			this.loading = true
 			this.error = null
 
-			const { data } = await apolloClient.query<Pick<Query, 'driverInfosByUser'>>({
-				query: GET_INTEGRATIONS_QUERY
-			})
+			const response = await integrationApi.getIntegrations()
 
 			runInAction(() => {
-				this.intergations = data?.driverInfosByUser.filter(integration => integration !== null) || []
+				this.intergations = response
 			})
 		} catch (error) {
 			console.error('[getIntegrations] error: ', error)
@@ -41,29 +38,26 @@ class IntegrationStore {
 		}
 	}
 
-	async getIntegation(id: string) {
+	getIntegation = async (id: string) => {
 		try {
 			this.loading = true
 			this.error = null
 
-			const { data } = await apolloClient.query<Pick<Query, 'driverInfoById'>>({
-				query: GET_INTEGRATION_QUERY,
-				variables: { id }
-			})
+			const response = await integrationApi.getIntegration(id)
 
 			runInAction(() => {
-				if (data?.driverInfoById) {
-					this.intergations = [...this.intergations, data.driverInfoById]
+				if (response) {
+					this.intergations.push(response)
 				}
 			})
 		} catch (error) {
+			console.error('[getIntegation] error: ', error)
 			this.error = error instanceof Error ? error.message : 'Произошла ошибка при получении интеграции'
 			toast({
 				title: 'Ошибка при получении интеграции',
 				variant: 'destructive',
 				description: this.error
 			})
-			console.error('[getIntegation] error: ', error)
 		} finally {
 			runInAction(() => {
 				this.loading = false
@@ -71,7 +65,7 @@ class IntegrationStore {
 		}
 	}
 
-	async createIntergration(input: DriverInfoInput) {
+	createIntergration = async (input: DriverInfoInput) => {
 		const { activeOrganization } = organizationStore
 
 		if (!activeOrganization) {
@@ -87,14 +81,14 @@ class IntegrationStore {
 			this.loading = true
 			this.error = null
 
-			const { data } = await apolloClient.mutate<Pick<Mutation, 'createDriverInfo'>>({
-				mutation: CREATE_INTEGRATION_MUTATION,
-				variables: { input: { ...input, organization_id: activeOrganization.id } }
+			const response = await integrationApi.createIntegration({
+				...input,
+				organization_id: activeOrganization.id
 			})
 
 			runInAction(() => {
-				if (data?.createDriverInfo) {
-					this.intergations = [...this.intergations, data.createDriverInfo]
+				if (response) {
+					this.intergations = [...this.intergations, response]
 				}
 			})
 		} catch (error) {

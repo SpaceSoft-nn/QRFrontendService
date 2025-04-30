@@ -1,3 +1,4 @@
+import { PartySuggestions } from 'react-dadata'
 import { userRoles } from '@/entities/user'
 import { Organization, UserRoleEnum } from '@/shared/api/graphql'
 
@@ -6,13 +7,16 @@ export interface OrganizationWithOpf extends Organization {
 }
 
 export enum CreateOrganizationMemberRole {
-	cassier = UserRoleEnum.Cassier,
-	manager = UserRoleEnum.Manager
+	CASSIER = UserRoleEnum.Cassier,
+	MANAGER = UserRoleEnum.Manager
 }
 
+export type PartySuggestionsProps = Omit<React.ComponentProps<typeof PartySuggestions>, 'token' | 'count' | 'delay'>
+export type PartySuggestionsValue = PartySuggestionsProps['value']
+
 export const createMemberRoles: Record<CreateOrganizationMemberRole, string> = {
-	[CreateOrganizationMemberRole.cassier]: userRoles[UserRoleEnum.Cassier],
-	[CreateOrganizationMemberRole.manager]: userRoles[UserRoleEnum.Manager]
+	[CreateOrganizationMemberRole.CASSIER]: userRoles[UserRoleEnum.Cassier],
+	[CreateOrganizationMemberRole.MANAGER]: userRoles[UserRoleEnum.Manager]
 }
 
 export const memberRolesOptions = Object.entries(CreateOrganizationMemberRole).map(([value, label]) => ({

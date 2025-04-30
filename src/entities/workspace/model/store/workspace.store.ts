@@ -1,12 +1,8 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import { authStore } from '@/features/auth'
-import { apolloClient } from '@/shared/api/apollo'
 import {
 	AddPaymentWorkspaceInput,
 	AddUserWorkspaceInput,
-	Mutation,
 	PaginatorInfo,
-	Query,
 	SetWorkUserWorkspaceInput,
 	User,
 	Workspace,
@@ -14,16 +10,7 @@ import {
 } from '@/shared/api/graphql'
 import { toast } from '@/shared/lib'
 import { formatDateTime } from '@/shared/lib/utils'
-import {
-	ADD_PAYMENT_METHOD_TO_WORKSPACE_MUTATION,
-	ADD_USER_TO_WORKSPACE_MUTATION,
-	CREATE_WORKSPACE_MUTATION,
-	GET_WORKSPACE_MEMBERS_QUERY,
-	GET_WORKSPACE_QUERY,
-	GET_WORKSPACES_QUERY,
-	REMOVE_USER_FROM_WORKSPACE_MUTATION,
-	SET_WORK_USER_WORKSPACE_MUTATION
-} from '../../gql'
+import { workspaceApi } from '../../api/workspace.api'
 
 class WorkspaceStore {
 	workspaces: Workspace[] = []
@@ -47,22 +34,17 @@ class WorkspaceStore {
 	}
 
 	getWorkspace = async (id: string) => {
-		if (!id) return null
-
 		try {
 			this.loading = true
 			this.error = null
 
-			const { data } = await apolloClient.query<Pick<Query, 'workspace'>>({
-				query: GET_WORKSPACE_QUERY,
-				variables: { id }
-			})
+			const response = await workspaceApi.getWorkspace(id)
 
 			runInAction(() => {
-				if (data.workspace) {
+				if (response) {
 					const formattedWorkspace = {
-						...data.workspace,
-						created_at: formatDateTime(data.workspace.created_at)
+						...response,
+						created_at: formatDateTime(response.created_at)
 					}
 
 					const existingIndex = this.workspaces.findIndex(workspace => workspace.id === id)
@@ -71,12 +53,8 @@ class WorkspaceStore {
 					} else {
 						this.workspaces.push(formattedWorkspace)
 					}
-
-					return formattedWorkspace
 				}
 			})
-
-			return null
 		} catch (error) {
 			console.error('[getWorkspace] error: ', error)
 			this.error = error instanceof Error ? error.message : 'Произошла ошибка при получении АРМа'
@@ -85,7 +63,6 @@ class WorkspaceStore {
 				variant: 'destructive',
 				description: this.error
 			})
-			return null
 		} finally {
 			runInAction(() => {
 				this.loading = false
@@ -93,30 +70,23 @@ class WorkspaceStore {
 		}
 	}
 
-	getWorkspaces = async (page?: number, limit: number = 9) => {
-		if (!authStore.isAuthenticated) return false
-
+	getWorkspaces = async (page?: number, count: number = 9) => {
 		try {
 			this.loading = true
 			this.error = null
 
-			const { data } = await apolloClient.query({
-				query: GET_WORKSPACES_QUERY,
-				variables: {
-					page,
-					count: limit
-				}
-			})
+			const response = await workspaceApi.getWorkspaces(count, page)
 
 			runInAction(() => {
-				this.workspaces = data.workspaces.data.map((workspace: Workspace) => ({
-					...workspace,
-					created_at: formatDateTime(workspace.created_at)
-				}))
-				this.pagination = data.workspaces.paginatorInfo
+				// типизация говна
+				if (response.data) {
+					this.workspaces = response.data.map(workspace => ({
+						...workspace,
+						created_at: formatDateTime(workspace!.created_at)
+					})) as Workspace[]
+				}
+				this.pagination = response.paginatorInfo
 			})
-
-			return true
 		} catch (error) {
 			console.error('[getWorkspaces] error: ', error)
 			toast({
@@ -125,7 +95,6 @@ class WorkspaceStore {
 				description: error instanceof Error ? error.message : 'Произошла ошибка при получении АРМов'
 			})
 			this.error = error instanceof Error ? error.message : 'Произошла ошибка при получении АРМов'
-			return false
 		} finally {
 			runInAction(() => {
 				this.loading = false
@@ -133,37 +102,28 @@ class WorkspaceStore {
 		}
 	}
 
-	getWorkspaceMembers = async (workspaceId: string) => {
+	getWorkspaceMembers = async (id: string) => {
 		try {
 			this.loading = true
 			this.error = null
 
-			const { data } = await apolloClient.query<Pick<Query, 'workspace'>>({
-				query: GET_WORKSPACE_MEMBERS_QUERY,
-				variables: { workspaceId }
-			})
+			const response = await workspaceApi.getWorkspaceMembers(id)
 
 			runInAction(() => {
-				if (data.workspace) {
-					this.workspaceMembers = data.workspace.users as User[]
-				} else {
-					this.workspaceMembers = []
+				if (response) {
+					this.workspaceMembers = response
 				}
 			})
-
-			return true
 		} catch (error) {
 			console.error('[getWorkspaceMembers] error: ', error)
 			runInAction(() => {
-				this.error =
-					error instanceof Error ? error.message : 'Произошла ошибка при получении пользователей АРМа'
+				this.error = error instanceof Error ? error.message : 'Произошла ошибка при получении пользователей АРМ'
 				toast({
 					title: 'Ошибка',
 					variant: 'destructive',
 					description: this.error
 				})
 			})
-			return false
 		} finally {
 			runInAction(() => {
 				this.loading = false
@@ -176,16 +136,13 @@ class WorkspaceStore {
 			this.loading = true
 			this.error = null
 
-			const { data } = await apolloClient.mutate<Pick<Mutation, 'createWorkspace'>>({
-				mutation: CREATE_WORKSPACE_MUTATION,
-				variables: { input }
-			})
+			const response = await workspaceApi.createWorkspace(input)
 
 			runInAction(() => {
-				if (data?.createWorkspace) {
+				if (response) {
 					this.workspaces.push({
-						...data.createWorkspace,
-						created_at: formatDateTime(data.createWorkspace.created_at)
+						...response,
+						created_at: formatDateTime(response.created_at)
 					})
 					this.pagination.total++
 				}
@@ -197,7 +154,7 @@ class WorkspaceStore {
 			toast({
 				title: 'Ошибка',
 				variant: 'destructive',
-				description: error instanceof Error ? error.message : 'Произошла ошибка при создании АРМа'
+				description: error instanceof Error ? error.message : 'Произошла ошибка при создании АРМ'
 			})
 			return false
 		} finally {
@@ -212,17 +169,14 @@ class WorkspaceStore {
 			this.loading = true
 			this.error = null
 
-			const { data } = await apolloClient.mutate<Pick<Mutation, 'addUserWorkspace'>>({
-				mutation: ADD_USER_TO_WORKSPACE_MUTATION,
-				variables: { input }
-			})
+			const response = await workspaceApi.addUserToWorkspace(input)
 
 			runInAction(() => {
-				if (data?.addUserWorkspace) {
-					this.workspaceMembers = [...this.workspaceMembers, data.addUserWorkspace]
+				if (response) {
+					this.workspaceMembers.push(response)
 					toast({
 						title: 'Успешно',
-						description: 'Пользователь успешно добавлен в АРМ'
+						description: 'Пользователь добавлен в АРМ'
 					})
 				}
 			})
@@ -252,18 +206,15 @@ class WorkspaceStore {
 			this.loading = true
 			this.error = null
 
-			const { data } = await apolloClient.mutate<Pick<Mutation, 'setWorkUserWorkspace'>>({
-				mutation: SET_WORK_USER_WORKSPACE_MUTATION,
-				variables: { input }
-			})
+			const response = await workspaceApi.setWorkerInWorkspace(input)
 
-			if (data?.setWorkUserWorkspace) {
-				runInAction(() => {
+			runInAction(() => {
+				if (response) {
 					this.workspaces = this.workspaces.map(workspace => {
 						if (workspace.id === input.workspace_id) {
 							return {
 								...workspace,
-								user_worker: data.setWorkUserWorkspace
+								user_worker: response
 							}
 						}
 						return workspace
@@ -273,8 +224,8 @@ class WorkspaceStore {
 						title: 'Успешно',
 						description: 'Пользователь успешно назначен на работу'
 					})
-				})
-			}
+				}
+			})
 
 			return true
 		} catch (error) {
@@ -301,12 +252,9 @@ class WorkspaceStore {
 			this.loading = true
 			this.error = null
 
-			const { data } = await apolloClient.mutate<Pick<Mutation, 'deleteUserWorkspace'>>({
-				mutation: REMOVE_USER_FROM_WORKSPACE_MUTATION,
-				variables: { input }
-			})
+			const response = await workspaceApi.removeUserFromWorkspace(input)
 
-			if (data?.deleteUserWorkspace) {
+			if (response) {
 				runInAction(() => {
 					toast({
 						title: 'Успешно',
@@ -320,12 +268,11 @@ class WorkspaceStore {
 		} catch (error) {
 			console.error('[removeUserFromWorkspace] error: ', error)
 			runInAction(() => {
-				this.error =
-					error instanceof Error ? error.message : 'Произошла ошибка при удалении пользователя из АРМа'
 				toast({
 					title: 'Ошибка',
 					variant: 'destructive',
-					description: this.error
+					description:
+						error instanceof Error ? error.message : 'Произошла ошибка при удалении пользователя из АРМа'
 				})
 			})
 			return false
@@ -340,18 +287,15 @@ class WorkspaceStore {
 		try {
 			this.error = null
 
-			const { data } = await apolloClient.mutate<Pick<Mutation, 'addPaymentWorkspace'>>({
-				mutation: ADD_PAYMENT_METHOD_TO_WORKSPACE_MUTATION,
-				variables: { input }
-			})
+			const response = await workspaceApi.addPaymentMethodToWorkspace(input)
 
-			if (data?.addPaymentWorkspace) {
+			if (response) {
 				runInAction(() => {
 					this.workspaces = this.workspaces.map(workspace =>
 						workspace.id === input.workspace_id
 							? {
-									...data.addPaymentWorkspace,
-									created_at: formatDateTime(data.addPaymentWorkspace.created_at)
+									...response,
+									created_at: formatDateTime(response.created_at)
 								}
 							: workspace
 					)
@@ -360,12 +304,11 @@ class WorkspaceStore {
 		} catch (error) {
 			console.error('[addPaymentMethodToWorkspace] error: ', error)
 			runInAction(() => {
-				this.error =
-					error instanceof Error ? error.message : 'Произошла ошибка при добавлении метода оплаты в АРМ'
 				toast({
 					title: 'Ошибка при добавлении метода оплаты в АРМ',
 					variant: 'destructive',
-					description: this.error
+					description:
+						error instanceof Error ? error.message : 'Произошла ошибка при добавлении метода оплаты в АРМ'
 				})
 			})
 		}

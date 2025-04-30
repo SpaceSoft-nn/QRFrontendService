@@ -1,27 +1,12 @@
 import { makeAutoObservable, reaction, runInAction } from 'mobx'
 import { authStore } from '@/features/auth'
-import { PartySuggestionsValue } from '@/features/organization'
+import { PartySuggestionsValue } from '@/entities/organization'
 import { userStore } from '@/entities/user'
-import { apolloClient } from '@/shared/api'
-import {
-	Mutation,
-	Organization,
-	OrganizationCreateInput,
-	OrganizationTypeEnum,
-	Query,
-	User,
-	UserCreate
-} from '@/shared/api/graphql'
-import { formatDateFromTimestamp, toast } from '@/shared/lib'
-import {
-	CREATE_ORGANIZATION_MEMBER_MUTATION,
-	CREATE_ORGANIZATION_MUTATION,
-	GET_ORGANIZATION_MEMBERS_QUERY,
-	GET_ORGANIZATION_QUERY,
-	GET_ORGANIZATIONS_QUERY
-} from '../../gql'
-import { formatOrganizationWithOpf } from '../../utils/format-organization-name'
-import { OrganizationWithOpf } from '../types'
+import { Organization, User, UserCreate } from '@/shared/api/graphql'
+import { toast } from '@/shared/lib'
+import { organizationApi } from '../../api/organization.api'
+import { formatOrganizationWithOpf } from '../../lib/organization.utils'
+import { OrganizationWithOpf } from '../organization.types'
 
 class OrganizationStore {
 	organizations: OrganizationWithOpf[] = []
@@ -36,20 +21,6 @@ class OrganizationStore {
 			() => this.activeOrganization,
 			() => this.getOrganizationMembers()
 		)
-	}
-
-	private formatDaDataOrganization = (value: NonNullable<PartySuggestionsValue>): OrganizationCreateInput => {
-		const organization: OrganizationCreateInput = {
-			address: value.data.address.value,
-			inn: value.data.inn,
-			name: value.data.name.full,
-			registration_number: value.data.ogrn,
-			okved: value.data.okved,
-			type: value.data.type.toLowerCase() as OrganizationTypeEnum,
-			kpp: value.data.kpp,
-			founded_date: formatDateFromTimestamp(value.data.state.registration_date)
-		}
-		return organization
 	}
 
 	membersOptions = () => {
@@ -67,23 +38,17 @@ class OrganizationStore {
 	}
 
 	getOrganizations = async () => {
-		if (!authStore.isAuthenticated) return false
-
 		try {
 			this.loading = true
 			this.error = null
 
-			const { data } = await apolloClient.query<Pick<Query, 'organizations'>>({
-				query: GET_ORGANIZATIONS_QUERY
+			const response = await organizationApi.getOrganizations()
+
+			runInAction(() => {
+				if (response) {
+					this.organizations = response.map(org => formatOrganizationWithOpf(org as Organization))
+				}
 			})
-
-			if (data?.organizations) {
-				runInAction(() => {
-					this.organizations = data.organizations.map(org => formatOrganizationWithOpf(org as Organization))
-				})
-			}
-
-			return true
 		} catch (error) {
 			console.error('[getOrganizations] error: ', error)
 			toast({
@@ -91,8 +56,6 @@ class OrganizationStore {
 				variant: 'destructive',
 				description: 'Произошла ошибка при получении организаций'
 			})
-			this.error = error instanceof Error ? error.message : 'Произошла ошибка при получении организаций'
-			return false
 		} finally {
 			runInAction(() => {
 				this.loading = false
@@ -101,20 +64,15 @@ class OrganizationStore {
 	}
 
 	getOrganization = async (id: string) => {
-		if (!authStore.isAuthenticated) return false
-
 		try {
 			this.loading = true
 			this.error = null
 
-			const { data } = await apolloClient.query<Pick<Query, 'organization'>>({
-				query: GET_ORGANIZATION_QUERY,
-				variables: { id }
-			})
+			const response = await organizationApi.getOrganization(id)
 
 			runInAction(() => {
-				if (data?.organization) {
-					this.organizations = [...this.organizations, formatOrganizationWithOpf(data.organization)]
+				if (response) {
+					this.organizations = [...this.organizations, formatOrganizationWithOpf(response)]
 				}
 			})
 
@@ -136,22 +94,15 @@ class OrganizationStore {
 	}
 
 	createOrganization = async (organization: NonNullable<PartySuggestionsValue>) => {
-		if (!authStore.isAuthenticated) return false
-
 		try {
 			this.loading = true
 			this.error = null
 
-			const body = this.formatDaDataOrganization(organization)
-
-			const { data } = await apolloClient.mutate<Pick<Mutation, 'createOrganization'>>({
-				mutation: CREATE_ORGANIZATION_MUTATION,
-				variables: { input: body }
-			})
+			const response = await organizationApi.createOrganization(organization)
 
 			runInAction(() => {
-				if (data) {
-					this.organizations = [...this.organizations, formatOrganizationWithOpf(data.createOrganization)]
+				if (response) {
+					this.organizations = [...this.organizations, formatOrganizationWithOpf(response)]
 				}
 			})
 
@@ -178,22 +129,22 @@ class OrganizationStore {
 		try {
 			this.loading = true
 			this.error = null
-			const { data } = await apolloClient.query<Pick<Query, 'organization'>>({
-				query: GET_ORGANIZATION_MEMBERS_QUERY,
-				variables: { organizationId: this.activeOrganization.id }
-			})
+
+			const response = await organizationApi.getOrganizationMembers(this.activeOrganization.id)
 
 			runInAction(() => {
-				this.organizationMembers = data.organization?.users || []
+				if (response) {
+					this.organizationMembers = response
+				}
 			})
 		} catch (error) {
 			console.error('[getOrganizationMembers] error: ', error)
+			this.error = error instanceof Error ? error.message : 'Произошла ошибка при получении пользователей'
 			toast({
 				title: 'Ошибка',
 				variant: 'destructive',
-				description: error instanceof Error ? error.message : 'Произошла ошибка при получении пользователей'
+				description: this.error
 			})
-			this.error = error instanceof Error ? error.message : 'Произошла ошибка при получении пользователей'
 		} finally {
 			runInAction(() => {
 				this.loading = false
@@ -209,20 +160,15 @@ class OrganizationStore {
 			this.loading = true
 			this.error = null
 
-			const { data } = await apolloClient.mutate<Pick<Mutation, 'userCreate'>>({
-				mutation: CREATE_ORGANIZATION_MEMBER_MUTATION,
-				variables: {
-					input: {
-						...input,
-						organization_id: this.activeOrganization.id,
-						personalarea_id: personalArea.id
-					}
-				}
+			const response = await organizationApi.createOrganizationMember({
+				...input,
+				organization_id: this.activeOrganization.id,
+				personalarea_id: personalArea.id
 			})
 
 			runInAction(() => {
-				if (data) {
-					this.organizationMembers = [...this.organizationMembers, data.userCreate]
+				if (response) {
+					this.organizationMembers = [...this.organizationMembers, response]
 					navigator.clipboard.writeText(`${input?.email || input?.phone}:${input.password}`)
 					toast({
 						title: 'Пользователь успешно добавлен',
