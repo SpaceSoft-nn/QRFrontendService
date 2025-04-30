@@ -18,6 +18,7 @@ const dataItemVariants = cva('w-full flex items-center text-sm', {
 interface DataItemProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof dataItemVariants> {
 	icon?: React.ElementType
 	link?: string
+	hide?: boolean
 	label?: React.ReactNode
 	data: React.ReactNode
 	dataClassName?: string
@@ -28,11 +29,14 @@ export const DataItem = ({
 	data,
 	orientation = 'horizontal',
 	className,
+	hide = false,
 	icon: Icon,
 	link,
 	dataClassName,
 	...props
 }: DataItemProps) => {
+	if (hide) return null
+
 	return (
 		<div className={cn(dataItemVariants({ orientation }), className)} {...props}>
 			{label && (
