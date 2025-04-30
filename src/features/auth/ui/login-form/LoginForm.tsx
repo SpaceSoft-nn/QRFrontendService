@@ -13,7 +13,7 @@ import { urls } from '@/shared/config'
 
 export const LoginForm = observer(() => {
 	const navigate = useNavigate()
-	const { loading, error } = authStore
+	const { loading, error, login } = authStore
 
 	const form = useForm<TypeLoginSchema>({
 		resolver: zodResolver(loginSchema),
@@ -24,8 +24,8 @@ export const LoginForm = observer(() => {
 	})
 
 	const onSubmit = async (data: TypeLoginSchema) => {
-		console.log(data)
-		const success = await authStore.login(data as UserLoginInput)
+		console.log('[LoginForm] onSubmit: ', data)
+		const success = await login(data as UserLoginInput)
 		if (success) {
 			navigate(urls.dashboard.main)
 		}
