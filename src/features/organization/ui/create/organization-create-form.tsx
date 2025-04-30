@@ -3,8 +3,8 @@ import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import { Plus } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
-import { OrganizationSuggestions, PartySuggestionsValue } from '@/features/organization'
-import { organizationStore } from '@/entities/organization'
+import { OrganizationSuggestions } from '@/features/organization'
+import { organizationStore, PartySuggestionsValue } from '@/entities/organization'
 import { userStore } from '@/entities/user'
 import {
 	Button,
@@ -16,7 +16,7 @@ import {
 	DialogTitle,
 	DialogTrigger
 } from '@/shared/ui'
-import { Form, FormErrorMessage } from '@/shared/ui/Forms'
+import { Form } from '@/shared/ui/Forms'
 import { UserRoleEnum } from '@/shared/api/graphql'
 
 interface OrganizationCreateFormProps extends VariantProps<typeof buttonVariants> {
@@ -26,14 +26,14 @@ interface OrganizationCreateFormProps extends VariantProps<typeof buttonVariants
 
 export const OrganizationCreateForm = observer<OrganizationCreateFormProps>(
 	({ children, className, variant, size }) => {
-		const { loading, error } = organizationStore
+		const { loading, createOrganization } = organizationStore
 		const { user } = userStore
 		const [isOpen, setIsOpen] = useState(false)
 
 		const form = useForm<NonNullable<PartySuggestionsValue>>()
 
 		const handleSubmit = async (data: NonNullable<PartySuggestionsValue>) => {
-			await organizationStore.createOrganization(data)
+			await createOrganization(data)
 			form.reset()
 			setIsOpen(false)
 		}
@@ -67,7 +67,6 @@ export const OrganizationCreateForm = observer<OrganizationCreateFormProps>(
 								}
 							}}
 						/>
-						{error && <FormErrorMessage>{error}</FormErrorMessage>}
 						<Button type='submit' disabled={!form.getValues('data')} loading={loading}>
 							Создать
 						</Button>

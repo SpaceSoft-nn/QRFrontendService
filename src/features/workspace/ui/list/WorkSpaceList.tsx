@@ -32,10 +32,10 @@ const WorkSpaceListEmpty = () => {
 }
 
 export const WorkSpaceList = observer(() => {
-	const { workspaces, loading, error, pagination } = workspaceStore
+	const { workspaces, loading, error, pagination, getWorkspaces } = workspaceStore
 
 	useEffect(() => {
-		workspaceStore.getWorkspaces()
+		getWorkspaces()
 	}, [])
 
 	const renderList = () => {

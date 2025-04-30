@@ -29,10 +29,10 @@ const IntegrationsListEmpty = () => {
 }
 
 export const IntegrationsList = observer(() => {
-	const { intergations, loading, error } = integrationStore
+	const { intergations, loading, error, getIntegrations } = integrationStore
 
 	useEffect(() => {
-		integrationStore.getIntegrations()
+		getIntegrations()
 	}, [])
 
 	const renderList = () => {

@@ -55,16 +55,9 @@ export function Breadcrumbs() {
 		)
 	}, [currentPath, dynamicLabels])
 
-	// Если нет хлебных крошек или только одна (главная), не показываем
 	if (breadcrumbPaths.length <= 1) {
 		return null
 	}
-
-	// // Если для текущего пути есть динамическая метка, но она еще не загружена,
-	// // не показываем хлебные крошки
-	// if (currentPath in dynamicLabels === false && currentPath.includes('/')) {
-	// 	return null
-	// }
 
 	return (
 		<Breadcrumb>

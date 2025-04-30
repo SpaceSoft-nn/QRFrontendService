@@ -17,20 +17,17 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, useSidebar } from '@/s
 import { urls } from '@/shared/config'
 
 export const NavUser: React.FC = observer(() => {
-	const { isMobile } = useSidebar()
 	const navigate = useNavigate()
-
-	const { loading, error, isAuthenticated } = authStore
-	const { user, contactInfo } = userStore
+	const { isMobile } = useSidebar()
+	const { loading, error, logout } = authStore
+	const { user, getUser } = userStore
 
 	useEffect(() => {
-		if (isAuthenticated) {
-			userStore.getUser()
-		}
-	}, [isAuthenticated])
+		getUser()
+	}, [])
 
 	const handleLogout = async () => {
-		const success = await userStore.logout()
+		const success = await logout()
 		if (success) {
 			navigate(urls.auth.login, { replace: true })
 		}
@@ -49,8 +46,8 @@ export const NavUser: React.FC = observer(() => {
 							<UserCircleIcon />
 							<div className='grid flex-1 text-left text-sm leading-tight'>
 								<span className='truncate'>{user?.first_name}</span>
-								{contactInfo.phone && (
-									<span className='truncate text-xs text-muted-foreground'>{contactInfo.phone}</span>
+								{user?.phone && (
+									<span className='truncate text-xs text-muted-foreground'>{user?.phone}</span>
 								)}
 							</div>
 							<ChevronRightIcon className='ml-auto size-4' />
@@ -64,9 +61,9 @@ export const NavUser: React.FC = observer(() => {
 					>
 						<DropdownMenuLabel className='font-normal'>
 							<div className='grid flex-1 text-left text-sm leading-tight'>
-								<span className='truncate font-medium'>{contactInfo.email}</span>
-								{contactInfo.phone && (
-									<span className='truncate text-xs text-muted-foreground'>{contactInfo.phone}</span>
+								<span className='truncate font-medium'>{user?.email}</span>
+								{user?.phone && (
+									<span className='truncate text-xs text-muted-foreground'>{user?.phone}</span>
 								)}
 							</div>
 						</DropdownMenuLabel>

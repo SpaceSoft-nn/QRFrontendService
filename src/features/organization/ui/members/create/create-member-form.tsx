@@ -10,7 +10,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { Button } from '@/shared/ui/button'
 import { Form, FormInput, FormTabs } from '@/shared/ui/Forms'
 import { UserCreate, UserRoleEnum } from '@/shared/api/graphql'
-import { createOrganizationMemberSchema, TypeCreateOrganizationMemberSchema } from './create-member.schema'
+import { createOrganizationMemberSchema } from './create-member.schema'
 
 interface CreateOrganizationMemberFormProps
 	extends Pick<React.ComponentProps<typeof Button>, 'size' | 'variant' | 'className'> {}
@@ -18,7 +18,7 @@ interface CreateOrganizationMemberFormProps
 export const CreateOrganizationMemberForm = observer<CreateOrganizationMemberFormProps>(({ ...props }) => {
 	const [open, setOpen] = useState(false)
 	const { user } = userStore
-	const { loading } = organizationStore
+	const { loading, createOrganizationMember } = organizationStore
 
 	const form = useForm<UserCreate>({
 		resolver: zodResolver(createOrganizationMemberSchema),
@@ -30,7 +30,7 @@ export const CreateOrganizationMemberForm = observer<CreateOrganizationMemberFor
 	})
 
 	const onSubmit = async (data: UserCreate) => {
-		const success = await organizationStore.createOrganizationMember(data)
+		const success = await createOrganizationMember(data)
 		if (success) {
 			form.reset()
 			setOpen(false)

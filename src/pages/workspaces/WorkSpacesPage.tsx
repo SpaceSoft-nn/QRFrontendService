@@ -1,5 +1,4 @@
-import { WorkSpaceList } from '@/features/workspace'
-import { CreateWorkspaceForm } from '@/features/workspace'
+import { CreateWorkspaceForm, WorkSpaceList } from '@/features/workspace'
 import { TitleUi } from '@/shared/ui'
 
 export const WorkSpacesPage = () => {

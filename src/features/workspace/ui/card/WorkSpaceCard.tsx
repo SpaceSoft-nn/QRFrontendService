@@ -1,6 +1,6 @@
-import { BanknoteIcon, Building2Icon, ShieldUserIcon, User, UsersIcon } from 'lucide-react'
+import { BanknoteIcon, Building2Icon, User, UsersIcon } from 'lucide-react'
 import { formatOrganizationWithOpf } from '@/entities/organization'
-import { PaymentMethodSelector } from '@/entities/payment-method/ui/payment-method-selector'
+import { PaymentMethodSelector } from '@/entities/payment-method'
 import { formatFullName } from '@/entities/user'
 import { workspaceStore } from '@/entities/workspace'
 import { DataGroup } from '@/shared/ui'

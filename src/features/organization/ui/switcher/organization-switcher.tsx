@@ -50,7 +50,7 @@ export const OrganizationSwitcher: React.FC = observer(() => {
 					<DropdownMenuTrigger asChild>
 						<SidebarMenuButton
 							size='lg'
-							loading={loading}
+							loading={loading || !organizations}
 							className='data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground'
 						>
 							<OrganizationItem organization={activeOrganization} />

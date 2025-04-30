@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
-import { Plus, User } from 'lucide-react'
+import { Plus } from 'lucide-react'
 import { observer } from 'mobx-react-lite'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { integrationStore } from '@/entities/integration'
@@ -12,7 +12,7 @@ import { DriverInfoInput, UserRoleEnum } from '@/shared/api/graphql'
 import { createIntegrationSchema, CreateIntegrationSchemaType } from './create-integration.schema'
 
 export const CreateIntegrationForm = observer(() => {
-	const { loading } = integrationStore
+	const { createIntergration, loading } = integrationStore
 	const { user } = userStore
 	const [isOpen, setIsOpen] = useState(false)
 
@@ -21,7 +21,7 @@ export const CreateIntegrationForm = observer(() => {
 	})
 
 	const handleSubmit = async (data: CreateIntegrationSchemaType) => {
-		await integrationStore.createIntergration(data as DriverInfoInput)
+		await createIntergration(data as DriverInfoInput)
 		form.reset()
 		setIsOpen(false)
 	}

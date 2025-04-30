@@ -1,12 +1,13 @@
 import { PartySuggestions } from 'react-dadata'
 import 'react-dadata/dist/react-dadata.css'
 import { Controller } from 'react-hook-form'
-import { OrganizationSuggestionsProps, PartySuggestionsProps } from '@/features/organization'
+import { PartySuggestionsProps } from '@/entities/organization'
 import { Input } from '@/shared/ui'
 import { BaseFormField, useFormField } from '@/shared/ui/Forms'
 import formStyles from '@/shared/ui/Forms/styles/Forms.module.scss'
 import { cn } from '@/shared/lib/utils'
 import s from './organization-suggestions.module.scss'
+import { OrganizationSuggestionsProps } from './organization-suggestions.types'
 
 const DaDataSuggestions = (props: PartySuggestionsProps) => {
 	return (

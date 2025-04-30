@@ -4,8 +4,7 @@ import { observer } from 'mobx-react-lite'
 import { useBreadcrumbs } from '@/features/breadcrumbs'
 import { WorkSpaceCard, WorkSpaceMembersList } from '@/features/workspace'
 import { workspaceStore } from '@/entities/workspace'
-import { NotFound } from '@/shared/ui'
-import { Skeleton } from '@/shared/ui/skeleton'
+import { NotFound, Skeleton } from '@/shared/ui'
 import { urls } from '@/shared/config'
 
 const WorkspaceDetailsSkeleton = () => (
@@ -16,14 +15,15 @@ const WorkspaceDetailsSkeleton = () => (
 )
 
 const useWorkspaceDetails = (workspaceId: string | undefined) => {
+	const { workspaces, getWorkspace, loading } = workspaceStore
 	const { setDynamicLabel } = useBreadcrumbs()
 
 	useEffect(() => {
 		if (!workspaceId) return
-		workspaceStore.getWorkspace(workspaceId)
+		getWorkspace(workspaceId)
 	}, [workspaceId])
 
-	const workspace = workspaceStore.workspaces.find(w => w.id === workspaceId)
+	const workspace = workspaces.find(w => w.id === workspaceId)
 
 	useEffect(() => {
 		if (workspace && workspaceId) {
@@ -33,15 +33,14 @@ const useWorkspaceDetails = (workspaceId: string | undefined) => {
 
 	return {
 		workspace,
-		isLoading: workspaceStore.loading && !workspace,
+		isLoading: loading && !workspace,
 		isNotFound: !workspaceId || !workspace
 	}
 }
 
 export const WorkspaceDetails = observer(() => {
 	const params = useParams()
-	const workspaceId = params.workspaceId
-	const { workspace, isLoading, isNotFound } = useWorkspaceDetails(workspaceId)
+	const { workspace, isLoading, isNotFound } = useWorkspaceDetails(params.workspaceId)
 
 	if (isLoading) return <WorkspaceDetailsSkeleton />
 	if (isNotFound || !workspace) return <NotFound title='Рабочее место не найдено' />
