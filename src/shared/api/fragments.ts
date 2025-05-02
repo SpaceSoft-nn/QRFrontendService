@@ -141,6 +141,15 @@ export const WORKSPACE_PAGINATED_FRAGMENT = gql`
 	${PAGINATION_FRAGMENT}
 `
 
+export const QRCODE_BASE_FRAGMENT = gql`
+	fragment QRCodeBaseFragment on QrCode {
+		qr_url
+		qr_type
+		amount
+		content_image_base64
+	}
+`
+
 export const TRANSACTION_FRAGMENT = gql`
 	fragment TransactionFragment on Transaction {
 		id
@@ -153,10 +162,11 @@ export const TRANSACTION_FRAGMENT = gql`
 			id
 		}
 		qr_code {
-			qr_url
+			...QRCodeBaseFragment
 		}
 		created_at
 	}
+	${QRCODE_BASE_FRAGMENT}
 `
 
 export const DRIVER_INFO_BASE_FRAGMENT = gql`

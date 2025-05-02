@@ -60,10 +60,18 @@ export type CreateTransactionInput = {
 	amount: Scalars['String']['input']
 	/** Количество товара */
 	count_product?: InputMaybe<Scalars['Int']['input']>
+	/** Высота картинки QR - стилизация* */
+	height?: InputMaybe<Scalars['Int']['input']>
 	/** Название продукта */
 	name_product?: InputMaybe<Scalars['String']['input']>
+	/** Тип QR кода - динамический или статический */
+	qr_type: QrTypeEnum
+	/** (Период использования QR-кода в минутах) Задается, только если тип QR = QR-Dynamic */
+	ttl?: InputMaybe<Scalars['Int']['input']>
 	/** Тип продукта, услуга/товар и т.д...  */
 	type_product?: InputMaybe<Scalars['String']['input']>
+	/** Ширина картинки QR - стилизация* */
+	width?: InputMaybe<Scalars['Int']['input']>
 	workspace_id: Scalars['ID']['input']
 }
 
@@ -348,13 +356,31 @@ export type PhoneList = {
 
 export type QrCode = {
 	__typename?: 'QrCode'
+	/** Сумма - должна быть только при динамическом QR - DYNAMIC */
 	amount?: Maybe<Scalars['String']['output']>
+	/** Бинарный формат изображения */
+	content_image_base64: Scalars['String']['output']
 	created_at: Scalars['Date']['output']
+	/** Высота изображения */
+	height?: Maybe<Scalars['String']['output']>
 	id: Scalars['ID']['output']
 	name_product?: Maybe<Scalars['String']['output']>
+	/** Тип QR: DYNAMIC/STATIC  */
+	qr_type: QrTypeEnum
+	/** Ссылка на изображения */
 	qr_url: Scalars['String']['output']
+	/** К какой транзакции принадлежит QR */
 	transaction: Transaction
+	/** Время существования QR - только у DYNAMIC */
+	ttl?: Maybe<Scalars['String']['output']>
 	updated_at: Scalars['Date']['output']
+	/** Ширина изображения */
+	width?: Maybe<Scalars['String']['output']>
+}
+
+export enum QrTypeEnum {
+	Dynamic = 'DYNAMIC',
+	Static = 'STATIC'
 }
 
 export type Query = {
@@ -555,6 +581,12 @@ export type UserCreate = {
 	role: UserRoleEnum
 }
 
+export type UserLogin = {
+	email: Scalars['String']['input']
+	password: Scalars['String']['input']
+	phone?: InputMaybe<Scalars['String']['input']>
+}
+
 export type UserLoginInput = {
 	email: Scalars['String']['input']
 	password: Scalars['String']['input']
@@ -589,6 +621,7 @@ export type Workspace = {
 	paymentMethod?: Maybe<PaymentMethod>
 	transactions: Array<Maybe<Transaction>>
 	updated_at: Scalars['Date']['output']
+	/** Пользователь - создатель workspace */
 	user_owner: User
 	/** Пользователь который работает в данный момент под workspace */
 	user_worker?: Maybe<User>
@@ -614,7 +647,7 @@ export type WorkspacePaginator = {
 export type DeleteUserWorkspace = {
 	__typename?: 'deleteUserWorkspace'
 	status: Scalars['Boolean']['output']
-	worksapce: Workspace
+	workspace: Workspace
 }
 
 export type DriverInfoByOrganizationIdInput = {
@@ -637,14 +670,9 @@ export type CreateDriverInfoMutation = {
 		user: {
 			__typename?: 'User'
 			id: string
+			father_name?: string | null
 			first_name?: string | null
 			last_name?: string | null
-			father_name?: string | null
-			role: UserRoleEnum
-			active: boolean
-			email?: string | null
-			phone?: string | null
-			created_at: any
 		}
 		organization: {
 			__typename?: 'Organization'
@@ -683,14 +711,9 @@ export type GetIntegrationQuery = {
 		user: {
 			__typename?: 'User'
 			id: string
+			father_name?: string | null
 			first_name?: string | null
 			last_name?: string | null
-			father_name?: string | null
-			role: UserRoleEnum
-			active: boolean
-			email?: string | null
-			phone?: string | null
-			created_at: any
 		}
 		organization: {
 			__typename?: 'Organization'
@@ -712,6 +735,45 @@ export type GetIntegrationQuery = {
 			created_at: any
 		}
 	}
+}
+
+export type GetIntegrationsQueryVariables = Exact<{ [key: string]: never }>
+
+export type GetIntegrationsQuery = {
+	__typename?: 'Query'
+	driverInfosByUser: Array<{
+		__typename?: 'DriverInfo'
+		id: string
+		key: string
+		value: string
+		created_at: any
+		user: {
+			__typename?: 'User'
+			id: string
+			father_name?: string | null
+			first_name?: string | null
+			last_name?: string | null
+		}
+		organization: {
+			__typename?: 'Organization'
+			id: string
+			name: string
+			address: string
+			type: OrganizationTypeEnum
+			okved?: string | null
+			founded_date?: string | null
+			registration_number: string
+			inn: string
+			kpp?: string | null
+		}
+		payment_method: {
+			__typename?: 'PaymentMethod'
+			id: string
+			active: boolean
+			driver_name: string
+			created_at: any
+		}
+	} | null>
 }
 
 export type GetOrganizationsQueryVariables = Exact<{ [key: string]: never }>
@@ -1612,6 +1674,14 @@ export type TransactionFragmentFragment = {
 	qr_code: { __typename?: 'QrCode'; qr_url: string }
 }
 
+export type DriverInfoBaseFragmentFragment = {
+	__typename?: 'DriverInfo'
+	id: string
+	key: string
+	value: string
+	created_at: any
+}
+
 export type DriverInfoFragmentFragment = {
 	__typename?: 'DriverInfo'
 	id: string
@@ -1621,14 +1691,9 @@ export type DriverInfoFragmentFragment = {
 	user: {
 		__typename?: 'User'
 		id: string
+		father_name?: string | null
 		first_name?: string | null
 		last_name?: string | null
-		father_name?: string | null
-		role: UserRoleEnum
-		active: boolean
-		email?: string | null
-		phone?: string | null
-		created_at: any
 	}
 	organization: {
 		__typename?: 'Organization'
@@ -1804,13 +1869,22 @@ export const TransactionFragmentFragmentDoc = gql`
 		created_at
 	}
 `
-export const DriverInfoFragmentFragmentDoc = gql`
-	fragment DriverInfoFragment on DriverInfo {
+export const DriverInfoBaseFragmentFragmentDoc = gql`
+	fragment DriverInfoBaseFragment on DriverInfo {
 		id
 		key
 		value
+		created_at
+	}
+`
+export const DriverInfoFragmentFragmentDoc = gql`
+	fragment DriverInfoFragment on DriverInfo {
+		...DriverInfoBaseFragment
 		user {
-			...UserBaseFragment
+			id
+			father_name
+			first_name
+			last_name
 		}
 		organization {
 			...OrganizationBaseFragment
@@ -1818,7 +1892,6 @@ export const DriverInfoFragmentFragmentDoc = gql`
 		payment_method {
 			...PaymentMethodBaseFragment
 		}
-		created_at
 	}
 `
 export const CreateDriverInfoDocument = gql`
@@ -1828,7 +1901,7 @@ export const CreateDriverInfoDocument = gql`
 		}
 	}
 	${DriverInfoFragmentFragmentDoc}
-	${UserBaseFragmentFragmentDoc}
+	${DriverInfoBaseFragmentFragmentDoc}
 	${OrganizationBaseFragmentFragmentDoc}
 	${PaymentMethodBaseFragmentFragmentDoc}
 `
@@ -1876,7 +1949,7 @@ export const GetIntegrationDocument = gql`
 		}
 	}
 	${DriverInfoFragmentFragmentDoc}
-	${UserBaseFragmentFragmentDoc}
+	${DriverInfoBaseFragmentFragmentDoc}
 	${OrganizationBaseFragmentFragmentDoc}
 	${PaymentMethodBaseFragmentFragmentDoc}
 `
@@ -1920,6 +1993,60 @@ export type GetIntegrationQueryHookResult = ReturnType<typeof useGetIntegrationQ
 export type GetIntegrationLazyQueryHookResult = ReturnType<typeof useGetIntegrationLazyQuery>
 export type GetIntegrationSuspenseQueryHookResult = ReturnType<typeof useGetIntegrationSuspenseQuery>
 export type GetIntegrationQueryResult = Apollo.QueryResult<GetIntegrationQuery, GetIntegrationQueryVariables>
+export const GetIntegrationsDocument = gql`
+	query getIntegrations {
+		driverInfosByUser {
+			...DriverInfoFragment
+		}
+	}
+	${DriverInfoFragmentFragmentDoc}
+	${DriverInfoBaseFragmentFragmentDoc}
+	${OrganizationBaseFragmentFragmentDoc}
+	${PaymentMethodBaseFragmentFragmentDoc}
+`
+
+/**
+ * __useGetIntegrationsQuery__
+ *
+ * To run a query within a React component, call `useGetIntegrationsQuery` and pass it any options that fit your needs.
+ * When your component renders, `useGetIntegrationsQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useGetIntegrationsQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useGetIntegrationsQuery(
+	baseOptions?: Apollo.QueryHookOptions<GetIntegrationsQuery, GetIntegrationsQueryVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useQuery<GetIntegrationsQuery, GetIntegrationsQueryVariables>(GetIntegrationsDocument, options)
+}
+export function useGetIntegrationsLazyQuery(
+	baseOptions?: Apollo.LazyQueryHookOptions<GetIntegrationsQuery, GetIntegrationsQueryVariables>
+) {
+	const options = { ...defaultOptions, ...baseOptions }
+	return Apollo.useLazyQuery<GetIntegrationsQuery, GetIntegrationsQueryVariables>(GetIntegrationsDocument, options)
+}
+export function useGetIntegrationsSuspenseQuery(
+	baseOptions?:
+		| Apollo.SkipToken
+		| Apollo.SuspenseQueryHookOptions<GetIntegrationsQuery, GetIntegrationsQueryVariables>
+) {
+	const options = baseOptions === Apollo.skipToken ? baseOptions : { ...defaultOptions, ...baseOptions }
+	return Apollo.useSuspenseQuery<GetIntegrationsQuery, GetIntegrationsQueryVariables>(
+		GetIntegrationsDocument,
+		options
+	)
+}
+export type GetIntegrationsQueryHookResult = ReturnType<typeof useGetIntegrationsQuery>
+export type GetIntegrationsLazyQueryHookResult = ReturnType<typeof useGetIntegrationsLazyQuery>
+export type GetIntegrationsSuspenseQueryHookResult = ReturnType<typeof useGetIntegrationsSuspenseQuery>
+export type GetIntegrationsQueryResult = Apollo.QueryResult<GetIntegrationsQuery, GetIntegrationsQueryVariables>
 export const GetOrganizationsDocument = gql`
 	query GetOrganizations {
 		organizations {
