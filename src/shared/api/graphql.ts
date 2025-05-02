@@ -333,6 +333,8 @@ export type PaymentMethod = {
 	/** Автоинкриментированный id - сделан для удобности обращения */
 	number_id: Scalars['Int']['output']
 	payment?: Maybe<Payment>
+	/** Логотип */
+	png_url: Scalars['String']['output']
 	updated_at: Scalars['Date']['output']
 }
 
@@ -906,7 +908,13 @@ export type CreateTransactionMutation = {
 		name_product?: string | null
 		created_at: any
 		workspace: { __typename?: 'Workspace'; id: string }
-		qr_code: { __typename?: 'QrCode'; qr_url: string }
+		qr_code: {
+			__typename?: 'QrCode'
+			qr_url: string
+			qr_type: QrTypeEnum
+			amount?: string | null
+			content_image_base64: string
+		}
 	}
 }
 
@@ -1661,6 +1669,14 @@ export type WorkspacePaginatedFragmentFragment = {
 	}
 }
 
+export type QrCodeBaseFragmentFragment = {
+	__typename?: 'QrCode'
+	qr_url: string
+	qr_type: QrTypeEnum
+	amount?: string | null
+	content_image_base64: string
+}
+
 export type TransactionFragmentFragment = {
 	__typename?: 'Transaction'
 	id: string
@@ -1671,7 +1687,13 @@ export type TransactionFragmentFragment = {
 	name_product?: string | null
 	created_at: any
 	workspace: { __typename?: 'Workspace'; id: string }
-	qr_code: { __typename?: 'QrCode'; qr_url: string }
+	qr_code: {
+		__typename?: 'QrCode'
+		qr_url: string
+		qr_type: QrTypeEnum
+		amount?: string | null
+		content_image_base64: string
+	}
 }
 
 export type DriverInfoBaseFragmentFragment = {
@@ -1852,6 +1874,14 @@ export const WorkspacePaginatedFragmentFragmentDoc = gql`
 		}
 	}
 `
+export const QrCodeBaseFragmentFragmentDoc = gql`
+	fragment QRCodeBaseFragment on QrCode {
+		qr_url
+		qr_type
+		amount
+		content_image_base64
+	}
+`
 export const TransactionFragmentFragmentDoc = gql`
 	fragment TransactionFragment on Transaction {
 		id
@@ -1864,7 +1894,7 @@ export const TransactionFragmentFragmentDoc = gql`
 			id
 		}
 		qr_code {
-			qr_url
+			...QRCodeBaseFragment
 		}
 		created_at
 	}
@@ -2349,6 +2379,7 @@ export const CreateTransactionDocument = gql`
 		}
 	}
 	${TransactionFragmentFragmentDoc}
+	${QrCodeBaseFragmentFragmentDoc}
 `
 export type CreateTransactionMutationFn = Apollo.MutationFunction<
 	CreateTransactionMutation,

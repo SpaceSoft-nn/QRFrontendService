@@ -17,7 +17,8 @@ class PaymentMethodStore {
 		return (
 			this.paymentMethods?.map(method => ({
 				value: method.id,
-				label: method.driver_name
+				label: method.driver_name,
+				iconUrl: method.png_url
 			})) || []
 		)
 	}

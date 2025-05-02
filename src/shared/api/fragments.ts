@@ -41,6 +41,7 @@ export const PAYMENT_METHOD_BASE_FRAGMENT = gql`
 	fragment PaymentMethodBaseFragment on PaymentMethod {
 		id
 		active
+		png_url
 		driver_name
 		created_at
 	}
