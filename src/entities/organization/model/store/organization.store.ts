@@ -3,7 +3,7 @@ import { authStore } from '@/features/auth'
 import { PartySuggestionsValue } from '@/entities/organization'
 import { userStore } from '@/entities/user'
 import { Organization, User, UserCreate } from '@/shared/api/graphql'
-import { toast } from '@/shared/lib'
+import { capitalizeFullName, toast } from '@/shared/lib'
 import { organizationApi } from '../../api/organization.api'
 import { formatOrganizationWithOpf } from '../../lib/organization.utils'
 import { OrganizationWithOpf } from '../organization.types'
@@ -162,6 +162,7 @@ class OrganizationStore {
 
 			const response = await organizationApi.createOrganizationMember({
 				...input,
+				...capitalizeFullName(input),
 				organization_id: this.activeOrganization.id,
 				personalarea_id: personalArea.id
 			})

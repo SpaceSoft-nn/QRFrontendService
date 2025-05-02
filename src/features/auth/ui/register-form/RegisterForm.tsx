@@ -1,4 +1,3 @@
-import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { useNavigate } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
@@ -25,7 +24,6 @@ export const RegisterForm = observer(() => {
 	})
 
 	const onSubmit = async (data: TypeRegisterSchema) => {
-		console.log(data)
 		const success = await authStore.register(data as UserRegistration)
 		if (success) {
 			navigate(urls.dashboard.main)
