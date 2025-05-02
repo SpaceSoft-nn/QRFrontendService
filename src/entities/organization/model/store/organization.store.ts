@@ -1,7 +1,7 @@
 import { makeAutoObservable, reaction, runInAction } from 'mobx'
 import { authStore } from '@/features/auth'
 import { PartySuggestionsValue } from '@/entities/organization'
-import { userStore } from '@/entities/user'
+import { formatFullName, userStore } from '@/entities/user'
 import { Organization, User, UserCreate } from '@/shared/api/graphql'
 import { capitalizeFullName, toast } from '@/shared/lib'
 import { organizationApi } from '../../api/organization.api'
@@ -24,8 +24,10 @@ class OrganizationStore {
 	}
 
 	membersOptions = () => {
-		return this.organizationMembers.map(member => ({
-			label: `${member.last_name} ${member.first_name} ${member.father_name}`,
+		const members = this.organizationMembers.filter(member => member.id !== userStore.user?.id)
+
+		return members.map(member => ({
+			label: formatFullName(member, { initials: true }),
 			description: member?.email || member?.phone || null,
 			value: member.id
 		}))
