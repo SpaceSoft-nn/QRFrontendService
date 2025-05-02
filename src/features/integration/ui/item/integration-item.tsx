@@ -1,42 +1,23 @@
-import { Building2, CreditCard, ShieldUserIcon } from 'lucide-react'
-import { formatOrganizationWithOpf } from '@/entities/organization'
-import { formatFullName } from '@/entities/user'
-import { DataGroup, SecretField } from '@/shared/ui'
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card'
+import { DataGroup, DateTimeUi, SecretField } from '@/shared/ui'
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/shared/ui/card'
 import { DriverInfo } from '@/shared/api/graphql'
-import { formatDateTime } from '@/shared/lib'
+import { getIntegrationItemData } from '../../model/config'
 
 interface IntegrationItemProps {
 	integration: DriverInfo
 }
 
 export const IntegrationItem = ({ integration }: IntegrationItemProps) => {
-	const integrationData = [
-		{
-			icon: Building2,
-			label: 'Организация',
-			data: formatOrganizationWithOpf(integration.organization).nameWithOpf
-		},
-		{
-			icon: ShieldUserIcon,
-			label: 'Создал',
-			data: formatFullName(integration.user, { initials: true })
-		},
-		{
-			icon: CreditCard,
-			label: 'Метод оплаты',
-			data: integration.payment_method.driver_name
-		}
-	]
+	const integrationItemData = getIntegrationItemData(integration)
 
 	return (
 		<Card>
 			<CardHeader>
 				<CardTitle>{integration.key}</CardTitle>
-				<CardDescription>от {formatDateTime(integration.created_at)}</CardDescription>
+				<DateTimeUi dateTime={integration.created_at} />
 			</CardHeader>
 			<CardContent>
-				<DataGroup data={integrationData} />
+				<DataGroup data={integrationItemData} />
 			</CardContent>
 			<CardFooter>
 				<SecretField value={integration.value} />
