@@ -42,7 +42,6 @@ export const WorkspaceMemberActions = observer(({ member, workspaceId }: MemberA
 				<Button variant='ghost' size='icon' icon={EllipsisIcon} />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align='end'>
-				<DropdownMenuLabel>Действия</DropdownMenuLabel>
 				<DropdownMenuItem asChild>
 					<Button
 						variant='ghost'

@@ -54,9 +54,9 @@ export const CreateWorkspaceForm = observer(() => {
 			<DialogContent>
 				<DialogHeader>
 					<DialogTitle>Добавление нового рабочего места</DialogTitle>
-					<DialogDescription>Укажите название и выберите матод оплаты.</DialogDescription>
+					<DialogDescription>Укажите название и выберите метод оплаты</DialogDescription>
 				</DialogHeader>
-				<Form ctx={form} onSubmit={onSubmit} className='flex flex-col gap-4'>
+				<Form ctx={form} onSubmit={onSubmit} className='flex flex-col gap-2'>
 					<FormInput name='name' placeholder='Название' disabled={loading} />
 					<PaymentMethodFormSelector name='payment_method_id' />
 					<FormTextarea name='description' placeholder='Описание' disabled={loading} />

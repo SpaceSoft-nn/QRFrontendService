@@ -1,4 +1,4 @@
-import { BanknoteIcon, Building2Icon, CreditCardIcon, User, UsersIcon } from 'lucide-react'
+import { Building2Icon, CreditCardIcon, UserIcon, UsersIcon } from 'lucide-react'
 import { formatOrganizationWithOpf } from '@/entities/organization'
 import { PaymentMethodSelector } from '@/entities/payment-method'
 import { formatFullName } from '@/entities/user'
@@ -27,12 +27,12 @@ export const getWorkspaceCardData = (workspace: Workspace) => [
 				}
 			/>
 		),
-		icon: BanknoteIcon
+		icon: CreditCardIcon
 	},
 	{
-		label: 'Занимает',
+		label: 'Работает',
 		data: workspace.user_worker ? formatFullName(workspace.user_worker) : 'Никто',
-		icon: User
+		icon: UserIcon
 	},
 	{
 		label: 'Пользователей',
@@ -48,9 +48,9 @@ export const getWorkspaceItemData = (workspace: Workspace) => [
 		icon: Building2Icon
 	},
 	{
-		label: 'Занимает',
+		label: 'Работает',
 		data: workspace.user_worker ? formatFullName(workspace.user_worker) : 'Никто',
-		icon: User
+		icon: UserIcon
 	},
 	{
 		label: 'Метод платы',

@@ -51,7 +51,7 @@ export const WorkspaceDetails = observer<WorkspaceDetailsProps>(({ id }) => {
 	return (
 		<div className='space-y-4'>
 			<TitleUi text='Информация' />
-			<div className='flex gap-4'>
+			<div className='flex md:flex-row flex-col gap-4'>
 				<WorkSpaceCard workspace={workspace} />
 				<CreateTransactionForm workspaceId={workspace.id} />
 			</div>
