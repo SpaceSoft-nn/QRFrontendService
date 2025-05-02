@@ -13,6 +13,7 @@ import {
 import { SelectItem } from '@/shared/ui/Forms'
 import { cn, commandFilter } from '@/shared/lib'
 import { Button, buttonVariants } from '../button'
+import { Image } from '../ImageUi'
 import { Popover, PopoverContent, PopoverTrigger } from '../popover'
 import { Skeleton } from '../skeleton'
 
@@ -24,11 +25,12 @@ export interface CommandUiProps
 	items: SelectItem[]
 	disabled?: boolean
 	loading?: boolean
-	placeholder: string
+	placeholder?: string
 	emptyMessage?: string
 	fetchError?: string | null
 	trigger?: JSX.Element
 	triggerClassName?: string
+	triggerBtnClassName?: string
 	actions?: JSX.Element
 	align?: PopoverContentProps['align']
 	onValueChange?: (value: string, label: string) => void
@@ -61,6 +63,7 @@ export const CommandUi = ({
 	actions,
 	align = 'end',
 	triggerClassName,
+	triggerBtnClassName,
 	...props
 }: CommandUiProps) => {
 	const [open, setOpen] = useState(false)
@@ -89,6 +92,7 @@ export const CommandUi = ({
 			>
 				<div className='flex items-center gap-3'>
 					{item.icon && <item.icon />}
+					{item.iconUrl && <Image src={item.iconUrl} className='rounded-lg aspect-square size-6' />}
 					<div className='flex flex-col'>
 						<span className='text-sm'>{item.label}</span>
 						<span className='text-sm text-muted-foreground'>{item.description}</span>
@@ -122,6 +126,24 @@ export const CommandUi = ({
 		)
 	}
 
+	const CommandValue = () => {
+		const currentValue = items.find(item => item.value === value)
+
+		if (!currentValue || !value) return placeholder
+
+		return (
+			<div className='flex items-center gap-3'>
+				{currentValue?.icon && <currentValue.icon />}
+				{currentValue?.iconUrl && (
+					<Image src={currentValue?.iconUrl} className='rounded-lg aspect-square size-6' />
+				)}
+				<div className='flex flex-col'>
+					<span className='text-sm'>{currentValue?.label}</span>
+				</div>
+			</div>
+		)
+	}
+
 	return (
 		<Popover open={open} onOpenChange={handleOpenChange}>
 			<PopoverTrigger asChild className={triggerClassName}>
@@ -129,18 +151,19 @@ export const CommandUi = ({
 					trigger
 				) : (
 					<Button
-						variant={variant}
-						size={size}
 						iconDir='right'
-						icon={ChevronsUpDown}
-						disabled={disabled}
+						type='button'
 						role='combobox'
 						aria-controls='command-list'
-						aria-expanded={open}
 						aria-haspopup='dialog'
-						type='button'
+						variant={variant}
+						size={size}
+						icon={ChevronsUpDown}
+						disabled={disabled}
+						className={triggerBtnClassName}
+						aria-expanded={open}
 					>
-						{value ? items.find(item => item.value === value)?.label : placeholder}
+						<CommandValue />
 					</Button>
 				)}
 			</PopoverTrigger>

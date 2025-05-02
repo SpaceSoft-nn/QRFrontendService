@@ -10,6 +10,7 @@ export type SelectItem = {
 	value: string
 	label: string
 	icon?: React.ElementType
+	iconUrl?: string
 	description?: string | null
 	disabled?: boolean
 }
