@@ -1,4 +1,5 @@
-import { apolloClient } from '@/shared/api'
+// workspace.api.ts
+import { BaseApi } from '@/shared/api/base-api'
 import {
 	AddPaymentWorkspaceInput,
 	AddUserWorkspaceInput,
@@ -18,72 +19,72 @@ import {
 	SET_WORK_USER_WORKSPACE_MUTATION
 } from './gql'
 
-export const workspaceApi = {
-	getWorkspaces: async (count: number, page?: number) => {
-		const { data } = await apolloClient.query<Pick<Query, 'workspaces'>>({
+class WorkspaceApi extends BaseApi {
+	async getWorkspaces(count: number, page?: number) {
+		const data = await this.query<Pick<Query, 'workspaces'>>({
 			query: GET_WORKSPACES_QUERY,
 			variables: { page, count }
 		})
 
 		return data?.workspaces
-	},
+	}
 
-	getWorkspace: async (id: string) => {
-		const { data } = await apolloClient.query<Pick<Query, 'workspace'>>({
+	async getWorkspace(id: string) {
+		const data = await this.query<Pick<Query, 'workspace'>>({
 			query: GET_WORKSPACE_QUERY,
 			variables: { id }
 		})
 
 		return data?.workspace
-	},
+	}
 
-	getWorkspaceMembers: async (workspaceId: string) => {
-		const { data } = await apolloClient.query<Pick<Query, 'workspace'>>({
+	async getWorkspaceMembers(workspaceId: string) {
+		const data = await this.query<Pick<Query, 'workspace'>>({
 			query: GET_WORKSPACE_MEMBERS_QUERY,
 			variables: { workspaceId }
 		})
 
 		return data?.workspace?.users as User[] | null
-	},
+	}
 
-	createWorkspace: async (input: WorkspaceCreateInput) => {
-		const { data } = await apolloClient.mutate<Pick<Mutation, 'createWorkspace'>>({
+	async createWorkspace(input: WorkspaceCreateInput) {
+		const data = await this.mutate<Pick<Mutation, 'createWorkspace'>>({
 			mutation: CREATE_WORKSPACE_MUTATION,
 			variables: { input }
 		})
 
 		return data?.createWorkspace
-	},
+	}
 
-	addUserToWorkspace: async (input: AddUserWorkspaceInput) => {
-		const { data } = await apolloClient.mutate<Pick<Mutation, 'addUserWorkspace'>>({
+	async addUserToWorkspace(input: AddUserWorkspaceInput) {
+		const data = await this.mutate<Pick<Mutation, 'addUserWorkspace'>>({
 			mutation: ADD_USER_TO_WORKSPACE_MUTATION,
 			variables: { input }
 		})
 
 		return data?.addUserWorkspace
-	},
+	}
 
-	setWorkerInWorkspace: async (input: AddUserWorkspaceInput) => {
-		const { data } = await apolloClient.mutate<Pick<Mutation, 'setWorkUserWorkspace'>>({
+	async setWorkerInWorkspace(input: AddUserWorkspaceInput) {
+		const data = await this.mutate<Pick<Mutation, 'setWorkUserWorkspace'>>({
 			mutation: SET_WORK_USER_WORKSPACE_MUTATION,
 			variables: { input }
 		})
 
 		return data?.setWorkUserWorkspace
-	},
+	}
 
-	removeUserFromWorkspace: async (input: AddUserWorkspaceInput) => {
-		const { data } = await apolloClient.mutate<Pick<Mutation, 'deleteUserWorkspace'>>({
+	async removeUserFromWorkspace(input: AddUserWorkspaceInput) {
+		const data = await this.mutate<Pick<Mutation, 'deleteUserWorkspace'>>({
 			mutation: REMOVE_USER_FROM_WORKSPACE_MUTATION,
 			variables: { input }
 		})
 
 		return data?.deleteUserWorkspace
-	},
+	}
 
-	addPaymentMethodToWorkspace: async (input: AddPaymentWorkspaceInput) => {
-		const { data } = await apolloClient.mutate<Pick<Mutation, 'addPaymentWorkspace'>>({
+	async addPaymentMethodToWorkspace(input: AddPaymentWorkspaceInput) {
+		const data = await this.mutate<Pick<Mutation, 'addPaymentWorkspace'>>({
 			mutation: ADD_PAYMENT_METHOD_TO_WORKSPACE_MUTATION,
 			variables: { input }
 		})
@@ -91,3 +92,5 @@ export const workspaceApi = {
 		return data?.addPaymentWorkspace
 	}
 }
+
+export const workspaceApi = new WorkspaceApi()

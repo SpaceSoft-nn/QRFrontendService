@@ -6,10 +6,10 @@ import {
 	NotFoundPage,
 	OrganizationsPage,
 	ProfilePage,
+	WorkSpacePage,
 	WorkSpacesPage
 } from '@/pages'
 import { LoginForm, RegisterForm } from '@/features/auth'
-import { WorkspaceDetails } from '@/features/workspace'
 import { AuthLayout, DashboardLayout } from './layouts'
 import { ProtectedRoute } from './protected-route'
 import { urls } from '@/shared/config'
@@ -70,7 +70,7 @@ export const AppRouter = createBrowserRouter([
 					},
 					{
 						path: ':workspaceId',
-						element: <WorkspaceDetails />
+						element: <WorkSpacePage />
 					}
 				]
 			},

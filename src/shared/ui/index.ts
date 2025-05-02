@@ -10,6 +10,7 @@ export { CommandUi } from './CommandUi/CommandUi'
 export { NotFound } from './NotFound/NotFound'
 export { SecretField } from './SecretField/SecretField'
 export { SkeletonListUi } from './SkeletonListUi/SkeletonListUi'
+export { DateTimeUi } from './DateTimeUi/DateTimeUi'
 
 export * from './ImageUi'
 export * from './accordion'

@@ -1,5 +1,6 @@
 import { useEffect } from 'react'
 import { UserPlusIcon } from 'lucide-react'
+import { toJS } from 'mobx'
 import { observer } from 'mobx-react-lite'
 import { OrganizationMemberSelector } from '@/features/organization'
 import { userStore } from '@/entities/user'
@@ -8,7 +9,7 @@ import { Button } from '@/shared/ui'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/shared/ui/card'
 import { DataTable } from '@/shared/ui/data-table'
 import { UserRoleEnum } from '@/shared/api/graphql'
-import { worksSpaceMembersColumns } from './members-list.columns'
+import { worksSpaceMembersColumns } from './WorkspaceMembersList.columns'
 
 interface WorkspaceMembersListProps {
 	workspaceId: string
@@ -22,7 +23,7 @@ export const WorkSpaceMembersList = observer(({ workspaceId }: WorkspaceMembersL
 		workspaceStore.getWorkspaceMembers(workspaceId)
 	}, [workspaceId])
 
-	const handleAddUser = async (userId: string) => {
+	const addUserToWorkspaceAction = async (userId: string) => {
 		await workspaceStore.addUserToWorkspace({
 			user_id: userId,
 			workspace_id: workspaceId
@@ -43,13 +44,16 @@ export const WorkSpaceMembersList = observer(({ workspaceId }: WorkspaceMembersL
 							Добавить
 						</Button>
 					}
-					onValueChange={handleAddUser}
+					onValueChange={userId => addUserToWorkspaceAction(userId)}
 				/>
 			</div>
 			<CardContent>
 				<DataTable
-					columns={worksSpaceMembersColumns(workspaceId, user?.role === UserRoleEnum.Cassier)}
-					data={workspaceMembers}
+					columns={worksSpaceMembersColumns(
+						workspaceId,
+						user?.role === UserRoleEnum.Cassier || workspaceMembers.length <= 1
+					)}
+					data={toJS(workspaceMembers)}
 					loading={loading}
 					error={error}
 				/>

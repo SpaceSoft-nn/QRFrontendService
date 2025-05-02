@@ -1,1 +1,1 @@
-export * from './list/workspace-members-list'
+export * from './list/WorkspaceMembersList'

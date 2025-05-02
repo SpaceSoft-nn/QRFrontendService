@@ -1,11 +1,15 @@
 import { useEffect } from 'react'
-import { useParams } from 'react-router-dom'
 import { observer } from 'mobx-react-lite'
 import { useBreadcrumbs } from '@/features/breadcrumbs'
+import { CreateTransactionForm } from '@/features/transaction'
 import { WorkSpaceCard, WorkSpaceMembersList } from '@/features/workspace'
 import { workspaceStore } from '@/entities/workspace'
-import { NotFound, Skeleton } from '@/shared/ui'
+import { NotFound, Skeleton, TitleUi } from '@/shared/ui'
 import { urls } from '@/shared/config'
+
+interface WorkspaceDetailsProps {
+	id: string | undefined
+}
 
 const WorkspaceDetailsSkeleton = () => (
 	<div className='space-y-4'>
@@ -23,7 +27,7 @@ const useWorkspaceDetails = (workspaceId: string | undefined) => {
 		getWorkspace(workspaceId)
 	}, [workspaceId])
 
-	const workspace = workspaces.find(w => w.id === workspaceId)
+	const workspace = workspaces.find(workspace => workspace.id === workspaceId)
 
 	useEffect(() => {
 		if (workspace && workspaceId) {
@@ -38,16 +42,19 @@ const useWorkspaceDetails = (workspaceId: string | undefined) => {
 	}
 }
 
-export const WorkspaceDetails = observer(() => {
-	const params = useParams()
-	const { workspace, isLoading, isNotFound } = useWorkspaceDetails(params.workspaceId)
+export const WorkspaceDetails = observer<WorkspaceDetailsProps>(({ id }) => {
+	const { workspace, isLoading, isNotFound } = useWorkspaceDetails(id)
 
 	if (isLoading) return <WorkspaceDetailsSkeleton />
 	if (isNotFound || !workspace) return <NotFound title='Рабочее место не найдено' />
 
 	return (
 		<div className='space-y-4'>
-			<WorkSpaceCard workspace={workspace} />
+			<TitleUi text='Информация' />
+			<div className='flex gap-4'>
+				<WorkSpaceCard workspace={workspace} />
+				<CreateTransactionForm workspaceId={workspace.id} />
+			</div>
 			<WorkSpaceMembersList workspaceId={workspace.id} />
 		</div>
 	)

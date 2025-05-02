@@ -3,11 +3,11 @@ import { Link } from 'react-router-dom'
 import { ExternalLinkIcon } from 'lucide-react'
 import { cn } from '@/shared/lib/utils'
 
-const dataItemVariants = cva('w-full flex items-center text-sm', {
+const dataItemVariants = cva('w-full flex text-sm', {
 	variants: {
 		orientation: {
 			vertical: 'flex-col gap-[1px]',
-			horizontal: 'flex-row gap-2 justify-between'
+			horizontal: 'flex-row gap-2 justify-between items-center'
 		}
 	},
 	defaultVariants: {
@@ -15,7 +15,7 @@ const dataItemVariants = cva('w-full flex items-center text-sm', {
 	}
 })
 
-interface DataItemProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof dataItemVariants> {
+interface DataItemType extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof dataItemVariants> {
 	icon?: React.ElementType
 	link?: string
 	hide?: boolean
@@ -34,7 +34,7 @@ export const DataItem = ({
 	link,
 	dataClassName,
 	...props
-}: DataItemProps) => {
+}: DataItemType) => {
 	if (hide) return null
 
 	return (
@@ -58,7 +58,7 @@ export const DataItem = ({
 }
 
 interface DataGroupProps extends React.HTMLAttributes<HTMLDivElement>, VariantProps<typeof dataItemVariants> {
-	data: DataItemProps[]
+	data: DataItemType[]
 }
 
 export const DataGroup = ({ data, orientation, className, ...props }: DataGroupProps) => {
