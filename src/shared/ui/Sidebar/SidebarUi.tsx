@@ -232,7 +232,7 @@ const SidebarTrigger = React.forwardRef<React.ElementRef<typeof Button>, React.C
 				data-sidebar='trigger'
 				variant='ghost'
 				size='icon'
-				icon={state === 'expanded' ? PanelLeftOpen : PanelLeftClose}
+				icon={state === 'expanded' ? PanelLeftClose : PanelLeftOpen}
 				className={cn(className)}
 				onClick={event => {
 					onClick?.(event)

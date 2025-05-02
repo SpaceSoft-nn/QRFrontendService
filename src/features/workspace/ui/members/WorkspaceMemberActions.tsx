@@ -10,31 +10,31 @@ import {
 	DropdownMenuLabel,
 	DropdownMenuTrigger
 } from '@/shared/ui'
-import { UserRoleEnum } from '@/shared/api/graphql'
+import { User, UserRoleEnum } from '@/shared/api/graphql'
 
 interface MemberActionsProps {
-	userId: string
+	member: User
 	workspaceId: string
 }
 
-export const MemberActions = observer(({ userId, workspaceId }: MemberActionsProps) => {
+export const WorkspaceMemberActions = observer(({ member, workspaceId }: MemberActionsProps) => {
 	const { user } = userStore
 
 	const removeUserFromWorkspace = async () => {
 		await workspaceStore.removeUserFromWorkspace({
-			user_id: userId,
+			user_id: member.id,
 			workspace_id: workspaceId
 		})
 	}
 
 	const addWorkerToWorkspace = async () => {
 		await workspaceStore.addWorkerToWorkspace({
-			user_id: userId,
+			user_id: member.id,
 			workspace_id: workspaceId
 		})
 	}
 
-	if (user?.role === UserRoleEnum.Cassier) return null
+	if (user?.role === UserRoleEnum.Cassier || member.role === UserRoleEnum.Admin) return null
 
 	return (
 		<DropdownMenu>
@@ -42,7 +42,6 @@ export const MemberActions = observer(({ userId, workspaceId }: MemberActionsPro
 				<Button variant='ghost' size='icon' icon={EllipsisIcon} />
 			</DropdownMenuTrigger>
 			<DropdownMenuContent align='end'>
-				<DropdownMenuLabel>Действия</DropdownMenuLabel>
 				<DropdownMenuItem asChild>
 					<Button
 						variant='ghost'

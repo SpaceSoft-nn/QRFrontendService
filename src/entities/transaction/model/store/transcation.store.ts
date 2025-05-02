@@ -1,5 +1,5 @@
 import { makeAutoObservable, runInAction } from 'mobx'
-import { CreateTransactionInput, Transaction } from '@/shared/api/graphql'
+import { CreateTransactionInput, QrTypeEnum, Transaction } from '@/shared/api/graphql'
 import { toast } from '@/shared/lib'
 import { transactionApi } from '../../api/transaction.api'
 
@@ -18,7 +18,10 @@ class TransactionStore {
 			this.loading = true
 			this.error = null
 
-			const response = await transactionApi.createTransaction(input)
+			const response = await transactionApi.createTransaction({
+				...input,
+				qr_type: QrTypeEnum.Static
+			})
 
 			runInAction(() => {
 				if (response) {

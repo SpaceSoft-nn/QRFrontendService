@@ -3,10 +3,10 @@
 }
 
 .formField__input {
-	@apply border text-base overflow-hidden;
+	@apply border text-base overflow-hidden ;
 
 	&__btnTrigger {
-		@apply w-full px-3 font-normal text-base;
+		@apply w-full px-3 font-normal justify-between text-base;
 	}
 
 	&__error {

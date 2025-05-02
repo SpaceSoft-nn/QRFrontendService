@@ -8,8 +8,8 @@ interface UserRoleBadgeProps {
 }
 
 const roleBadgeColors: Record<UserRoleEnum, string> = {
-	[UserRoleEnum.Cassier]: 'bg-blue-500',
-	[UserRoleEnum.Manager]: 'bg-green-500',
+	[UserRoleEnum.Cassier]: 'bg-red-900',
+	[UserRoleEnum.Manager]: 'bg-red-700',
 	[UserRoleEnum.Admin]: 'bg-red-500'
 }
 

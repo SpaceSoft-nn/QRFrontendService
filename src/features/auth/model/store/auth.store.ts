@@ -4,8 +4,7 @@ import { organizationStore } from '@/entities/organization'
 import { userStore } from '@/entities/user'
 import { workspaceStore } from '@/entities/workspace'
 import { UserLoginInput, UserRegistration } from '@/shared/api/graphql'
-import { toast } from '@/shared/lib'
-import { urls } from '@/shared/config'
+import { capitalizeFullName, toast } from '@/shared/lib'
 
 class AuthStore {
 	token: string | null = null
@@ -75,7 +74,10 @@ class AuthStore {
 		this.error = null
 
 		try {
-			const token = await authApi.register(input)
+			const token = await authApi.register({
+				...input,
+				...capitalizeFullName(input)
+			})
 
 			if (token) {
 				this.setAccessToken(token)

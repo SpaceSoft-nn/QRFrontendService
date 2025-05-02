@@ -3,7 +3,7 @@ import { UserRoleBadge } from '@/features/user'
 import { formatFullName } from '@/entities/user'
 import { CopyableUi } from '@/shared/ui'
 import { User } from '@/shared/api/graphql'
-import { MemberActions } from '../member-actions'
+import { WorkspaceMemberActions } from '../WorkspaceMemberActions'
 
 const memberContacts = (user: User) => {
 	return (
@@ -42,10 +42,9 @@ export const worksSpaceMembersColumns = (workspaceId: string, disableActions: bo
 					id: 'actions',
 					header: () => <div className='text-right'>Действия</div>,
 					cell: ({ row }: { row: { original: User } }) => {
-						const userId = row.original.id
 						return (
 							<div className='flex justify-end'>
-								<MemberActions userId={userId} workspaceId={workspaceId} />
+								<WorkspaceMemberActions member={row.original} workspaceId={workspaceId} />
 							</div>
 						)
 					}

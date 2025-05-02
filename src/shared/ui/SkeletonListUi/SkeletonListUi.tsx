@@ -7,5 +7,5 @@ interface SkeletonListUiProps {
 }
 
 export const SkeletonListUi = ({ length, className }: SkeletonListUiProps) => {
-	return Array.from({ length }).map((_, index) => <Skeleton key={index} className={cn('h-56 w-full', className)} />)
+	return Array.from({ length }).map((_, index) => <Skeleton key={index} className={cn('h-52 w-full', className)} />)
 }

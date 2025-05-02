@@ -27,7 +27,6 @@ const AdditionalTransactionFields = () => {
 
 export const CreateTransactionForm = observer<CreateTransactionFormProps>(({ workspaceId }) => {
 	const [showAdditionalFields, setShowAdditionalFields] = useState(false)
-	const [showQrCode, setShowQrCode] = useState(false)
 	const { lastTransaction, loading } = transactionStore
 
 	const form = useForm<CreateTransactionInput>({
@@ -39,10 +38,9 @@ export const CreateTransactionForm = observer<CreateTransactionFormProps>(({ wor
 
 	const onSubmit = async (data: CreateTransactionInput) => {
 		await transactionStore.createTransaction(data)
-		setShowQrCode(true)
 	}
 
-	if (showQrCode) {
+	if (lastTransaction) {
 		return <QrCodePayment transaction={lastTransaction} />
 	}
 
@@ -53,7 +51,6 @@ export const CreateTransactionForm = observer<CreateTransactionFormProps>(({ wor
 				<CardDescription>Создание транзакции</CardDescription>
 			</CardHeader>
 			<CardContent>
-				{lastTransaction?.status === 'pending' && <TextGenerateEffect text='У вас уже есть ожидающая оплата' />}
 				<Form ctx={form} onSubmit={onSubmit} className='space-y-4'>
 					<FormInput
 						name='amount'

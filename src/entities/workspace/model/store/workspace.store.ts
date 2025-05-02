@@ -9,12 +9,12 @@ import {
 	WorkspaceCreateInput
 } from '@/shared/api/graphql'
 import { toast } from '@/shared/lib'
-import { formatDateTime } from '@/shared/lib/utils'
 import { workspaceApi } from '../../api/workspace.api'
 
 class WorkspaceStore {
 	workspaces: Workspace[] = []
 	workspaceMembers: User[] = []
+	workspaceMaxMembers: number = 10
 	pagination: PaginatorInfo = {
 		limit: 6,
 		total: 0,
@@ -42,16 +42,11 @@ class WorkspaceStore {
 
 			runInAction(() => {
 				if (response) {
-					const formattedWorkspace = {
-						...response,
-						created_at: formatDateTime(response.created_at)
-					}
-
 					const existingIndex = this.workspaces.findIndex(workspace => workspace.id === id)
 					if (existingIndex !== -1) {
-						this.workspaces[existingIndex] = formattedWorkspace
+						this.workspaces[existingIndex] = response
 					} else {
-						this.workspaces.push(formattedWorkspace)
+						this.workspaces.push(response)
 					}
 				}
 			})
@@ -80,10 +75,7 @@ class WorkspaceStore {
 			runInAction(() => {
 				// типизация говна
 				if (response.data) {
-					this.workspaces = response.data.map(workspace => ({
-						...workspace,
-						created_at: formatDateTime(workspace!.created_at)
-					})) as Workspace[]
+					this.workspaces = response.data as Workspace[]
 				}
 				this.pagination = response.paginatorInfo
 			})
@@ -140,10 +132,7 @@ class WorkspaceStore {
 
 			runInAction(() => {
 				if (response) {
-					this.workspaces.push({
-						...response,
-						created_at: formatDateTime(response.created_at)
-					})
+					this.workspaces.push(response)
 					this.pagination.total++
 				}
 			})
@@ -174,6 +163,17 @@ class WorkspaceStore {
 			runInAction(() => {
 				if (response) {
 					this.workspaceMembers.push(response)
+
+					this.workspaces = this.workspaces.map(workspace => {
+						if (workspace.id === input.workspace_id) {
+							return {
+								...workspace,
+								users: workspace.users ? [...workspace.users, response] : [response]
+							}
+						}
+						return workspace
+					})
+
 					toast({
 						title: 'Успешно',
 						description: 'Пользователь добавлен в АРМ'
@@ -254,15 +254,26 @@ class WorkspaceStore {
 
 			const response = await workspaceApi.removeUserFromWorkspace(input)
 
-			if (response) {
-				runInAction(() => {
+			runInAction(() => {
+				if (response) {
+					this.workspaceMembers = this.workspaceMembers.filter(member => member.id !== input.user_id)
+
+					this.workspaces = this.workspaces.map(workspace => {
+						if (workspace.id === input.workspace_id && workspace.users) {
+							return {
+								...workspace,
+								users: workspace.users.filter(user => (user?.id as string) !== input.user_id)
+							}
+						}
+						return workspace
+					})
+
 					toast({
 						title: 'Успешно',
 						description: 'Пользователь успешно удален из АРМа'
 					})
-				})
-				await this.getWorkspaceMembers(input.workspace_id)
-			}
+				}
+			})
 
 			return true
 		} catch (error) {
@@ -289,26 +300,26 @@ class WorkspaceStore {
 
 			const response = await workspaceApi.addPaymentMethodToWorkspace(input)
 
-			if (response) {
-				runInAction(() => {
+			runInAction(() => {
+				if (response) {
 					this.workspaces = this.workspaces.map(workspace =>
-						workspace.id === input.workspace_id
-							? {
-									...response,
-									created_at: formatDateTime(response.created_at)
-								}
-							: workspace
+						workspace.id === input.workspace_id ? response : workspace
 					)
-				})
-			}
+					toast({
+						title: 'Успешно',
+						description: 'Метод оплаты успешно добавлен в АРМ'
+					})
+				}
+			})
 		} catch (error) {
 			console.error('[addPaymentMethodToWorkspace] error: ', error)
 			runInAction(() => {
+				this.error =
+					error instanceof Error ? error.message : 'Произошла ошибка при добавлении метода оплаты в АРМ'
 				toast({
-					title: 'Ошибка при добавлении метода оплаты в АРМ',
+					title: 'Ошибка',
 					variant: 'destructive',
-					description:
-						error instanceof Error ? error.message : 'Произошла ошибка при добавлении метода оплаты в АРМ'
+					description: this.error
 				})
 			})
 		}

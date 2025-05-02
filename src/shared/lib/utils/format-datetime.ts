@@ -2,7 +2,7 @@ import { format } from 'date-fns'
 import { ru } from 'date-fns/locale'
 
 export const formatDateTime = (date: string) => {
-	return format(new Date(date), 'dd MMMM в HH:mm', { locale: ru })
+	return format(new Date(date), 'd MMMM HH:mm', { locale: ru })
 }
 
 /**

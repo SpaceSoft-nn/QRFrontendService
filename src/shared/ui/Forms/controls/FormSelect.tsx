@@ -1,6 +1,7 @@
 import { Controller } from 'react-hook-form'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui/select'
 import { cn } from '@/shared/lib'
+import { Image } from '../../ImageUi'
 import { BaseFormField } from '../BaseFormField'
 import { useFormField } from '../hooks/useFormField'
 import s from '../styles/Forms.module.scss'
@@ -43,6 +44,13 @@ export const FormSelect: React.FC<FormSelectProps> = ({
 										<SelectItem key={item.value} value={item.value}>
 											<div className='flex items-center gap-3'>
 												{item.icon && <item.icon />}
+												{item.iconUrl && (
+													<Image
+														src={item.iconUrl}
+														className='rounded-full aspect-square'
+														fallbackText='?'
+													/>
+												)}
 												<div className='flex flex-col'>
 													<span className='text-sm font-medium'>{item.label}</span>
 													<span className='text-sm text-muted-foreground'>
@@ -66,6 +74,13 @@ export const FormSelect: React.FC<FormSelectProps> = ({
 									<SelectItem key={item.value} value={item.value}>
 										<div className='flex items-center gap-3'>
 											{item.icon && <item.icon />}
+											{item.iconUrl && (
+												<Image
+													src={item.iconUrl}
+													className='rounded-full aspect-square'
+													fallbackText='?'
+												/>
+											)}
 											<div className='flex flex-col'>
 												<span className='text-sm font-medium'>{item.label}</span>
 												<span className='text-sm text-muted-foreground'>

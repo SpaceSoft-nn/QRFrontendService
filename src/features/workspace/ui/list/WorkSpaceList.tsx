@@ -39,7 +39,7 @@ export const WorkSpaceList = observer(() => {
 	}, [])
 
 	const renderList = () => {
-		if (loading) return <SkeletonListUi length={6} />
+		if (loading) return <SkeletonListUi length={9} />
 		if (error) return <WorkSpaceListError error={error} />
 		if (workspaces.length === 0) return <WorkSpaceListEmpty />
 
