@@ -73,13 +73,9 @@ export const NavUser: React.FC = observer(() => {
 								<UserCircleIcon className='mr-2 size-4' />
 								Профиль
 							</DropdownMenuItem>
-							<DropdownMenuItem>
-								<BellIcon className='mr-2 size-4' />
-								Уведомления
-							</DropdownMenuItem>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
-						<DropdownMenuItem onClick={handleLogout}>
+						<DropdownMenuItem onClick={handleLogout} className='text-destructive !hover:bg-destructive/10'>
 							<LogOutIcon className='mr-2 size-4' />
 							Выйти
 						</DropdownMenuItem>
